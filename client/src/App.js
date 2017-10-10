@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import LectureMedia from "./app/components/LectureMedia/LectureMedia";
 import logo from './logo.svg';
 import './App.css';
 
@@ -17,14 +18,22 @@ class App extends Component {
   }
 
   render() {
+    const course = this.props.course;
     return (
-      <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <h1 className="App-title">Welcome to React</h1>
-        </header>
-        <h1>Users</h1>
-        {this.state.data}
+      <div className="lecture">
+        <div className="lecture-header">
+          <h1>
+            {this.props.course.name}
+          </h1>
+        </div>
+        <div className="lecture-body">
+          <LectureMedia
+            lecture = {this.props.lecture}
+            media = {this.props.media}
+            semester = {course.semester}
+            courseId = {course.id}
+          />
+        </div>
       </div>
     );
   }
