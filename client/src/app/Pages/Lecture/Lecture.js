@@ -3,14 +3,8 @@ import LectureMedia from "../../components/LectureMedia/LectureMedia";
 
 class Lecture extends React.Component {
 
-	componentDidMount() {
-		if(this.props.course) {
-			this.props.initLectureData();
-		}
-	}
-
 	render() {
-		const course = this.props.course;
+		const course = this.props.context_title;
 		if(!course) {
 			return (<div></div>);
 		}
@@ -18,21 +12,18 @@ class Lecture extends React.Component {
 			<div className="lecture">
 				<div className="lecture-header">
 					<h1>
-						{this.props.course.name}
+						{this.props.context_title}
 					</h1>
-					<h3>
-						{lectureNameToDateString(this.props.lecture.id)}
-					</h3>
 				</div>
 				<div className="lecture-body">
 					<LectureMedia
 						lecture = {this.props.lecture}
-						media = {this.props.media}
-						semester = {course.semester}
-						courseId = {course.id}
+						courseId = {course.lis_course_section_sourcedid}
 					/>
 				</div>
 			</div>
 		);
 	}
 }
+
+export default Lecture;
