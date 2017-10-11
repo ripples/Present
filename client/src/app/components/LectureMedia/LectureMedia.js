@@ -18,7 +18,7 @@ class LectureMedia extends React.Component {
         <div className="container">
           <div className="video-wrapper">
             <VideoView
-              videoSrc={`${BASE_URL}/media/${courseId}/${lecture.id}/video`}
+              videoSrc={`${BASE_URL}/media/${courseId}/${lecture}/video`}
             />
           </div>
         </div>

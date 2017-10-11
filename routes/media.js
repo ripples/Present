@@ -15,7 +15,7 @@ function sendRedirectResponse(mediaPath, contentType, res) {
 
 function getLectureInfoOrReturn401(req, res) {
   const info = {
-    courseId: req.params.courseId,
+    courseId: req.params.lis_course_section_sourcedid,
     lectureName: req.params.lectureName,
   };
 
@@ -30,15 +30,8 @@ function getLectureInfoOrReturn401(req, res) {
  */
 router.get("/:courseId/:lectureName/video", (req, res, next) => {
   const info = getLectureInfoOrReturn401(req, res);
-  const videoPath = path.join(MEDIA_PATH, info.course.id, info.lectureName, "videoLarge.mp4");
+  const videoPath = path.join(MEDIA_PATH, info.lis_course_section_sourcedid, info.lectureName, "videoLarge.mp4");
   sendRedirectResponse(videoPath, "video/mp4", res);
-});
-
-router.get("/:courseId/:lectureName/images", (req, res, next) => {
-  const info = getLectureInfoOrReturn401(req, res);
-  mediaApi.getLectureData(info.course.id, info.lectureName)
-    .then(data => res.send(data))
-    .catch(next);
 });
 
 module.exports = router;
