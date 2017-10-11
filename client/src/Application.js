@@ -1,10 +1,17 @@
 import React, { Component } from 'react';
 import logo from './logo.svg';
 import './App.css';
+import Lecture from './app/Pages/Lecture/Lecture';
 
 export default class Application extends Component {
 
-  state = {data: "yo"}
+  constructor(props) {
+    super(props);
+    this.state = {
+      data: "yo",
+      stuff: {}
+    };
+  }
 
   componentDidMount() {
     fetch('/data')
@@ -12,7 +19,7 @@ export default class Application extends Component {
       .then(data => 
         {
           console.log(data);
-          this.setState(data);
+          this.setState({stuff: data});
         });
   }
 
@@ -28,6 +35,7 @@ export default class Application extends Component {
         {
             this.props.children
         }
+        <Lecture data={this.state.stuff} />
       </div>
     );
   }

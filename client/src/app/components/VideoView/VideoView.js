@@ -26,12 +26,6 @@ class VideoView extends React.Component {
     }
   }
 
-  componentWillReceiveProps(nextProps) {
-    if (nextProps.newVideoTime !== this.props.newVideoTime) {
-      this.player.currentTime(nextProps.newVideoTime);
-    }
-  }
-
   render() {
     return (
       <div>

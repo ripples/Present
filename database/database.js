@@ -1,5 +1,4 @@
 var database = {
-	data: {
 		context_id:"2",
 		context_label:"Ripples",
 		context_title:"Ripples-Test",
@@ -16,7 +15,6 @@ var database = {
 		lis_person_name_full:"Admin User",
 		lis_person_name_given:"Admin",
 		lis_person_sourcedid:"",
-		lis_result_sourcedid:"{"data": {"instanceid":"3","userid":"2","typeid":"3","launchid":1520943053},"hash":"87fd45241bbac57adea653711fb7b6728655b4fdf24e2708e4b3ff83fd67e07c"}",
 		lti_message_type:"basic-lti-launch-request",
 		lti_version:"LTI-1p0",
 		oauth_callback:"about:blank",
@@ -30,7 +28,6 @@ var database = {
 		tool_consumer_instance_guid:"localhost",
 		tool_consumer_instance_name:"Moodle",
 		user_id:"2"
-	}
 }
 
 exports.getDB = function (){

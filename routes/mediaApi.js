@@ -4,7 +4,7 @@ const fetch = require("node-fetch");
 const co = require("co");
 
 function request(route) {
-  const requestUrl = encodeURI(`http://lv-media:5000/${route}`);
+  const requestUrl = encodeURI(`http://localhost:3000/666/09-02-2016--12-59-01/videoLarge.mp4`);
   return co(function* () {
     const response = yield fetch(requestUrl, "GET", {
       "Content-Type": "application/json"

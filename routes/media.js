@@ -19,15 +19,12 @@ function getLectureInfoOrReturn401(req, res) {
     lectureName: req.params.lectureName,
   };
 
-  if (!info.course) {
+  if (!info.courseId) {
     res.sendStatus(401);
   }
   return info;
 }
 
-/**
- *  Serves authenticated video data via lv-proxy
- */
 router.get("/:courseId/:lectureName/video", (req, res, next) => {
   const info = getLectureInfoOrReturn401(req, res);
   const videoPath = path.join(MEDIA_PATH, info.lis_course_section_sourcedid, info.lectureName, "videoLarge.mp4");

@@ -7,19 +7,14 @@ class LectureMedia extends React.Component {
   }
 
   render() {
-    const lecture = this.props.lecture;
-    const courseId = this.props.lis_course_section_sourcedid;
-
-    const API_VERSION = "v1";
-    const BASE_URL = `http://${window.location.host}/api/${API_VERSION}`;
+    const courseId = this.props.courseId;
 
     return (
       <div className="lecture-media">
         <div className="container">
           <div className="video-wrapper">
             <VideoView
-              videoSrc={`${BASE_URL}/media/${courseId}/${lecture}/video`}
-            />
+              videoSrc={'./' + this.props.courseId +'/09-02-2016--12-59-01/videoLarge.mp4'}/>
           </div>
         </div>
       </div>

@@ -9,12 +9,19 @@ import LecturesList from './app/Pages/LectureList/LecturesList';
 
 
 export default class App extends Component {
+  
+  state = {data: {}}
+
+  setData(data) {
+    this.setState(data);
+  }
+
   render(){
+    //console.log("Test: " + this.state.data);
     return(
       <Router history={hashHistory}>
         <Route path="/" component={Application}>
           <IndexRoute component={LecturesList} />
-          <Route path="LectureList" component={LecturesList} />
         </Route>
       </Router>
     );
