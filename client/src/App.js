@@ -2,41 +2,26 @@ import React, { Component } from 'react';
 import LectureMedia from "./app/components/LectureMedia/LectureMedia";
 import logo from './logo.svg';
 import './App.css';
+import { IndexRoute, Router, Route, hashHistory } from 'react-router';
+import ReactDOM from 'react-dom';
+import Application from './Application.js';
+import LecturesList from './Pages/LecturesList.js';
 
-class App extends Component {
 
-  state = {data: "yo"}
-
-  componentDidMount() {
-    fetch('/data')
-      .then(res => res.json())
-      .then(data => 
-        {
-          console.log(data);
-          this.setState(data);
-        });
-  }
-
-  render() {
-    const course = this.props.course;
-    return (
-      <div className="lecture">
-        <div className="lecture-header">
-          <h1>
-            {this.props.course.name}
-          </h1>
-        </div>
-        <div className="lecture-body">
-          <LectureMedia
-            lecture = {this.props.lecture}
-            media = {this.props.media}
-            semester = {course.semester}
-            courseId = {course.id}
-          />
-        </div>
-      </div>
+export default class App extends Component {
+  render(){
+    return(
+      <Router history={hashHistory}>
+        <Route path="/" component={Application}>
+          <IndexRoute component={LecturesList} />
+          <Route path="Lecture" component={LecturesList} />
+        </Route>
+      </Router>
     );
   }
 }
 
-export default App;
+ReactDOM.render(
+  <App />,
+  document.getElementById('root')
+)
