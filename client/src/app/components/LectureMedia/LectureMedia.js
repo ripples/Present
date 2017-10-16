@@ -10,7 +10,7 @@ class LectureMedia extends React.Component {
         <div className="container">
           <div className="video-wrapper">
             <VideoView
-              videoSrc={'./' + this.props.courseId +'/09-02-2016--12-59-01/videoLarge.mp4'}/>
+              videoSrc={'./' + this.props.courseId + "/" +  this.props.lectureId + '/videoLarge.mp4'}/>
           </div>
         </div>
       </div>
