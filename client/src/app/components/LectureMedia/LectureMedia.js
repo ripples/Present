@@ -2,12 +2,8 @@ import React from "react";
 import VideoView from "../../components/VideoView/VideoView";
 
 class LectureMedia extends React.Component {
-  constructor(props) {
-    super(props);
-  }
 
   render() {
-    const courseId = this.props.courseId;
 
     return (
       <div className="lecture-media">

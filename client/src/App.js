@@ -1,11 +1,10 @@
 import React, { Component } from 'react';
-import Lecture from './app/Pages/Lecture/Lecture';
-import logo from './logo.svg';
 import './App.css';
 import { IndexRoute, Router, Route, hashHistory } from 'react-router';
 import ReactDOM from 'react-dom';
 import Application from './Application.js';
 import LecturesList from './app/Pages/LectureList/LecturesList';
+import Lecture from './app/Pages/Lecture/Lecture.js';
 
 
 export default class App extends Component {
@@ -17,11 +16,11 @@ export default class App extends Component {
   }
 
   render(){
-    //console.log("Test: " + this.state.data);
     return(
       <Router history={hashHistory}>
         <Route path="/" component={Application}>
-          <IndexRoute component={LecturesList} />
+          <IndexRoute component={() => <LecturesList courseId = "666"/>} />
+          <Route path="course/:courseId/lecture/:lectureId" component={Lecture} />
         </Route>
       </Router>
     );
