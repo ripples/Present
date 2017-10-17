@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import './App.css';
 import { IndexRoute, Router, Route, hashHistory } from 'react-router';
 import ReactDOM from 'react-dom';
 import Application from './Application.js';
@@ -9,10 +8,8 @@ import Lecture from './app/Pages/Lecture/Lecture.js';
 
 export default class App extends Component {
   
-  state = {data: {}}
-
-  setData(data) {
-    this.setState(data);
+  state = {
+    data: {}
   }
 
   render(){

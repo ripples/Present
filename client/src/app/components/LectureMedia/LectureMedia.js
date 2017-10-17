@@ -1,10 +1,9 @@
 import React from "react";
 import VideoView from "../../components/VideoView/VideoView";
 
-class LectureMedia extends React.Component {
+export default class LectureMedia extends React.Component {
 
   render() {
-
     return (
       <div className="lecture-media">
         <div className="container">
@@ -17,5 +16,3 @@ class LectureMedia extends React.Component {
     );
   }
 }
-
-export default LectureMedia;
