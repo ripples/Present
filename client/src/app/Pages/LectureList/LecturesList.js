@@ -27,9 +27,9 @@ export default class LecturesList extends Component {
             <div>
                 <h1>Lecture Dates:</h1>
                 {(typeof this.state.course !== "undefined") ?  
-                    this.state.course.children.map((course) =>{
+                    this.state.course.children.map((course, i) =>{
                         return (
-                            <div>
+                            <div key = {i}>
                                 <Link to={ "course/" + this.props.courseId + "/lecture/" + course.name }>
                                     <button type = "button">{course.name}</button>
                                 </Link>

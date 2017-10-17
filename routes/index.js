@@ -4,7 +4,9 @@ var database = require('../database/database.js');
 var dirToJson = require('dir-to-json');
 
 router.get('/data', function(req, res){
-  res.json(database.getDB());
+  var data = database.getDB();
+  database.setDB({});
+  res.json(data);
 });
 
 router.post('/data', function(req, res){
