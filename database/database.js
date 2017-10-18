@@ -8,7 +8,7 @@ var database = {
 		launch_presentation_document_target:"window",
 		launch_presentation_locale:"en",
 		launch_presentation_return_url:"http://localhost/mod/lti/return.php?course=2&launch_container=4&instanceid=3&sesskey=mgYaUv2UfZ",
-		lis_course_section_sourcedid:"666",
+		lis_course_section_sourcedid:"COMPSCI311",
 		lis_outcome_service_url:"http://localhost/mod/lti/service.php",
 		lis_person_contact_email_primary:"rsusai@umass.edu",
 		lis_person_name_family:"User",

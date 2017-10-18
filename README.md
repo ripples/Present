@@ -10,7 +10,7 @@ How To Setup
 3. clone the repository
 4. cd into the client directory and run "npm install"
 5. cd lv-client2 and run "npm install"
-6. put your lecture files in lv-client2/public
+6. put your lecture files in the folder lv-client2/lectures -You may use a symlink for this if you so choose.
 file tree should be:
 * courseId
     * lectureId

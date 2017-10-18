@@ -9,7 +9,7 @@ export default class LectureMedia extends React.Component {
         <div className="container">
           <div className="video-wrapper">
             <VideoView
-              videoSrc={'./' + this.props.courseId + "/" +  this.props.lectureId + '/videoLarge.mp4'}/>
+              videoSrc={'/' + this.props.courseId + "/" +  this.props.lectureId + '/video'}/>
           </div>
         </div>
       </div>
