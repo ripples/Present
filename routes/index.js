@@ -28,6 +28,25 @@ router.get('/listOfCourseLectures', function(req, res){
   });
 });
 
+router.get('/:courseId/:lectureName/manifest', function(req, res) {
+  const fpath = "./lectures/" + req.params.courseId.toString() + '/' + req.params.lectureName.toString() + '/INFO'
+  fs.readFile(fpath, 'utf8', function(err, contents){
+    if (err){
+      res.status(404).send('Not Found');
+    }
+    else{
+      const re = /(?:whiteboardCount: (\d))(?:\s|.*)*(?:computerCount: (\d))/
+      const found = contents.match(re)
+      const manifest = {
+        whiteboardCount: parseInt(found[1]),
+        computerCount: parseInt(found[2]),
+        input: found['input']
+      } 
+      res.json(manifest)
+    }
+  })
+})
+
 router.get('/:courseId/:lectureName/video', function(req, res) {
   const fpath = "./lectures/" + req.params.courseId.toString() + '/' + req.params.lectureName.toString() + '/videoLarge.mp4'  
   const stat = fs.statSync(fpath)
@@ -49,7 +68,8 @@ router.get('/:courseId/:lectureName/video', function(req, res) {
     }
     res.writeHead(206, head);
     file.pipe(res);
-  } else {
+  } 
+  else {
     const head = {
       'Content-Length': fileSize,
       'Content-Type': 'video/mp4',
