@@ -1,0 +1,30 @@
+input {
+  margin: auto;
+}
+
+.input_block {
+  display: block;
+  margin-bottom: 10px;
+}
+
+.dateInput {
+  display:inline-block;
+}
+
+.datelbl {
+  display:inline-block;
+  padding-right: 5px;
+}
+
+.chkbxlbl {
+  display: inline-block;
+  padding-right: 5px;
+}
+
+.exclude-button {
+  display: inline-block;
+}
+
+.repeat {
+  display:inline-block;
+}
