@@ -12,6 +12,9 @@ export default class LectureMedia extends React.Component {
               videoSrc={'/' + this.props.courseId + "/" +  this.props.lectureId + '/video'}/>
           </div>
         </div>
+        <div>
+          <img src={'/' + this.props.courseId + "/" +  this.props.lectureId + '/image/' + '0'}/> 
+        </div>
       </div>
     );
   }

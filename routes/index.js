@@ -59,4 +59,9 @@ router.get('/:courseId/:lectureName/video', function(req, res) {
   }
 });
 
+router.get('/:courseId/:lectureName/image/:time', function(res, req){
+  const path = "./lectures/" + req.params.courseId.toString() + '/' + req.params.lectureName.toString() + '/image.jpg'  
+  res.sendFile(path.resolve(path))
+});
+
 module.exports = router;
