@@ -2,7 +2,7 @@ var express = require('express');
 var router = express.Router();
 var database = require('../database/database.js');
 var dirToJson = require('dir-to-json');
-
+var path = require('path')
 const fs = require('fs');
 
 
@@ -29,8 +29,8 @@ router.get('/listOfCourseLectures', function(req, res){
 });
 
 router.get('/:courseId/:lectureName/video', function(req, res) {
-  const path = "./lectures/" + req.params.courseId.toString() + '/' + req.params.lectureName.toString() + '/videoLarge.mp4'  
-  const stat = fs.statSync(path)
+  const fpath = "./lectures/" + req.params.courseId.toString() + '/' + req.params.lectureName.toString() + '/videoLarge.mp4'  
+  const stat = fs.statSync(fpath)
   const fileSize = stat.size
   const range = req.headers.range
   if (range) {
@@ -40,7 +40,7 @@ router.get('/:courseId/:lectureName/video', function(req, res) {
       ? parseInt(parts[1], 10)
       : fileSize-1
     const chunksize = (end-start)+1
-    const file = fs.createReadStream(path, {start, end})
+    const file = fs.createReadStream(fpath, {start, end})
     const head = {
       'Content-Range': `bytes ${start}-${end}/${fileSize}`,
       'Accept-Ranges': 'bytes',
@@ -55,13 +55,13 @@ router.get('/:courseId/:lectureName/video', function(req, res) {
       'Content-Type': 'video/mp4',
     }
     res.writeHead(200, head)
-    fs.createReadStream(path).pipe(res)
+    fs.createReadStream(fpath).pipe(res)
   }
 });
 
-router.get('/:courseId/:lectureName/image/:time', function(res, req){
-  const path = "./lectures/" + req.params.courseId.toString() + '/' + req.params.lectureName.toString() + '/image.jpg'  
-  res.sendFile(path.resolve(path))
+router.get('/:courseId/:lectureName/image/:time', function(req, res){
+  //const fpath = './lectures/' + req.params.courseId.toString() + '/' + req.params.lectureName.toString() + '/image.jpg'
+  res.sendFile(path.resolve('lectures', req.params.courseId.toString(), req.params.lectureName.toString(), 'image.jpg'))
 });
 
 module.exports = router;
