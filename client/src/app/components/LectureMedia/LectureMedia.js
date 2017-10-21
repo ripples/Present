@@ -5,8 +5,8 @@ export default class LectureMedia extends React.Component {
 
   render() {
     var style = {
-      'max-width':'500px', 
-      'max-height':'500px'
+      'maxWidth':'500px', 
+      'maxHeight':'500px'
     };
     return (
       <div className="lecture-media">

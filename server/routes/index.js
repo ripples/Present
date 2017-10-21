@@ -25,8 +25,8 @@ router.get('/identify/*', function (req, res) {
 	}
 });
 
-router.get('/listOfCourseLectures', function (req, res) {
-	dirToJson("./lectures", function (err, dirTree) {
+router.get('/listOfCourseLectures/:courseId', function (req, res) {
+	dirToJson("./lectures/" + req.params.courseId.toString(), function (err, dirTree) {
 		if (err) {
 			throw err;
 		} else {

@@ -11,7 +11,8 @@ export default class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      data: {}
+      data: {},
+      course: {}
     };
   }
 
@@ -21,8 +22,12 @@ export default class App extends Component {
     ).then(
       dat => 
       {
-        console.log(dat)
-        this.setState({data: dat})
+        fetch('/listofCourseLectures/' + dat.lis_course_section_sourcedid).then(res => res.json()).then(cour => {
+          this.setState({
+            data: dat,
+            course: cour
+          });
+        });
       }
     );
   }
@@ -31,7 +36,7 @@ export default class App extends Component {
     return (
       <Router history={hashHistory}>
         <Route path="/" component={Application}>
-          <IndexRoute component={() => <LecturesList courseId={this.state.data.lis_course_section_sourcedid}/>} />
+          <IndexRoute component={() => <LecturesList courseId={this.state.data.lis_course_section_sourcedid} course={this.state.course}/>} />
           <Route path="course/:courseId/lecture/:lectureId" component={Lecture} />
         </Route>
       </Router>
