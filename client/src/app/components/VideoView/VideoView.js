@@ -15,7 +15,7 @@ class VideoView extends React.Component {
     };
     this.player = videojs(this.videoNode, videoJsOptions, () => {
       this.player.on("timeupdate", () => {
-        //this.props.onVideoTimeUpdate(this.player.currentTime());
+        this.props.onVideoTimeUpdate(this.player.currentTime());
       });
     });
   }

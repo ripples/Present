@@ -37,7 +37,7 @@ router.get('/listOfCourseLectures', function (req, res) {
 	});
 });
 
-router.get('/:courseId/:lectureName/manifest', function (req, res) {
+router.get('/manifest/:courseId/:lectureName', function (req, res) {
 	const fpath = "./lectures/" + req.params.courseId.toString() + '/' + req.params.lectureName.toString() + '/INFO'
 	fs.readFile(fpath, 'utf8', function (err, contents) {
 		if (err) {
@@ -57,7 +57,7 @@ router.get('/:courseId/:lectureName/manifest', function (req, res) {
 })
 
 
-router.get('/:courseId/:lectureName/video', function (req, res) {
+router.get('/video/:courseId/:lectureName', function (req, res) {
 	const fpath = "./lectures/" + req.params.courseId.toString() + '/' + req.params.lectureName.toString() + '/videoLarge.mp4'  // TODO tie this to absolute location
 	const stat = fs.statSync(fpath)
 	const fileSize = stat.size
