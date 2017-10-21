@@ -4,6 +4,7 @@ var dirToJson = require('dir-to-json')
 var path = require('path')
 const fs = require('fs')
 const util = require('util')
+const _ = require("underscore")
 
 // TODO do encryption properly
 const key = "You/'ll never walk alone"
@@ -94,24 +95,44 @@ router.get('/:courseId/:lectureName/video', function (req, res) {
 Scheme for sourceID
 1-x is for computer, x is an feed number
 2-x is for a whiteboard, x is for feed number
+Maybe some diffing... 
 */
 router.get('image/:courseId/:lectureName/:sourceId/:time', function (req, res) {
 	const feedType = (req.params["sourceId"].split("-")[0] === 1) ? "computer" : "whiteboard"
 	const feedId = req.params["sourceId"].split("-")[1]
-	const fpath = "./lectures/" + req.params.courseId.toString() + '/' + req.params.lectureName.toString() + '/INFO'
-	util.promisify(fs.readFile)(fpath, 'utf8').then( contents =>{
-		if (err) {
-			res.status(404).send('Not Found');
+	const fpath = "./lectures/" + req.params.courseId.toString() + '/' + req.params.lectureName.toString()
+	var currTime = parseInt(req.params.time) //I really wish this could be a const.
+	util.promisify(fs.readFile)(fpath+ '/INFO', 'utf8').then( contents =>{
+		const re = /(?:timestamp: (\d*)))/
+		const found = contents.match(re)[1];
+		currTime += parseInt(found)
+	}).then(
+		util.promisify(fs.readdir)(fpath + '/' + feedType).then( files => {
+			const fileName = files.reduce((result, file) => {
+				const splitFileName = file.split('-')
+				const fileTime = parseInt(splitFileName[2].split('.')[0])
+				if(splitFileName[0] === feedType && splitFileName[1] === feedId && fileTime <= currTime){
+					result.push({
+						name: file,
+						time: fileTime
+					})
+				}
+				return result
+			}, []).sort((left, right) => left.time - right.time).pop() //this should be the file
+			if(typeof fileName != 'undefined' && fileName != null){
+				res.sendFile(path.resolve('lectures', req.params.courseId.toString(), req.params.lectureName.toString(), feedType, fileName.name))
+			}
+			else{
+				res.status(404).send()
+			}
 		}
-		else {
-			const re = /(?:timestamp: (\d*)))/ //this is a little bit more delicate than I'd like it to be
-			const found = contents.match(re)[1];
-			resolve(found)
-		}
-	}).then( startTime => {
-		
-	}) 
-	res.sendFile(path.resolve('lectures', req.params.courseId.toString(), req.params.lectureName.toString(), 'image.jpg'))
+		).catch(
+			res.status(404).send(err)
+		)
+	).catch( (err) =>{
+		res.status(404).send(err)
+	})
+	//res.sendFile(path.resolve('lectures', req.params.courseId.toString(), req.params.lectureName.toString(), 'image.jpg'))
 });
 
 module.exports = router;
