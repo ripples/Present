@@ -9,23 +9,33 @@ import Lecture from './app/Pages/Lecture/Lecture.js';
 export default class App extends Component {
 
   constructor(props) {
-      super(props);
-       this.state = {
-        data: {}
-       };
-      }
-     
-       componentDidMount() {
-                 fetch('/data').then(res => res.json()).then(dat => {
-           this.setState({data: dat})
-       })
-    }
+    super(props);
+    this.state = {
+      data: {}
+    };
+  }
 
-  render(){
-    return(
+  componentDidMount() {
+    console.log(window.location.pathname.substr(1));
+
+    fetch(('/identify/' + window.location.pathname.substr(1))).then(
+      res => res.json()
+    ).then(
+      dat => 
+      {
+        console.log(dat)
+        this.setState({data: dat})
+      }
+    );
+  }
+
+  render() {
+    var TheCourseId = (typeof this.state.data != 'undefined') ? this.state.data.lis_course_section_sourcedid : "none";
+    
+    return (
       <Router history={hashHistory}>
         <Route path="/" component={Application}>
-          <IndexRoute component={() => <LecturesList courseId = {this.state.data.lis_course_section_sourcedid}/>} />
+          <IndexRoute component={() => <LecturesList courseId={TheCourseId}/>} />
           <Route path="course/:courseId/lecture/:lectureId" component={Lecture} />
         </Route>
       </Router>

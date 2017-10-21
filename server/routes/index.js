@@ -1,20 +1,23 @@
 var express = require('express');
 var router = express.Router();
-var database = require('../database/database.js');
 var dirToJson = require('dir-to-json');
 var path = require('path')
 const fs = require('fs');
 
-
-router.get('/data', function(req, res){
-  var data = database.getDB();
-  database.setDB({});
-  res.json(data);
-});
+// TODO do encryption properly
+const key = "You/'ll never walk alone"
+var encryptor = require('simple-encryptor')(key);
 
 router.post('/data', function(req, res){
-  database.setDB(req.body);
-  res.redirect("http://localhost:3000/");
+  const hashed = encryptor.encrypt(req.body).replace(/\//g, '-');
+  const url = "http://localhost:3000/" // TODO Global constant
+  res.redirect(url + hashed);
+});
+
+router.get('/identify/*' , function(req, res){
+  const token = req.params[0].replace(/-/g, '/');
+  const unhashed = encryptor.decrypt(token)
+  res.send(unhashed);
 });
 
 router.get('/listOfCourseLectures', function(req, res){
@@ -22,7 +25,7 @@ router.get('/listOfCourseLectures', function(req, res){
     if( err ){
         throw err;
     }else{
-        console.log(dirTree)
+      console.log(dirTree)
         res.send(dirTree);
     }
   });
@@ -35,20 +38,21 @@ router.get('/:courseId/:lectureName/manifest', function(req, res) {
       res.status(404).send('Not Found');
     }
     else{
-      const re = /(?:whiteboardCount: (\d))(?:\s|.*)*(?:computerCount: (\d))/
+      const re = /(?:whiteboardCount: (\d))(?:\s|.*)*(?:computerCount: (\d))/ //this is a little bit more delicate than I'd like it to be
       const found = contents.match(re)
       const manifest = {
-        whiteboardCount: parseInt(found[1]),
+        whiteboardCount: parseInt(found[1]), //for some reason there is a third capture group at 0...
         computerCount: parseInt(found[2]),
         input: found['input']
       } 
-      res.json(manifest)
+      res.send(manifest)
     }
   })
 })
 
+
 router.get('/:courseId/:lectureName/video', function(req, res) {
-  const fpath = "./lectures/" + req.params.courseId.toString() + '/' + req.params.lectureName.toString() + '/videoLarge.mp4'  
+  const fpath = "../lectures/" + req.params.courseId.toString() + '/' + req.params.lectureName.toString() + '/videoLarge.mp4'  // TODO tie this to absolute location
   const stat = fs.statSync(fpath)
   const fileSize = stat.size
   const range = req.headers.range
@@ -80,7 +84,6 @@ router.get('/:courseId/:lectureName/video', function(req, res) {
 });
 
 router.get('/:courseId/:lectureName/image/:time', function(req, res){
-  //const fpath = './lectures/' + req.params.courseId.toString() + '/' + req.params.lectureName.toString() + '/image.jpg'
   res.sendFile(path.resolve('lectures', req.params.courseId.toString(), req.params.lectureName.toString(), 'image.jpg'))
 });
 
