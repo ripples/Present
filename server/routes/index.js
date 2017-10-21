@@ -37,7 +37,7 @@ router.get('/listOfCourseLectures/:courseId', function (req, res) {
 	});
 });
 
-router.get('/:courseId/:lectureName/manifest', function (req, res) {
+router.get('/manifest/:courseId/:lectureName', function (req, res) {
 	const fpath = "./lectures/" + req.params.courseId.toString() + '/' + req.params.lectureName.toString() + '/INFO'
 	fs.readFile(fpath, 'utf8', function (err, contents) {
 		if (err) {
@@ -57,7 +57,7 @@ router.get('/:courseId/:lectureName/manifest', function (req, res) {
 })
 
 
-router.get('/:courseId/:lectureName/video', function (req, res) {
+router.get('/video/:courseId/:lectureName', function (req, res) {
 	const fpath = "./lectures/" + req.params.courseId.toString() + '/' + req.params.lectureName.toString() + '/videoLarge.mp4'  // TODO tie this to absolute location
 	const stat = fs.statSync(fpath)
 	const fileSize = stat.size
@@ -97,7 +97,7 @@ Scheme for sourceID
 Maybe some diffing... 
 */
 router.get('/image/:courseId/:lectureName/:sourceId/:time', function (req, res) {
-	const feedType = (req.params["sourceId"].split("-")[0] === 1) ? "computer" : "whiteBoard"
+	const feedType = (req.params["sourceId"].split("-")[0] === "1") ? "computer" : "whiteBoard"
 	const feedId = req.params["sourceId"].split("-")[1]
 	const fpath = "./lectures/" + req.params.courseId.toString() + '/' + req.params.lectureName.toString()
 	util.promisify(fs.readFile)(fpath+ '/INFO', 'utf8').then( contents =>{
@@ -109,7 +109,6 @@ router.get('/image/:courseId/:lectureName/:sourceId/:time', function (req, res) 
 			const fileName = files.reduce((result, file) => {
 				const splitFileName = file.split('-')
 				const fileTime = parseInt(splitFileName[2].split('.')[0])
-				console.log(splitFileName[0] === feedType, splitFileName[1] === feedId , fileTime <= cTime)
 				if(splitFileName[0] === feedType && splitFileName[1] === feedId && fileTime <= cTime){
 					result.push({
 						name: file,
