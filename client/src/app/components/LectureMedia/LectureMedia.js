@@ -4,27 +4,6 @@ import VideoView from "../../components/VideoView/VideoView";
 
 export default class LectureMedia extends React.Component {
 
-<<<<<<< HEAD
-  render() {
-    var style = {
-      'maxWidth':'500px', 
-      'maxHeight':'500px'
-    };
-    return (
-      <div className="lecture-media">
-        <div className="container">
-          <div className="video-wrapper">
-            <VideoView
-              videoSrc={'/' + this.props.courseId + "/" +  this.props.lectureId + '/video'}/>
-          </div>
-        </div>
-        <div>
-          <img src={'/image/' + this.props.courseId + "/" +  this.props.lectureId + '/2-0/' + '0'} style={style}/> 
-        </div>
-      </div>
-    );
-  }
-=======
 	constructor(props){
 		super(props)
 		this.state = {
@@ -73,5 +52,4 @@ export default class LectureMedia extends React.Component {
 			</div>
 		);
 	}
->>>>>>> 0e7d4f3ff4359fcc2cf50e241559c937c5b72dfc
 }
