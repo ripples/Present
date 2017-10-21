@@ -2,7 +2,8 @@ var express = require('express');
 var router = express.Router();
 var dirToJson = require('dir-to-json');
 var path = require('path')
-const fs = require('fs');
+const fs = require('fs')
+const util = require('util')
 
 // TODO do encryption properly
 const key = "You/'ll never walk alone"
@@ -88,8 +89,45 @@ router.get('/:courseId/:lectureName/video', function (req, res) {
 	}
 });
 
-router.get('/:courseId/:lectureName/image/:time', function (req, res) {
-	res.sendFile(path.resolve('lectures', req.params.courseId.toString(), req.params.lectureName.toString(), 'image.jpg'))
+
+/*
+Scheme for sourceID
+1-x is for computer, x is an feed number
+2-x is for a whiteboard, x is for feed number
+Maybe some diffing... 
+*/
+router.get('/image/:courseId/:lectureName/:sourceId/:time', function (req, res) {
+	const feedType = (req.params["sourceId"].split("-")[0] === 1) ? "computer" : "whiteBoard"
+	const feedId = req.params["sourceId"].split("-")[1]
+	const fpath = "./lectures/" + req.params.courseId.toString() + '/' + req.params.lectureName.toString()
+	util.promisify(fs.readFile)(fpath+ '/INFO', 'utf8').then( contents =>{
+		const re = /(?:timestamp: (\d*))/
+		const found = contents.match(re)[1];
+		return parseInt(req.params.time) + parseInt(found)
+	}).then( cTime => {
+		util.promisify(fs.readdir)(fpath + '/' + feedType).then( files => {
+			const fileName = files.reduce((result, file) => {
+				const splitFileName = file.split('-')
+				const fileTime = parseInt(splitFileName[2].split('.')[0])
+				console.log(splitFileName[0] === feedType, splitFileName[1] === feedId , fileTime <= cTime)
+				if(splitFileName[0] === feedType && splitFileName[1] === feedId && fileTime <= cTime){
+					result.push({
+						name: file,
+						time: fileTime
+					})
+				}
+				return result
+			}, []).sort((left, right) => left.time - right.time).pop() //this should be the file
+			if(typeof fileName != 'undefined' && fileName != null){
+				res.sendFile(path.resolve('lectures', req.params.courseId.toString(), req.params.lectureName.toString(), feedType, fileName.name))
+			}
+			else{
+				res.status(404).send()
+			}
+		}).catch( err => res.status(404).send(err))
+	}).catch( err => {
+		res.status(404).send(err)
+	})
 });
 
 module.exports = router;

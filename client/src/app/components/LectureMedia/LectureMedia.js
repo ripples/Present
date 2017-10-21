@@ -17,7 +17,7 @@ export default class LectureMedia extends React.Component {
           </div>
         </div>
         <div>
-          <img src={'/' + this.props.courseId + "/" +  this.props.lectureId + '/image/' + '0'} style={style}/> 
+          <img src={'/image/' + this.props.courseId + "/" +  this.props.lectureId + '/2-0/' + '0'} style={style}/> 
         </div>
       </div>
     );
