@@ -1,10 +1,9 @@
-var express = require('express')
-var router = express.Router()
-var dirToJson = require('dir-to-json')
+var express = require('express');
+var router = express.Router();
+var dirToJson = require('dir-to-json');
 var path = require('path')
 const fs = require('fs')
 const util = require('util')
-const _ = require("underscore")
 
 // TODO do encryption properly
 const key = "You/'ll never walk alone"
@@ -97,21 +96,20 @@ Scheme for sourceID
 2-x is for a whiteboard, x is for feed number
 Maybe some diffing... 
 */
-router.get('image/:courseId/:lectureName/:sourceId/:time', function (req, res) {
-	const feedType = (req.params["sourceId"].split("-")[0] === 1) ? "computer" : "whiteboard"
+router.get('/image/:courseId/:lectureName/:sourceId/:time', function (req, res) {
+	const feedType = (req.params["sourceId"].split("-")[0] === "1") ? "computer" : "whiteBoard"
 	const feedId = req.params["sourceId"].split("-")[1]
 	const fpath = "./lectures/" + req.params.courseId.toString() + '/' + req.params.lectureName.toString()
-	var currTime = parseInt(req.params.time) //I really wish this could be a const.
 	util.promisify(fs.readFile)(fpath+ '/INFO', 'utf8').then( contents =>{
-		const re = /(?:timestamp: (\d*)))/
+		const re = /(?:timestamp: (\d*))/
 		const found = contents.match(re)[1];
-		currTime += parseInt(found)
-	}).then(
+		return parseInt(req.params.time) + parseInt(found)
+	}).then( cTime => {
 		util.promisify(fs.readdir)(fpath + '/' + feedType).then( files => {
 			const fileName = files.reduce((result, file) => {
 				const splitFileName = file.split('-')
 				const fileTime = parseInt(splitFileName[2].split('.')[0])
-				if(splitFileName[0] === feedType && splitFileName[1] === feedId && fileTime <= currTime){
+				if(splitFileName[0] === feedType && splitFileName[1] === feedId && fileTime <= cTime){
 					result.push({
 						name: file,
 						time: fileTime
@@ -125,14 +123,10 @@ router.get('image/:courseId/:lectureName/:sourceId/:time', function (req, res) {
 			else{
 				res.status(404).send()
 			}
-		}
-		).catch(
-			res.status(404).send(err)
-		)
-	).catch( (err) =>{
+		}).catch( err => res.status(404).send(err))
+	}).catch( err => {
 		res.status(404).send(err)
 	})
-	//res.sendFile(path.resolve('lectures', req.params.courseId.toString(), req.params.lectureName.toString(), 'image.jpg'))
 });
 
 module.exports = router;
