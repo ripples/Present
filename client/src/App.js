@@ -16,10 +16,8 @@ export default class App extends Component {
   }
 
   componentDidMount() {
-    console.log(window.location.pathname.substr(1));
-
     fetch(('/identify/' + window.location.pathname.substr(1))).then(
-      res => res.json()
+      res => (res.status === 200) ? res.json() : ""
     ).then(
       dat => 
       {
@@ -29,13 +27,11 @@ export default class App extends Component {
     );
   }
 
-  render() {
-    var TheCourseId = (typeof this.state.data != 'undefined') ? this.state.data.lis_course_section_sourcedid : "none";
-    
+  render() {   
     return (
       <Router history={hashHistory}>
         <Route path="/" component={Application}>
-          <IndexRoute component={() => <LecturesList courseId={TheCourseId}/>} />
+          <IndexRoute component={() => <LecturesList courseId={this.state.data.lis_course_section_sourcedid}/>} />
           <Route path="course/:courseId/lecture/:lectureId" component={Lecture} />
         </Route>
       </Router>
