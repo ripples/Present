@@ -1,8 +1,9 @@
-var express = require('express');
-var router = express.Router();
-var dirToJson = require('dir-to-json');
+var express = require('express')
+var router = express.Router()
+var dirToJson = require('dir-to-json')
 var path = require('path')
-const fs = require('fs');
+const fs = require('fs')
+const util = require('util')
 
 // TODO do encryption properly
 const key = "You/'ll never walk alone"
@@ -88,7 +89,28 @@ router.get('/:courseId/:lectureName/video', function (req, res) {
 	}
 });
 
-router.get('/:courseId/:lectureName/image/:time', function (req, res) {
+
+/*
+Scheme for sourceID
+1-x is for computer, x is an feed number
+2-x is for a whiteboard, x is for feed number
+*/
+router.get('image/:courseId/:lectureName/:sourceId/:time', function (req, res) {
+	const feedType = (req.params["sourceId"].split("-")[0] === 1) ? "computer" : "whiteboard"
+	const feedId = req.params["sourceId"].split("-")[1]
+	const fpath = "./lectures/" + req.params.courseId.toString() + '/' + req.params.lectureName.toString() + '/INFO'
+	util.promisify(fs.readFile)(fpath, 'utf8').then( contents =>{
+		if (err) {
+			res.status(404).send('Not Found');
+		}
+		else {
+			const re = /(?:timestamp: (\d*)))/ //this is a little bit more delicate than I'd like it to be
+			const found = contents.match(re)[1];
+			resolve(found)
+		}
+	}).then( startTime => {
+		
+	}) 
 	res.sendFile(path.resolve('lectures', req.params.courseId.toString(), req.params.lectureName.toString(), 'image.jpg'))
 });
 
