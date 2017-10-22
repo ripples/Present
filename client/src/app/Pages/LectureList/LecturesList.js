@@ -9,13 +9,16 @@ export default class LecturesList extends Component {
 				<h1>Lecture Dates:</h1>
 				{( typeof this.props.course !== "undefined" && typeof this.props.course.children !== "undefined") ?
 					this.props.course.children.map((course, i) => {
-						return (
+						var patt = /^\d\d-\d\d-\d\d\d\d--\d\d-\d\d-\d\d$/;
+						if (patt.test(course.name)) { 
+							return (
 							<div key={i}>
 								<Link to={"course/" + this.props.courseId + "/lecture/" + course.name}>
 									<button type="button">{course.name}</button>
 								</Link>
 							</div>
 						)
+					}
 					}) : null
 				}
 			</div>
