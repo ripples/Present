@@ -10,23 +10,34 @@ import Calendar from './app/Pages/Calendar/Calendar.js'
 export default class App extends Component {
 
   constructor(props) {
-      super(props);
-       this.state = {
-        data: {}
-       };
+    super(props);
+    this.state = {
+      data: {},
+      course: {}
+    };
+  }
+
+  componentDidMount() {
+    fetch(('/identify/' + window.location.pathname.substr(1))).then(
+      res => (res.status === 200) ? res.json() : ""
+    ).then(
+      dat =>
+      {
+        fetch('/listofCourseLectures/' + dat.lis_course_section_sourcedid).then(res => res.json()).then(cour => {
+          this.setState({
+            data: dat,
+            course: cour
+          });
+        });
       }
+    );
+  }
 
-       componentDidMount() {
-                 fetch('/data').then(res => res.json()).then(dat => {
-           this.setState({data: dat})
-       })
-    }
-
-  render(){
-    return(
+  render() {
+    return (
       <Router history={hashHistory}>
         <Route path="/" component={Application}>
-          <IndexRoute component={() => <LecturesList courseId = {this.state.data.lis_course_section_sourcedid}/>} />
+          <IndexRoute component={() => <LecturesList courseId={this.state.data.lis_course_section_sourcedid} course={this.state.course}/>} />
           <Route path="course/:courseId/lecture/:lectureId" component={Lecture} />
           <Route path="calendar" component={Calendar} />
         </Route>
