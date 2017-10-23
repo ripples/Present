@@ -6,20 +6,24 @@ class CalendarForm extends React.Component {
   constructor(props){
     super(props);
     this.state ={
-      startDate: "",
-      endDate: "",
-      repeatDays: [false, false, false, false, false],
-      excludeDates: [],
-      result: "Results"
+      sDate: "YYYYMMDD",
+      eDate: "YYYYMMDD",
+      sTime: "HHMMSS",
+      eTime: "HHMMSS",
+      recurDays: [],
+      excludeDates: ["No dates excluded"],
+      description: "",
+      location: "",
+      summary: ""
     };
   }
 
   render() {
     return (
       <div className='calForm'>
-        <form className='pure-form'>
+        <form className='pure-form' method='post' action='/calendar'>
           <fieldset>
-            <legend>New Recording Schedule</legend>
+            <legend>New Recording Schedule: {this.props.courseId}</legend>
             <div className='input_block'>
               <label className='datelbl' htmlFor='start'>Start Date: </label>
               <input className='dateInput' id='startDate' type='date' placeholder='Start Date: mm/dd/yyyy hh:mm' name='start' />
@@ -36,22 +40,28 @@ class CalendarForm extends React.Component {
             </div>
             <div className='input_block'>
               <p>Repeat (WEEKLY): </p>
-              <input className='repeat' type='checkbox' name='M'/><label className='chkbxlbl' htmlFor='M'>M</label>
-              <input className='repeat' type='checkbox' name='Tu'/><label className='chkbxlbl' htmlFor='Tu'>Tu</label>
-              <input className='repeat' type='checkbox' name='W'/><label className='chkbxlbl' htmlFor='W'>W</label>
-              <input className='repeat' type='checkbox' name='Th'/><label className='chkbxlbl' htmlFor='Th'>Th</label>
-              <input className='repeat' type='checkbox' name='F'/><label className='chkbxlbl' htmlFor='F'>F</label>
+              <label className='chkbxlbl' htmlFor='Monday'><input className='repeat' type='checkbox' name='Monday'/>Monday</label>
+              <label className='chkbxlbl' htmlFor='Tuesday'><input className='repeat' type='checkbox' name='Tuesday'/>Tuesday</label>
+              <label className='chkbxlbl' htmlFor='Wednesday'><input className='repeat' type='checkbox' name='Wednesday'/>Wednesday</label>
+              <label className='chkbxlbl' htmlFor='Thursday'><input className='repeat' type='checkbox' name='Thursday'/>Thursday</label>
+              <label className='chkbxlbl' htmlFor='Friday'><input className='repeat' type='checkbox' name='Friday'/>Friday</label>
             </div>
             <div className='input_block'>
               <label className='datelbl' htmlFor='exclude'>Exclude Date: </label>
               <input className='dateInput' type='date' placeholder='Exclude: mm/dd/yyyy' name='exclude'/>
               <button className='exclude-button' type='submit' className='pure-button pure-button-primary'>Exclude</button>
+              <label className='datelbl'>{this.state.excludeDates}</label>
             </div>
             <div className='input_block'>
-              <button type='submit' className='pure-button pure-button-primary'>Create</button>
+              <label className='datelbl' htmlFor='description'>Description: </label>
+              <input className='dateInput' id='description' type='text' placeholder='Class description...' name='description'/>
+              <label className='datelbl' htmlFor='location'>Location: </label>
+              <input className='dateInput' id='location' type='text' placeholder='Class location...' name='location'/>
+              <label className='datelbl' htmlFor='summary'>Summary: </label>
+              <input className='dateInput' id='summary' type='text' placeholder='Class summary...' name='summary'/>
             </div>
             <div className='input_block'>
-              <label id='results'></label>
+              <input type='submit' value='Create Schedule'/>
             </div>
           </fieldset>
         </form>

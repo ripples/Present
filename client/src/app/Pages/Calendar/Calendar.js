@@ -6,7 +6,7 @@ export default class Calendar extends Component {
     render(){
         return(
             <div>
-                <CalendarForm />
+                <CalendarForm courseId={this.props.courseId}/>
             </div>
         );
     }
