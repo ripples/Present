@@ -11,7 +11,7 @@ const util = require('util')
 const key = "You/'ll never walk alone"
 var encryptor = require('simple-encryptor')(key);
 
-export function generateCalendar(sDate, eDate, sTime, eTime, recurDays, excludeDates, description, location, summary) {
+function generateCalendar(sDate, eDate, sTime, eTime, recurDays, excludeDates, description, location, summary) {
   var start = moment(startDate, "MM-DD-YYYY"), end = moment(endDate, "MM-DD-YYYY");
   var recurrence = moment.recur(start, end).every(recurDays).daysOfWeek(); //Create moment recurrence object of date list
   var initialDates = recurrence.all("L"); //Generate string array of dates in "MM-DD-YYYY" format, in chronological order

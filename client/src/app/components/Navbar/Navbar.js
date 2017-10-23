@@ -8,7 +8,7 @@ export default class Navbar extends Component {
             <div>
                 <h1>Welcome to Lecture Viewer 2</h1>
                 <Link to="/"><button>Lecture List</button></Link>
-                <Link to="/"><button>Calendar</button></Link>
+                <Link to="/calendar"><button>Calendar</button></Link>
             </div>
         );
     }

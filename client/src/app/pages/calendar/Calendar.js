@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import CalendarForm from '../../components/Calendar/CalendarForm';
+import CalendarForm from '../../components/CalendarForm/CalendarForm';
 
 export default class Calendar extends Component {
 

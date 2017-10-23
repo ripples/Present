@@ -4,7 +4,7 @@ import ReactDOM from 'react-dom';
 import Application from './Application.js';
 import LecturesList from './app/Pages/LectureList/LecturesList';
 import Lecture from './app/Pages/Lecture/Lecture.js';
-import Calendar from './app/Pages/Calendar/Calendar.js'
+import Calendar from './app/Pages/Calendar/Calendar.js';
 
 
 export default class App extends Component {
