@@ -7,13 +7,23 @@ class CalendarForm extends React.Component {
     super(props);
     this.handleAddExclude = this.handleAddExclude.bind(this);
     this.handleExcludeChange = this.handleExcludeChange.bind(this);
+    this.formatExclude = this.formatExclude.bind(this);
+
     this.handleCheckboxChange = this.handleCheckboxChange.bind(this);
+
+
+
+    this.formatTime = this.formatTime.bind(this);
+    this.handleSTime = this.handleSTime.bind(this);
+    this.handleETime = this.handleETime.bind(this);
+
     this.handleSubmit = this.handleSubmit.bind(this);
+
     this.state ={
-      sDate: "YYYYMMDD",
-      eDate: "YYYYMMDD",
-      sTime: "HHMMSS",
-      eTime: "HHMMSS",
+      sDate: "",
+      eDate: "",
+      sTime: "",
+      eTime: "",
       recurDays: [],
       excludeDates: [],
       currentExclude: "",
@@ -25,13 +35,16 @@ class CalendarForm extends React.Component {
 
   handleSubmit(e){
     e.preventDefault();
+
+    console.log(this.state.sTime);
+
     fetch('/calendar', {
       method: 'post',
       body: {
         "sDate": this.sDate.value,
         "eDate": this.eDate.value,
-        "sTime": this.sTime.value,
-        "eTime": this.eTime.value,
+        "sTime": this.state.sTime,
+        "eTime": this.state.eTime,
         "recurDays": this.state.recurDays,
         "excludeDates": this.state.excludeDates,
         "description": this.description.value,
@@ -39,9 +52,11 @@ class CalendarForm extends React.Component {
         "summary": this.summary.value,
         "courseId": this.state.courseId
       }
-    }).then(
-			res => (res.status === 201 ) ? console.log("Success!") : console.log("Failure!")
-		);
+    }).then( res => {
+      console.log(res)
+    }, err => {
+      console.log(err);
+    });
   }
 
   handleExcludeChange(e) {
@@ -52,9 +67,31 @@ class CalendarForm extends React.Component {
   handleAddExclude(e){
     e.preventDefault();
     const currentExcludes = this.state.excludeDates;
-    const newExcludes = currentExcludes.concat(this.state.currentExclude);
+    const newExcludes = currentExcludes.concat(this.formatExclude(this.state.currentExclude));
     this.setState({excludeDates: newExcludes}, function(){
       console.log(this.state.excludeDates);
+    });
+  }
+
+  formatExclude(excludedDate) {
+    var split = excludedDate.split("-");
+    return split[0] + split[1] + split[2];
+  }
+
+  formatTime(time) { //Formats time from form format to ics format
+    var str = time.split(":");
+    return str[0] + str[1] + "00";
+  }
+
+  handleSTime(e) {
+   this.setState({sTime: this.formatTime(e.target.value)}, function () {
+     console.log(this.state.sTime);
+   });
+  }
+
+  handleETime(e){
+    this.setState({eTime: this.formatTime(e.target.value)}, function () {
+      console.log(this.state.eTime);
     });
   }
 
@@ -83,13 +120,13 @@ class CalendarForm extends React.Component {
             <legend>New Recording Schedule: {this.props.courseId}</legend>
             <div className='input_block'>
               <label className='datelbl' htmlFor='sDate'>Start Date: </label>
-              <input ref={(ref) => {this.sDate = ref}} className='dateInput' id='startDate' type='date' placeholder='Start Date: mm/dd/yyyy hh:mm' name='sDate' />
+              <input ref={(ref) => {this.sDate = ref}} className='dateInput' id='startDate' type='date' placeholder='Start Date: mm/dd/yyyy hh:mm' name='sDate'/>
             </div>
             <div className='input_block'>
               <label className='datelbl' htmlFor='sTime'>Start Time: </label>
-              <input ref={(ref) => {this.sTime = ref}} className='dateInput' id='begin' type='time' placeholder='Start Time: hh:mm AM/PM' name='sTime'/>
+              <input ref={(ref) => {this.sTime = ref}} className='dateInput' id='begin' type='time' placeholder='Start Time: hh:mm AM/PM' name='sTime' onChange={this.handleSTime}/>
               <label className='datelbl' htmlFor='eTime'>End Time: </label>
-              <input ref={(ref) => {this.eTime = ref}} className='dateInput' id='endTime' type='time' placeholder='End Time: hh:mm AM/PM' name='eTime'/>
+              <input ref={(ref) => {this.eTime = ref}} className='dateInput' id='endTime' type='time' placeholder='End Time: hh:mm AM/PM' name='eTime' onChange={this.handleETime}/>
             </div>
             <div className='input_block'>
               <label className='datelbl' htmlFor='eDate'>End Date: </label>

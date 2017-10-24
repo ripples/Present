@@ -1,4 +1,5 @@
 var express = require('express');
+//const bodyParser = require('body-parser');
 var router = express.Router();
 var dirToJson = require('dir-to-json');
 var path = require('path')
@@ -7,61 +8,12 @@ require('moment-recur');
 const fs = require('fs')
 const util = require('util')
 
+//var app = express();
+//app.use(bodyParser);
+
 // TODO do encryption properly
 const key = "You/'ll never walk alone"
 var encryptor = require('simple-encryptor')(key);
-
-function generateCalendar(sDate, eDate, sTime, eTime, recurDays, excludeDates, description, location, summary, courseId) {
-  var start = moment(startDate, "MM-DD-YYYY"), end = moment(endDate, "MM-DD-YYYY");
-  var recurrence = moment.recur(start, end).every(recurDays).daysOfWeek(); //Create moment recurrence object of date list
-  var initialDates = recurrence.all("L"); //Generate string array of dates in "MM-DD-YYYY" format, in chronological order
-  var filteredDates = dates.filter(function(e){return this.indexOf(e)<0}, excludeDates); //Returns array with excluded dates removed, still in chronological order
-  return generateICS(filteredDates, [sDate, eDate, sTime, eTime, description, location, summary, courseId])
-}
-
-function getICSDateNow() { //Gets the current timestamp in YYYYMMDDTHHMMSS format (for ics file generation)
-  var now = new Date();
-  var year = "" + now.getFullYear();
-  var month = "" + (now.getMonth() + 1); if (month.length == 1) { month = "0" + month; }
-  var day = "" + now.getDate(); if (day.length == 1) { day = "0" + day; }
-  var hour = "" + now.getHours(); if (hour.length == 1) { hour = "0" + hour; }
-  var minute = "" + now.getMinutes(); if (minute.length == 1) { minute = "0" + minute; }
-  var second = "" + now.getSeconds(); if (second.length == 1) { second = "0" + second; }
-  return [year, month, day, "T", hour, minute, second];
-}
-
-function generateICS(dates, tags) {
-  var fileText = "";
-  var START_TAG = "BEGIN:VCALENDAR\nPRODID:Calendar\nVERSION:2.0\n", END_TAG = "END:VCALENDAR";
-  const SDATE = 0, EDATE = 1, STIME = 2, ETIME = 3, DESCRIPTION = 4, LOCATION = 5, SUMMARY = 6, COURSEID = 7;
-  var dateNow = getICSDateNow();
-  var DTSTAMP = dateNow[0] + dateNow[1] + dateNow[2] + dateNow[3] + dateNow[4] + dateNow[5] + dateNow[6];
-  var lectureDir = dateNow[1] + "-" + dateNow[2] + "-" + dateNow[0] + "--" + dateNow[4] + "-" + dateNow[5] + "-" + dateNow[6];
-  fileText += START_TAG;
-
-  for(var i = 0; i < dates.length; i++){
-    fileText += "BEGIN:VEVENT\n";
-    fileText += (i + "@default\nCLASS:PUBLIC\n");
-    fileText += ("DESCRIPTION:" + tags[DESCRIPTION] + "\n");
-    fileText += ("DTSTAMP;VALUE=DATE-TIME:" + DTSTAMP + "\n");
-    fileText += ("DTSTART;VALUE=DATE-TIME:" + tags[SDATE] + "T" + tags[STIME] + "\n");
-    fileText += ("DTEND;VALUE=DATE-TIME:" + tags[EDATE] + "T" + tags[ETIME] + "\n");
-    fileText += ("LOCATION:" + tags[LOCATION] + "\n");
-    fileText += ("SUMMARY;LANGUAGE=en-us:" + tags[SUMMARY] + "\n");
-    fileText += "TRANSP:TRANSPARENT\nEND:VEVENT\n";
-  }
-
-  fileText += END_TAG;
-
-  /*fs.writeFile("./lectures/" + tags[COURSEID] + "/" + lectureDir + "/Calendar.ics", fileText, function (err) {
-    if (err) return console.log(err);
-    console.log("ICS file written!");
-  });*/
-
-  console.log(fileText);
-  return fileText;
-  //Save as ics file to server filesystem
-}
 
 router.post('/calendar', function (req, res) { //Successful POST = code 201 (CREATED)
   var sDate = req.body.sDate;
@@ -75,9 +27,8 @@ router.post('/calendar', function (req, res) { //Successful POST = code 201 (CRE
   var summary = req.body.summary;
   var courseId = req.body.courseId;
 
-  //var text = generateCalendar(sDate, eDate, sTime, eTime, recurDays, excludeDates, description, location, summary, courseId);
-  console.log(req.body);
-  res.status(201).send("ICS Created!");
+  var text = generateCalendar(sDate, eDate, sTime, eTime, recurDays, excludeDates, description, location, summary, courseId);
+  res.status(201).send("POST Received");
 });
 
 
@@ -200,5 +151,56 @@ router.get('/image/:courseId/:lectureName/:sourceId/:time', function (req, res) 
 		res.status(404).send(err)
 	})
 });
+
+function generateCalendar(sDate, eDate, sTime, eTime, recurDays, excludeDates, description, location, summary, courseId) {
+  var start = moment(sDate, "YYYY-MM-DD"), end = moment(eDate, "YYYY-MM-DD");
+  var recurrence = moment.recur(start, end).every(recurDays).daysOfWeek(); //Create moment recurrence object of date list
+  var initialDates = recurrence.all("YYYYMMDD"); //Generate string array of dates in "YYYY-MM-DD" format, in chronological order
+  var filteredDates = initialDates.filter(function(e){return this.indexOf(e)<0}, excludeDates); //Returns array with excluded dates removed, still in chronological order
+  return generateICS(filteredDates, [sDate, eDate, sTime, eTime, description, location, summary, courseId])
+}
+
+function getICSDateNow() { //Gets the current timestamp in YYYYMMDDTHHMMSS format (for ics file generation)
+  var now = new Date();
+  var year = "" + now.getFullYear();
+  var month = "" + (now.getMonth() + 1); if (month.length == 1) { month = "0" + month; }
+  var day = "" + now.getDate(); if (day.length == 1) { day = "0" + day; }
+  var hour = "" + now.getHours(); if (hour.length == 1) { hour = "0" + hour; }
+  var minute = "" + now.getMinutes(); if (minute.length == 1) { minute = "0" + minute; }
+  var second = "" + now.getSeconds(); if (second.length == 1) { second = "0" + second; }
+  return [year, month, day, "T", hour, minute, second];
+}
+
+function generateICS(dates, tags) {
+  var fileText = "";
+  var START_TAG = "BEGIN:VCALENDAR\nPRODID:Calendar\nVERSION:2.0\n", END_TAG = "END:VCALENDAR";
+  const SDATE = 0, EDATE = 1, STIME = 2, ETIME = 3, DESCRIPTION = 4, LOCATION = 5, SUMMARY = 6, COURSEID = 7;
+  var dateNow = getICSDateNow();
+  var DTSTAMP = dateNow[0] + dateNow[1] + dateNow[2] + dateNow[3] + dateNow[4] + dateNow[5] + dateNow[6];
+  var lectureDir = dateNow[1] + "-" + dateNow[2] + "-" + dateNow[0] + "--" + dateNow[4] + "-" + dateNow[5] + "-" + dateNow[6];
+  fileText += START_TAG;
+
+  for(var i = 0; i < dates.length; i++){
+    fileText += "BEGIN:VEVENT\n";
+    fileText += (i + "@default\nCLASS:PUBLIC\n");
+    fileText += ("DESCRIPTION:" + tags[DESCRIPTION] + "\n");
+    fileText += ("DTSTAMP;VALUE=DATE-TIME:" + DTSTAMP + "\n");
+    fileText += ("DTSTART;VALUE=DATE-TIME:" + tags[SDATE] + "T" + tags[STIME] + "\n");
+    fileText += ("DTEND;VALUE=DATE-TIME:" + tags[EDATE] + "T" + tags[ETIME] + "\n");
+    fileText += ("LOCATION:" + tags[LOCATION] + "\n");
+    fileText += ("SUMMARY;LANGUAGE=en-us:" + tags[SUMMARY] + "\n");
+    fileText += "TRANSP:TRANSPARENT\nEND:VEVENT\n";
+  }
+
+  fileText += END_TAG;
+
+  /*fs.writeFile("./lectures/" + tags[COURSEID] + "/" + lectureDir + "/Calendar.ics", fileText, function (err) {
+    if (err) return console.log(err);
+    console.log("ICS file written!");
+  });*/
+  return fileText;
+
+  //Save as ics file to server filesystem
+}
 
 module.exports = router;
