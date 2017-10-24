@@ -7,17 +7,21 @@ const util = require('util')
 
 // TODO do encryption properly
 const key = "You/'ll never walk alone"
-var encryptor = require('simple-encryptor')(key);
+var encryptor = require('simple-encryptor')(key)
 
 router.post('/data', function (req, res) {
-	const hashed = encryptor.encrypt(req.body).replace(/\//g, '-');
-	const url = "http://localhost:3000/" // TODO Global constant
-	res.redirect(url + hashed);
+	var user = req.body.lis_person_contact_email_primary;
+	if(user) {
+		req.session.token = encryptor.encrypt(req.body).replace(/\//g, '-');
+		req.session.save()
+		const url = "http://localhost:3000/" // TODO Global constant
+		res.redirect(url + req.session.token);
+	}
 });
 
 router.get('/identify/*', function (req, res) {
-	const token = req.params[0].replace(/-/g, '/');
-	const unhashed = encryptor.decrypt(token)
+	const tok = req.params[0].replace(/-/g, '/');
+	const unhashed = encryptor.decrypt(tok);
 	if (typeof unhashed == 'undefined' || unhashed === null) {
 		res.status(404).send('Not Found');
 	}
@@ -31,7 +35,7 @@ router.get('/listOfCourseLectures/:courseId', function (req, res) {
 		if (err) {
 			throw err;
 		} else {
-			console.log(dirTree)
+			//console.log(dirTree)
 			res.send(dirTree);
 		}
 	});

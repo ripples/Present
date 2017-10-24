@@ -4,10 +4,11 @@ var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
+var randomstring = require("randomstring");
 
 var index = require('./routes/index');
 //var users = require('./routes/users');
-
+var session = require('express-session');
 var app = express();
 
 // view engine setup
@@ -21,6 +22,18 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(session({
+    secret: "You/'ll never walk alone",
+    resave: false,
+    saveUninitialized: true,
+    cookie: { 
+      secure: !true, 
+      genid: function(req) {
+        return require('crypto').randomBytes(48).toString('hex'); // use UUIDs for session IDs
+      },
+      token: '' 
+    }
+}));
 
 app.use('/', index);
 
