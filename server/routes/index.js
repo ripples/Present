@@ -53,15 +53,17 @@ function generateICS(dates, tags) {
 
   fileText += END_TAG;
 
-  fs.writeFile("./lectures/" + tags[COURSEID] + "/" + lectureDir + "/Calendar.ics", fileText, function (err) {
+  /*fs.writeFile("./lectures/" + tags[COURSEID] + "/" + lectureDir + "/Calendar.ics", fileText, function (err) {
   if (err) return console.log(err);
-  console.log("ICS file written!");
+  console.log("ICS file written!");*/
+  console.log("ICS FILE GENERATED:\n");
+  console.log(fileText);
 });
   //Save as ics file to server filesystem
 }
 
-router.post('/calendar', function (req, res) { //Successful PUT = code 201 (CREATED)
-  var sDate = req.body.sDate;
+router.post('/calendar/submit', function (req, res) { //Successful POST = code 201 (CREATED)
+  /*var sDate = req.body.sDate;
   var eDate = req.body.eDate;
   var sTime = req.body.sTime;
   var eTime = req.body.eTime;
@@ -72,8 +74,9 @@ router.post('/calendar', function (req, res) { //Successful PUT = code 201 (CREA
   var summary = req.body.summary;
   var courseId = req.params.courseId.toString;
 
-  generateCalendar(sDate, eDate, sTime, eTime, recurDays, excludeDates, description, location, summary, courseId);
-  res.status(201).send();
+  generateCalendar(sDate, eDate, sTime, eTime, recurDays, excludeDates, description, location, summary, courseId);*/
+  console.log(req.body);
+  res.status(201).end();
 });
 
 router.post('/data', function (req, res) {

@@ -21,7 +21,7 @@ class CalendarForm extends React.Component {
   render() {
     return (
       <div className='calForm'>
-        <form className='pure-form' method='post' action='/calendar'>
+        <form action='/calendar/submit' method='post'>
           <fieldset>
             <legend>New Recording Schedule: {this.props.courseId}</legend>
             <div className='input_block'>
@@ -49,7 +49,7 @@ class CalendarForm extends React.Component {
             <div className='input_block'>
               <label className='datelbl' htmlFor='exclude'>Exclude Date: </label>
               <input className='dateInput' type='date' placeholder='Exclude: mm/dd/yyyy' name='exclude'/>
-              <button className='exclude-button' type='submit' className='pure-button pure-button-primary'>Exclude</button>
+              <button className='exclude-button' className='pure-button pure-button-primary'>Exclude</button>
               <label className='datelbl'>{this.state.excludeDates}</label>
             </div>
             <div className='input_block'>
