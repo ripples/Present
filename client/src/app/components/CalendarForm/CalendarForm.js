@@ -21,22 +21,22 @@ class CalendarForm extends React.Component {
   render() {
     return (
       <div className='calForm'>
-        <form action='/calendar/submit' method='post'>
+        <form action='/calendar' method='POST'>
           <fieldset>
             <legend>New Recording Schedule: {this.props.courseId}</legend>
             <div className='input_block'>
-              <label className='datelbl' htmlFor='start'>Start Date: </label>
-              <input className='dateInput' id='startDate' type='date' placeholder='Start Date: mm/dd/yyyy hh:mm' name='start' />
+              <label className='datelbl' htmlFor='sDate'>Start Date: </label>
+              <input className='dateInput' id='startDate' type='date' placeholder='Start Date: mm/dd/yyyy hh:mm' name='sDate' />
             </div>
             <div className='input_block'>
-              <label className='datelbl' htmlFor='begin'>Start Time: </label>
-              <input className='dateInput' id='begin' type='time' placeholder='Start Time: hh:mm AM/PM' name='begin'/>
-              <label className='datelbl' htmlFor='endTime'>End Time: </label>
-              <input className='dateInput' id='endTime' type='time' placeholder='End Time: hh:mm AM/PM' name='endTime'/>
+              <label className='datelbl' htmlFor='sTime'>Start Time: </label>
+              <input className='dateInput' id='begin' type='time' placeholder='Start Time: hh:mm AM/PM' name='sTime'/>
+              <label className='datelbl' htmlFor='eTime'>End Time: </label>
+              <input className='dateInput' id='endTime' type='time' placeholder='End Time: hh:mm AM/PM' name='eTime'/>
             </div>
             <div className='input_block'>
-              <label className='datelbl' htmlFor='end'>End Date: </label>
-              <input className='dateInput' id='endDate' type='date' placeholder='End Date: mm/dd/yyyy' name='end'/>
+              <label className='datelbl' htmlFor='eDate'>End Date: </label>
+              <input className='dateInput' id='endDate' type='date' placeholder='End Date: mm/dd/yyyy' name='eDate'/>
             </div>
             <div className='input_block'>
               <p>Repeat (WEEKLY): </p>
@@ -50,7 +50,7 @@ class CalendarForm extends React.Component {
               <label className='datelbl' htmlFor='exclude'>Exclude Date: </label>
               <input className='dateInput' type='date' placeholder='Exclude: mm/dd/yyyy' name='exclude'/>
               <button className='exclude-button' className='pure-button pure-button-primary'>Exclude</button>
-              <label className='datelbl'>{this.state.excludeDates}</label>
+              <label className='datelbl' name='excludeDates' value={this.state.excludeDates}>{this.state.excludeDates}</label>
             </div>
             <div className='input_block'>
               <label className='datelbl' htmlFor='description'>Description: </label>
