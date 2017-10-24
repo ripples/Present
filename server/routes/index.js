@@ -16,7 +16,7 @@ function generateCalendar(sDate, eDate, sTime, eTime, recurDays, excludeDates, d
   var recurrence = moment.recur(start, end).every(recurDays).daysOfWeek(); //Create moment recurrence object of date list
   var initialDates = recurrence.all("L"); //Generate string array of dates in "MM-DD-YYYY" format, in chronological order
   var filteredDates = dates.filter(function(e){return this.indexOf(e)<0}, excludeDates); //Returns array with excluded dates removed, still in chronological order
-  generateICS(filteredDates, [sDate, eDate, sTime, eTime, description, location, summary, courseId])
+  return generateICS(filteredDates, [sDate, eDate, sTime, eTime, description, location, summary, courseId])
 }
 
 function getICSDateNow() { //Gets the current timestamp in YYYYMMDDTHHMMSS format (for ics file generation)
@@ -53,21 +53,18 @@ function generateICS(dates, tags) {
 
   fileText += END_TAG;
 
-  fs.writeFile("./lectures/" + tags[COURSEID] + "/" + lectureDir + "/Calendar.ics", fileText, function (err) {
+  /*fs.writeFile("./lectures/" + tags[COURSEID] + "/" + lectureDir + "/Calendar.ics", fileText, function (err) {
     if (err) return console.log(err);
     console.log("ICS file written!");
-  });
+  });*/
 
   console.log(fileText);
+  return fileText;
   //Save as ics file to server filesystem
 }
 
-router.get('/calendar', function (req, res) {
-  res.send('You have submitted the calendar!');
-});
-
 router.post('/calendar', function (req, res) { //Successful POST = code 201 (CREATED)
-  /*var sDate = req.body.sDate;
+  var sDate = req.body.sDate;
   var eDate = req.body.eDate;
   var sTime = req.body.sTime;
   var eTime = req.body.eTime;
@@ -76,11 +73,11 @@ router.post('/calendar', function (req, res) { //Successful POST = code 201 (CRE
   var description = req.body.description;
   var location = req.body.location;
   var summary = req.body.summary;
-  var courseId = req.params.courseId.toString;
+  var courseId = req.body.courseId;
 
-  generateCalendar(sDate, eDate, sTime, eTime, recurDays, excludeDates, description, location, summary, courseId);*/
+  //var text = generateCalendar(sDate, eDate, sTime, eTime, recurDays, excludeDates, description, location, summary, courseId);
   console.log(req.body);
-  res.status(201).send();
+  res.status(201).send("ICS Created!");
 });
 
 
