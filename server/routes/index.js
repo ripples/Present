@@ -7,6 +7,9 @@ require('moment-recur');
 const fs = require('fs')
 const util = require('util')
 
+/*var bodyParser = require('body-parser');
+var app = express();
+app.use(bodyParser.urlencoded({ extended: true }));*/
 
 // TODO do encryption properly
 const key = "You/'ll never walk alone"
@@ -26,6 +29,8 @@ router.post('/calendar', function (req, res) {
 
   var text = generateCalendar(sDate, eDate, sTime, eTime, recurDays, excludeDates, description, location, summary, courseId);
   res.status(201).send(text);
+  /*if (!req.body) return res.sendStatus(400);
+  else res.status(200).send(text);*/
 });
 
 
@@ -150,10 +155,11 @@ router.get('/image/:courseId/:lectureName/:sourceId/:time', function (req, res) 
 });
 
 function generateCalendar(sDate, eDate, sTime, eTime, recurDays, excludeDates, description, location, summary, courseId) {
-  var start = moment(sDate, "YYYY-MM-DD"), end = moment(eDate, "YYYY-MM-DD");
+  console.log(sDate + eDate + sTime + eTime + recurDays + excludeDates + description + location + summary + courseId);
+  var start = moment(sDate, "YYYYMMDD"), end = moment(eDate, "YYYYMMDD");
   var recurrence = moment.recur(start, end).every(recurDays).daysOfWeek(); //Create moment recurrence object of date list
   var initialDates = recurrence.all("YYYYMMDD"); //Generate string array of dates in "YYYY-MM-DD" format, in chronological order
-  var filteredDates = initialDates.filter(function(e){return this.indexOf(e)<0}, excludeDates); //Returns array with excluded dates removed, still in chronological order
+  var filteredDates = initialDates.filter(function(e){return excludeDates.indexOf(e)<0}); //Returns array with excluded dates removed, still in chronological order
   return generateICS(filteredDates, [sDate, eDate, sTime, eTime, description, location, summary, courseId])
 }
 
@@ -182,8 +188,8 @@ function generateICS(dates, tags) {
     fileText += (i + "@default\nCLASS:PUBLIC\n");
     fileText += ("DESCRIPTION:" + tags[DESCRIPTION] + "\n");
     fileText += ("DTSTAMP;VALUE=DATE-TIME:" + DTSTAMP + "\n");
-    fileText += ("DTSTART;VALUE=DATE-TIME:" + tags[SDATE] + "T" + tags[STIME] + "\n");
-    fileText += ("DTEND;VALUE=DATE-TIME:" + tags[EDATE] + "T" + tags[ETIME] + "\n");
+    fileText += ("DTSTART;VALUE=DATE-TIME:" + dates[i] + "T" + tags[STIME] + "\n");
+    fileText += ("DTEND;VALUE=DATE-TIME:" + dates[i] + "T" + tags[ETIME] + "\n");
     fileText += ("LOCATION:" + tags[LOCATION] + "\n");
     fileText += ("SUMMARY;LANGUAGE=en-us:" + tags[SUMMARY] + "\n");
     fileText += "TRANSP:TRANSPARENT\nEND:VEVENT\n";
@@ -191,10 +197,10 @@ function generateICS(dates, tags) {
 
   fileText += END_TAG;
 
-  /*fs.writeFile("./lectures/" + tags[COURSEID] + "/" + lectureDir + "/Calendar.ics", fileText, function (err) {
+  fs.writeFile("./lectures/" + tags[COURSEID] + "/Calendar.ics", fileText, function (err) {
     if (err) return console.log(err);
     console.log("ICS file written!");
-  });*/
+  });
   return fileText;
 }
 

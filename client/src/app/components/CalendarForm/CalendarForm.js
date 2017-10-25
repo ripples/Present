@@ -7,11 +7,13 @@ class CalendarForm extends React.Component {
     super(props);
     this.handleAddExclude = this.handleAddExclude.bind(this);
     this.handleExcludeChange = this.handleExcludeChange.bind(this);
-    this.formatExclude = this.formatExclude.bind(this);
+    this.formatDate = this.formatDate.bind(this);
     this.handleCheckboxChange = this.handleCheckboxChange.bind(this);
     this.formatTime = this.formatTime.bind(this);
     this.handleSTime = this.handleSTime.bind(this);
     this.handleETime = this.handleETime.bind(this);
+    this.handleSDate = this.handleSDate.bind(this);
+    this.handleEDate = this.handleEDate.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
     this.state ={
       sDate: "",
@@ -31,10 +33,11 @@ class CalendarForm extends React.Component {
   handleSubmit(e){
     e.preventDefault();
 
-    var myInit = {method: 'post',
+    var options = {method: 'POST',
+                  headers: {"Content-Type": "application/json"},
                   body: {
-                    "sDate": this.sDate.value,
-                    "eDate": this.eDate.value,
+                    "sDate": this.state.sDate,
+                    "eDate": this.state.eDate,
                     "sTime": this.state.sTime,
                     "eTime": this.state.eTime,
                     "recurDays": this.state.recurDays,
@@ -45,8 +48,8 @@ class CalendarForm extends React.Component {
                     "courseId": this.state.courseId
                   }};
 
-    fetch('/calendar', myInit).then((res) => {
-      return res.text()
+    fetch('/calendar', options).then((response) => {
+      return response.json()
     }).then((data) => console.log(data)).catch((err) => console.log(err));
   }
 
@@ -58,20 +61,32 @@ class CalendarForm extends React.Component {
   handleAddExclude(e){
     e.preventDefault();
     const currentExcludes = this.state.excludeDates;
-    const newExcludes = currentExcludes.concat(this.formatExclude(this.state.currentExclude));
+    const newExcludes = currentExcludes.concat(this.formatDate(this.state.currentExclude));
     this.setState({excludeDates: newExcludes}, function(){
       console.log(this.state.excludeDates);
     });
   }
 
-  formatExclude(excludedDate) {
-    var split = excludedDate.split("-");
+  formatDate(date) {
+    var split = date.split("-");
     return split[0] + split[1] + split[2];
   }
 
   formatTime(time) { //Formats time from form format to ics format
     var str = time.split(":");
     return str[0] + str[1] + "00";
+  }
+
+  handleSDate(e) {
+   this.setState({sDate: this.formatDate(e.target.value)}, function () {
+     console.log(this.state.sDate);
+   });
+  }
+
+  handleEDate(e) {
+   this.setState({eDate: this.formatDate(e.target.value)}, function () {
+     console.log(this.state.eDate);
+   });
   }
 
   handleSTime(e) {
@@ -111,7 +126,7 @@ class CalendarForm extends React.Component {
             <legend>New Recording Schedule: {this.props.courseId}</legend>
             <div className='input_block'>
               <label className='datelbl' htmlFor='sDate'>Start Date: </label>
-              <input ref={(ref) => {this.sDate = ref}} className='dateInput' id='startDate' type='date' placeholder='Start Date: mm/dd/yyyy hh:mm' name='sDate'/>
+              <input className='dateInput' id='startDate' type='date' placeholder='Start Date: mm/dd/yyyy hh:mm' name='sDate' onChange={this.handleSDate}/>
             </div>
             <div className='input_block'>
               <label className='datelbl' htmlFor='sTime'>Start Time: </label>
@@ -121,7 +136,7 @@ class CalendarForm extends React.Component {
             </div>
             <div className='input_block'>
               <label className='datelbl' htmlFor='eDate'>End Date: </label>
-              <input ref={(ref) => {this.eDate = ref}} className='dateInput' id='endDate' type='date' placeholder='End Date: mm/dd/yyyy' name='eDate'/>
+              <input className='dateInput' id='endDate' type='date' placeholder='End Date: mm/dd/yyyy' name='eDate' onChange={this.handleEDate}/>
             </div>
             <div className='input_block'>
               <p>Repeat (WEEKLY): </p>
@@ -143,7 +158,7 @@ class CalendarForm extends React.Component {
               <label className='datelbl' htmlFor='location'>Location: </label>
               <input ref={(ref) => {this.location = ref}} className='dateInput' id='location' type='text' placeholder='Class location...' name='location'/>
               <label className='datelbl' htmlFor='summary'>Summary: </label>
-              <input ref={(ref) => {this.summary = ref}} className='dateInput' id='summary' type='text' placeholder='Class summary...' name='summary'/>
+              <input ref={(ref) => {this.summary = ref}} className='dateInput' id='summary' type='text' placeholder='Semester + Course Name/#' name='summary'/>
             </div>
             <div className='input_block'>
               <input type='submit' value='Create Schedule'/>
