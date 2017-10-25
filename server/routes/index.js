@@ -8,14 +8,18 @@ const util = require('util')
 // TODO do encryption properly
 const key = "You/'ll never walk alone"
 var encryptor = require('simple-encryptor')(key)
+var courseId = ''; //temporarily using variable since req.sessions is finicky
 
 router.post('/data', function (req, res) {
-	var user = req.body.lis_person_contact_email_primary;
-	if(user) {
-		req.session.token = encryptor.encrypt(req.body).replace(/\//g, '-');
-		req.session.save()
+	var course = req.body.lis_course_section_sourcedid;
+	if(course) {
+		const hashed = encryptor.encrypt(req.body).replace(/\//g, '-');
+		req.session.token = course;
+		console.log("Course ID: " + req.session.token);
+		req.session.save();
+		courseId = req.session.token;
 		const url = "http://localhost:3000/" // TODO Global constant
-		res.redirect(url + req.session.token);
+		res.redirect(url + hashed);
 	}
 });
 
@@ -31,65 +35,72 @@ router.get('/identify/*', function (req, res) {
 });
 
 router.get('/listOfCourseLectures/:courseId', function (req, res) {
-	dirToJson("./lectures/" + req.params.courseId.toString(), function (err, dirTree) {
-		if (err) {
-			throw err;
-		} else {
-			//console.log(dirTree)
-			res.send(dirTree);
-		}
-	});
+	console.log(courseId);
+	if(courseId === req.params.courseId) {
+		dirToJson("./lectures/" + req.params.courseId.toString(), function (err, dirTree) {
+			if (err) {
+				throw err;
+			} else {
+				//console.log(dirTree)
+				res.send(dirTree);
+			}
+		});
+	}
 });
 
 router.get('/manifest/:courseId/:lectureName', function (req, res) {
-	const fpath = "./lectures/" + req.params.courseId.toString() + '/' + req.params.lectureName.toString() + '/INFO'
-	fs.readFile(fpath, 'utf8', function (err, contents) {
-		if (err) {
-			res.status(404).send('Not Found');
-		}
-		else {
-			const re = /(?:whiteboardCount: (\d))(?:\s|.*)*(?:computerCount: (\d))/ //this is a little bit more delicate than I'd like it to be
-			const found = contents.match(re)
-			const manifest = {
-				whiteboardCount: parseInt(found[1]), //for some reason there is a third capture group at 0...
-				computerCount: parseInt(found[2]),
-				input: found['input']
+	if(courseId === req.params.courseId) {
+		const fpath = "./lectures/" + req.params.courseId.toString() + '/' + req.params.lectureName.toString() + '/INFO'
+		fs.readFile(fpath, 'utf8', function (err, contents) {
+			if (err) {
+				res.status(404).send('Not Found');
 			}
-			res.send(manifest)
-		}
-	})
+			else {
+				const re = /(?:whiteboardCount: (\d))(?:\s|.*)*(?:computerCount: (\d))/ //this is a little bit more delicate than I'd like it to be
+				const found = contents.match(re)
+				const manifest = {
+					whiteboardCount: parseInt(found[1]), //for some reason there is a third capture group at 0...
+					computerCount: parseInt(found[2]),
+					input: found['input']
+				}
+				res.send(manifest)
+			}
+		})
+	}
 })
 
 
 router.get('/video/:courseId/:lectureName', function (req, res) {
-	const fpath = "./lectures/" + req.params.courseId.toString() + '/' + req.params.lectureName.toString() + '/videoLarge.mp4'  // TODO tie this to absolute location
-	const stat = fs.statSync(fpath)
-	const fileSize = stat.size
-	const range = req.headers.range
-	if (range) {
-		const parts = range.replace(/bytes=/, "").split("-")
-		const start = parseInt(parts[0], 10)
-		const end = parts[1]
-			? parseInt(parts[1], 10)
-			: fileSize - 1
-		const chunksize = (end - start) + 1
-		const file = fs.createReadStream(fpath, { start, end })
-		const head = {
-			'Content-Range': `bytes ${start}-${end}/${fileSize}`,
-			'Accept-Ranges': 'bytes',
-			'Content-Length': chunksize,
-			'Content-Type': 'video/mp4',
+	if(courseId === req.params.courseId) {
+		const fpath = "./lectures/" + req.params.courseId.toString() + '/' + req.params.lectureName.toString() + '/videoLarge.mp4'  // TODO tie this to absolute location
+		const stat = fs.statSync(fpath)
+		const fileSize = stat.size
+		const range = req.headers.range
+		if (range) {
+			const parts = range.replace(/bytes=/, "").split("-")
+			const start = parseInt(parts[0], 10)
+			const end = parts[1]
+				? parseInt(parts[1], 10)
+				: fileSize - 1
+			const chunksize = (end - start) + 1
+			const file = fs.createReadStream(fpath, { start, end })
+			const head = {
+				'Content-Range': `bytes ${start}-${end}/${fileSize}`,
+				'Accept-Ranges': 'bytes',
+				'Content-Length': chunksize,
+				'Content-Type': 'video/mp4',
+			}
+			res.writeHead(206, head);
+			file.pipe(res);
 		}
-		res.writeHead(206, head);
-		file.pipe(res);
-	}
-	else {
-		const head = {
-			'Content-Length': fileSize,
-			'Content-Type': 'video/mp4',
+		else {
+			const head = {
+				'Content-Length': fileSize,
+				'Content-Type': 'video/mp4',
+			}
+			res.writeHead(200, head)
+			fs.createReadStream(fpath).pipe(res)
 		}
-		res.writeHead(200, head)
-		fs.createReadStream(fpath).pipe(res)
 	}
 });
 

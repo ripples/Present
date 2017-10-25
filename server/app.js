@@ -19,18 +19,14 @@ app.set('view engine', 'jade');
 app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
-app.use(cookieParser());
+app.use(cookieParser('_secret_'));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(session({
-    secret: "You/'ll never walk alone",
+    secret: '_secret_',
     resave: false,
     saveUninitialized: true,
-    cookie: { 
-      secure: !true, 
-      genid: function(req) {
-        return require('crypto').randomBytes(48).toString('hex'); // use UUIDs for session IDs
-      },
-      token: '' 
+    cookie: {
+      secure: true
     }
 }));
 

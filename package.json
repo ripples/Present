@@ -11,6 +11,7 @@
     "debug": "~2.6.9",
     "dir-to-json": "0.0.3",
     "express": "~4.15.5",
+    "express-session": "^1.15.6",
     "jade": "~1.11.0",
     "morgan": "~1.9.0",
     "react": "^0.14.6",
