@@ -7,10 +7,6 @@ require('moment-recur');
 const fs = require('fs')
 const util = require('util')
 
-/*var bodyParser = require('body-parser');
-var app = express();
-app.use(bodyParser.urlencoded({ extended: true }));*/
-
 // TODO do encryption properly
 const key = "You/'ll never walk alone"
 var encryptor = require('simple-encryptor')(key);
@@ -29,8 +25,6 @@ router.post('/calendar', function (req, res) {
 
   var text = generateCalendar(sDate, eDate, sTime, eTime, recurDays, excludeDates, description, location, summary, courseId);
   res.status(201).send(text);
-  /*if (!req.body) return res.sendStatus(400);
-  else res.status(200).send(text);*/
 });
 
 
@@ -199,7 +193,6 @@ function generateICS(dates, tags) {
 
   fs.writeFile("./lectures/" + tags[COURSEID] + "/Calendar.ics", fileText, function (err) {
     if (err) return console.log(err);
-    console.log("ICS file written!");
   });
   return fileText;
 }

@@ -35,21 +35,21 @@ class CalendarForm extends React.Component {
 
     var options = {method: 'POST',
                   headers: {"Content-Type": "application/json"},
-                  body: {
-                    "sDate": this.state.sDate,
-                    "eDate": this.state.eDate,
-                    "sTime": this.state.sTime,
-                    "eTime": this.state.eTime,
-                    "recurDays": this.state.recurDays,
-                    "excludeDates": this.state.excludeDates,
-                    "description": this.description.value,
-                    "location": this.location.value,
-                    "summary": this.summary.value,
-                    "courseId": this.state.courseId
-                  }};
+                  body: JSON.stringify({
+                    sDate: this.state.sDate,
+                    eDate: this.state.eDate,
+                    sTime: this.state.sTime,
+                    eTime: this.state.eTime,
+                    recurDays: this.state.recurDays,
+                    excludeDates: this.state.excludeDates,
+                    description: this.description.value,
+                    location: this.location.value,
+                    summary: this.summary.value,
+                    courseId: this.state.courseId
+                  })};
 
     fetch('/calendar', options).then((response) => {
-      return response.json()
+      return response.text()
     }).then((data) => console.log(data)).catch((err) => console.log(err));
   }
 
