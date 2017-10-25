@@ -1,7 +1,7 @@
 import React from "react";
 import videojs from "video.js";
 
-class VideoView extends React.Component {
+export default class VideoView extends React.Component {
   componentDidMount() {
     const videoJsOptions = {
       height: 358,
@@ -30,7 +30,7 @@ class VideoView extends React.Component {
     return (
       <div>
         <div className="video-view">
-          <video
+          <video 
             ref={node => this.videoNode = node}
             className="video-js vjs-default-skin vjs-big-play-centered">
           </video>
@@ -39,5 +39,3 @@ class VideoView extends React.Component {
     );
   }
 }
-
-export default VideoView;
