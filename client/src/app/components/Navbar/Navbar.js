@@ -13,7 +13,7 @@ export default class Navbar extends Component {
                         </Link>
                     </div>
                     <div className="col-md-6" >
-                        <h1>Lecture Viewer 2</h1>
+                        <h1 style={headerStyle}>Lecture Viewer 2</h1>
                     </div>
                     <div className="col-md-3">
                     </div>
@@ -37,4 +37,8 @@ var buttonStyle= {
     paddingRight: "10px",
     paddingTop: "4px",
     paddingBottom: "4px"
+}
+
+var headerStyle= {
+	fontWeight: "bold"
 }
