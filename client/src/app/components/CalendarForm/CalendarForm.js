@@ -8,17 +8,11 @@ class CalendarForm extends React.Component {
     this.handleAddExclude = this.handleAddExclude.bind(this);
     this.handleExcludeChange = this.handleExcludeChange.bind(this);
     this.formatExclude = this.formatExclude.bind(this);
-
     this.handleCheckboxChange = this.handleCheckboxChange.bind(this);
-
-
-
     this.formatTime = this.formatTime.bind(this);
     this.handleSTime = this.handleSTime.bind(this);
     this.handleETime = this.handleETime.bind(this);
-
     this.handleSubmit = this.handleSubmit.bind(this);
-
     this.state ={
       sDate: "",
       eDate: "",
@@ -29,34 +23,31 @@ class CalendarForm extends React.Component {
       currentExclude: "",
       description: "",
       location: "",
-      summary: ""
+      summary: "",
+      courseId: this.props.courseId
     };
   }
 
   handleSubmit(e){
     e.preventDefault();
 
-    console.log(this.state.sTime);
+    var myInit = {method: 'post',
+                  body: {
+                    "sDate": this.sDate.value,
+                    "eDate": this.eDate.value,
+                    "sTime": this.state.sTime,
+                    "eTime": this.state.eTime,
+                    "recurDays": this.state.recurDays,
+                    "excludeDates": this.state.excludeDates,
+                    "description": this.description.value,
+                    "location": this.location.value,
+                    "summary": this.summary.value,
+                    "courseId": this.state.courseId
+                  }};
 
-    fetch('/calendar', {
-      method: 'post',
-      body: {
-        "sDate": this.sDate.value,
-        "eDate": this.eDate.value,
-        "sTime": this.state.sTime,
-        "eTime": this.state.eTime,
-        "recurDays": this.state.recurDays,
-        "excludeDates": this.state.excludeDates,
-        "description": this.description.value,
-        "location": this.location.value,
-        "summary": this.summary.value,
-        "courseId": this.state.courseId
-      }
-    }).then( res => {
-      console.log(res)
-    }, err => {
-      console.log(err);
-    });
+    fetch('/calendar', myInit).then((res) => {
+      return res.text()
+    }).then((data) => console.log(data)).catch((err) => console.log(err));
   }
 
   handleExcludeChange(e) {
@@ -124,9 +115,9 @@ class CalendarForm extends React.Component {
             </div>
             <div className='input_block'>
               <label className='datelbl' htmlFor='sTime'>Start Time: </label>
-              <input ref={(ref) => {this.sTime = ref}} className='dateInput' id='begin' type='time' placeholder='Start Time: hh:mm AM/PM' name='sTime' onChange={this.handleSTime}/>
+              <input className='dateInput' id='begin' type='time' placeholder='Start Time: hh:mm AM/PM' name='sTime' onChange={this.handleSTime}/>
               <label className='datelbl' htmlFor='eTime'>End Time: </label>
-              <input ref={(ref) => {this.eTime = ref}} className='dateInput' id='endTime' type='time' placeholder='End Time: hh:mm AM/PM' name='eTime' onChange={this.handleETime}/>
+              <input className='dateInput' id='endTime' type='time' placeholder='End Time: hh:mm AM/PM' name='eTime' onChange={this.handleETime}/>
             </div>
             <div className='input_block'>
               <label className='datelbl' htmlFor='eDate'>End Date: </label>

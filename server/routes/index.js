@@ -1,5 +1,4 @@
 var express = require('express');
-//const bodyParser = require('body-parser');
 var router = express.Router();
 var dirToJson = require('dir-to-json');
 var path = require('path')
@@ -8,14 +7,12 @@ require('moment-recur');
 const fs = require('fs')
 const util = require('util')
 
-//var app = express();
-//app.use(bodyParser);
 
 // TODO do encryption properly
 const key = "You/'ll never walk alone"
 var encryptor = require('simple-encryptor')(key);
 
-router.post('/calendar', function (req, res) { //Successful POST = code 201 (CREATED)
+router.post('/calendar', function (req, res) {
   var sDate = req.body.sDate;
   var eDate = req.body.eDate;
   var sTime = req.body.sTime;
@@ -28,7 +25,7 @@ router.post('/calendar', function (req, res) { //Successful POST = code 201 (CRE
   var courseId = req.body.courseId;
 
   var text = generateCalendar(sDate, eDate, sTime, eTime, recurDays, excludeDates, description, location, summary, courseId);
-  res.status(201).send("POST Received");
+  res.status(201).send(text);
 });
 
 
@@ -199,8 +196,6 @@ function generateICS(dates, tags) {
     console.log("ICS file written!");
   });*/
   return fileText;
-
-  //Save as ics file to server filesystem
 }
 
 module.exports = router;
