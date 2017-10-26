@@ -16,6 +16,8 @@ class CalendarForm extends React.Component {
     this.handleETime = this.handleETime.bind(this);
     this.handleSDate = this.handleSDate.bind(this);
     this.handleEDate = this.handleEDate.bind(this);
+    this.handleDescription = this.handleDescription.bind(this);
+    this.handleLocation = this.handleLocation.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
     this.state ={
       sDate: "",
@@ -33,27 +35,45 @@ class CalendarForm extends React.Component {
     };
   }
 
+  canBeSubmitted() {
+    return (
+      this.state.sDate.length > 0 &&
+      this.state.eDate.length > 0 &&
+      this.state.sTime.length > 0 &&
+      this.state.eTime.length > 0 &&
+      this.state.recurDays.length > 0 &&
+      this.state.description.length > 0 &&
+      this.state.location.length > 0
+    );
+  }
+
   handleSubmit(e){
-    e.preventDefault();
+    if(!this.canBeSubmitted()){
+      e.preventDefault();
+      return;
+    }
+    else{
+      e.preventDefault();
 
-    var options = {method: 'POST',
-                  headers: {"Content-Type": "application/json"},
-                  body: JSON.stringify({
-                    sDate: this.state.sDate,
-                    eDate: this.state.eDate,
-                    sTime: this.state.sTime,
-                    eTime: this.state.eTime,
-                    recurDays: this.state.recurDays,
-                    excludeDates: this.state.excludeDates,
-                    includeDates: this.state.includeDates,
-                    description: this.description.value,
-                    location: this.location.value,
-                    courseId: this.state.courseId
-                  })};
+      var options = {method: 'POST',
+                    headers: {"Content-Type": "application/json"},
+                    body: JSON.stringify({
+                      sDate: this.state.sDate,
+                      eDate: this.state.eDate,
+                      sTime: this.state.sTime,
+                      eTime: this.state.eTime,
+                      recurDays: this.state.recurDays,
+                      excludeDates: this.state.excludeDates,
+                      includeDates: this.state.includeDates,
+                      description: this.state.description,
+                      location: this.state.location,
+                      courseId: this.state.courseId
+                    })};
 
-    fetch('/calendar', options).then((response) => {
-      return response.text()
-    }).then((data) => console.log(data)).catch((err) => console.log(err));
+      fetch('/calendar', options).then((response) => {
+        return response.text()
+      }).then((data) => console.log(data)).catch((err) => console.log(err));
+    }
   }
 
   handleExcludeChange(e) {
@@ -118,6 +138,18 @@ class CalendarForm extends React.Component {
     });
   }
 
+  handleLocation(e){
+    this.setState({location: e.target.value}, function () {
+      console.log(this.state.location);
+    });
+  }
+
+  handleDescription(e){
+    this.setState({description: e.target.value}, function () {
+      console.log(this.state.description);
+    });
+  }
+
   handleCheckboxChange(e){
     const rDays = this.state.recurDays;
     let index
@@ -136,6 +168,8 @@ class CalendarForm extends React.Component {
   }
 
   render() {
+    const isEnabled = this.canBeSubmitted();
+
     return (
       <div className='calForm'>
         <form onSubmit={this.handleSubmit}>
@@ -177,12 +211,12 @@ class CalendarForm extends React.Component {
             </div>
             <div className='input_block'>
               <label className='datelbl' htmlFor='description'>Description: </label>
-              <input ref={(ref) => {this.description = ref}} className='dateInput' id='description' type='text' placeholder='Class description...' name='description'/>
+              <input className='dateInput' id='description' type='text' placeholder='Class description...' name='description' onChange={this.handleDescription}/>
               <label className='datelbl' htmlFor='location'>Location: </label>
-              <input ref={(ref) => {this.location = ref}} className='dateInput' id='location' type='text' placeholder='Class location...' name='location'/>
+              <input className='dateInput' id='location' type='text' placeholder='Class location...' name='location' onChange={this.handleLocation}/>
             </div>
             <div className='input_block'>
-              <input type='submit' value='Create Schedule'/>
+              <input type='submit' disabled={!isEnabled} value='Create Schedule'/>
             </div>
           </fieldset>
         </form>
