@@ -7,6 +7,8 @@ class CalendarForm extends React.Component {
     super(props);
     this.handleAddExclude = this.handleAddExclude.bind(this);
     this.handleExcludeChange = this.handleExcludeChange.bind(this);
+    this.handleAddInclude = this.handleAddInclude.bind(this);
+    this.handleIncludeChange = this.handleIncludeChange.bind(this);
     this.formatDate = this.formatDate.bind(this);
     this.handleCheckboxChange = this.handleCheckboxChange.bind(this);
     this.formatTime = this.formatTime.bind(this);
@@ -22,10 +24,11 @@ class CalendarForm extends React.Component {
       eTime: "",
       recurDays: [],
       excludeDates: [],
+      includeDates: [],
       currentExclude: "",
+      currentInclude: "",
       description: "",
       location: "",
-      summary: "",
       courseId: this.props.courseId
     };
   }
@@ -42,9 +45,9 @@ class CalendarForm extends React.Component {
                     eTime: this.state.eTime,
                     recurDays: this.state.recurDays,
                     excludeDates: this.state.excludeDates,
+                    includeDates: this.state.includeDates,
                     description: this.description.value,
                     location: this.location.value,
-                    summary: this.summary.value,
                     courseId: this.state.courseId
                   })};
 
@@ -64,6 +67,20 @@ class CalendarForm extends React.Component {
     const newExcludes = currentExcludes.concat(this.formatDate(this.state.currentExclude));
     this.setState({excludeDates: newExcludes}, function(){
       console.log(this.state.excludeDates);
+    });
+  }
+
+  handleIncludeChange(e) {
+    e.preventDefault();
+    this.setState({ currentInclude: e.target.value });
+  }
+
+  handleAddInclude(e){
+    e.preventDefault();
+    const currentIncludes = this.state.includeDates;
+    const newIncludes = currentIncludes.concat(this.formatDate(this.state.currentInclude));
+    this.setState({includeDates: newIncludes}, function(){
+      console.log(this.state.includeDates);
     });
   }
 
@@ -150,15 +167,19 @@ class CalendarForm extends React.Component {
               <label className='datelbl' htmlFor='exclude'>Exclude Date: </label>
               <input className='dateInput' type='date' placeholder='Exclude: mm/dd/yyyy' name='exclude' onChange={this.handleExcludeChange}/>
               <button className='exclude-button' className='pure-button pure-button-primary' onClick={this.handleAddExclude}>Exclude</button>
-              <label className='datelbl' name='excludeDates'>{this.state.excludeDates}</label>
+              <label className='datelbl' name='excludeDates'>Currently Excluded: [{this.state.excludeDates}]</label>
+            </div>
+            <div className='input_block'>
+              <label className='datelbl' htmlFor='include'>Add Extra Date: </label>
+              <input className='dateInput' type='date' placeholder='Add: mm/dd/yyyy' name='include' onChange={this.handleIncludeChange}/>
+              <button className='include-button' className='pure-button pure-button-primary' onClick={this.handleAddInclude}>Add</button>
+              <label className='datelbl' name='includeDates'>Currently Added: [{this.state.includeDates}]</label>
             </div>
             <div className='input_block'>
               <label className='datelbl' htmlFor='description'>Description: </label>
               <input ref={(ref) => {this.description = ref}} className='dateInput' id='description' type='text' placeholder='Class description...' name='description'/>
               <label className='datelbl' htmlFor='location'>Location: </label>
               <input ref={(ref) => {this.location = ref}} className='dateInput' id='location' type='text' placeholder='Class location...' name='location'/>
-              <label className='datelbl' htmlFor='summary'>Summary: </label>
-              <input ref={(ref) => {this.summary = ref}} className='dateInput' id='summary' type='text' placeholder='Semester + Course Name/#' name='summary'/>
             </div>
             <div className='input_block'>
               <input type='submit' value='Create Schedule'/>

@@ -18,13 +18,14 @@ router.post('/calendar', function (req, res) {
   var eTime = req.body.eTime;
   var recurDays = req.body.recurDays;
   var excludeDates = req.body.excludeDates;
+  var includeDates = req.body.includeDates;
   var description = req.body.description;
   var location = req.body.location;
-  var summary = req.body.summary;
+  var summary = getCurrentSemester() + " " + req.body.courseId;
   var courseId = req.body.courseId;
 
-  var text = generateCalendar(sDate, eDate, sTime, eTime, recurDays, excludeDates, description, location, summary, courseId);
-  res.status(201).send(text);
+  generateCalendar(sDate, eDate, sTime, eTime, recurDays, excludeDates, includeDates, description, location, summary, courseId);
+  res.status(201).send("Recording schedule successfully created: ./lectures/" + courseId + "/Calendar.ics");
 });
 
 
@@ -148,24 +149,12 @@ router.get('/image/:courseId/:lectureName/:sourceId/:time', function (req, res) 
 	})
 });
 
-function generateCalendar(sDate, eDate, sTime, eTime, recurDays, excludeDates, description, location, summary, courseId) {
-  console.log(sDate + eDate + sTime + eTime + recurDays + excludeDates + description + location + summary + courseId);
+function generateCalendar(sDate, eDate, sTime, eTime, recurDays, excludeDates, includeDates, description, location, summary, courseId) {
   var start = moment(sDate, "YYYYMMDD"), end = moment(eDate, "YYYYMMDD");
   var recurrence = moment.recur(start, end).every(recurDays).daysOfWeek(); //Create moment recurrence object of date list
   var initialDates = recurrence.all("YYYYMMDD"); //Generate string array of dates in "YYYY-MM-DD" format, in chronological order
   var filteredDates = initialDates.filter(function(e){return excludeDates.indexOf(e)<0}); //Returns array with excluded dates removed, still in chronological order
-  return generateICS(filteredDates, [sDate, eDate, sTime, eTime, description, location, summary, courseId])
-}
-
-function getICSDateNow() { //Gets the current timestamp in YYYYMMDDTHHMMSS format (for ics file generation)
-  var now = new Date();
-  var year = "" + now.getFullYear();
-  var month = "" + (now.getMonth() + 1); if (month.length == 1) { month = "0" + month; }
-  var day = "" + now.getDate(); if (day.length == 1) { day = "0" + day; }
-  var hour = "" + now.getHours(); if (hour.length == 1) { hour = "0" + hour; }
-  var minute = "" + now.getMinutes(); if (minute.length == 1) { minute = "0" + minute; }
-  var second = "" + now.getSeconds(); if (second.length == 1) { second = "0" + second; }
-  return [year, month, day, "T", hour, minute, second];
+  generateICS(filteredDates.concat(includeDates).sort(), [sDate, eDate, sTime, eTime, description, location, summary, courseId])
 }
 
 function generateICS(dates, tags) {
@@ -194,7 +183,70 @@ function generateICS(dates, tags) {
   fs.writeFile("./lectures/" + tags[COURSEID] + "/Calendar.ics", fileText, function (err) {
     if (err) return console.log(err);
   });
-  return fileText;
+}
+
+function getCurrentSemester(){
+  var year = new Date().getFullYear().toString().substr(-2);
+  var curMonth = new Date().getMonth(); //Jan:0, May=4, Aug=7, Dec=11, 1-3, 5-6, 8-10
+  var curDay = new Date().getDate();
+  var semester = "";
+
+  if(curMonth == 0){
+    if(curDay < 21){
+      semester = "WINTER";
+    }
+    else{
+      semester = "SPRING";
+    }
+  }
+  else if(curMonth == 4){
+    if(curDay < 17){
+      semester = "SPRING";
+    }
+    else{
+      semester = "SUMMER";
+    }
+  }
+  else if(curMonth == 7){
+    if(curDay < 24){
+      semester = "SUMMER";
+    }
+    else{
+      semester = "FALL";
+    }
+  }
+  else if(curMonth == 11){
+    if(curDay < 22){
+      semester = "FALL";
+    }
+    else{
+      semester = "WINTER";
+    }
+  }
+  else{
+    if(curMonth >= 1 && curMonth <= 3){
+      semester = "SPRING";
+    }
+    else if(curMonth >= 5 && curMonth <= 6){
+      semester = "SUMMER";
+    }
+    else{
+      semester = "FALL";
+    }
+  }
+
+  return semester + year;
+}
+
+function getICSDateNow() { //Gets the current timestamp in YYYYMMDDTHHMMSS format (for ics file generation)
+  var now = new Date();
+  var year = "" + now.getFullYear();
+  var month = "" + (now.getMonth() + 1); if (month.length == 1) { month = "0" + month; }
+  var day = "" + now.getDate(); if (day.length == 1) { day = "0" + day; }
+  var hour = "" + now.getHours(); if (hour.length == 1) { hour = "0" + hour; }
+  var minute = "" + now.getMinutes(); if (minute.length == 1) { minute = "0" + minute; }
+  var second = "" + now.getSeconds(); if (second.length == 1) { second = "0" + second; }
+  return [year, month, day, "T", hour, minute, second];
 }
 
 module.exports = router;
