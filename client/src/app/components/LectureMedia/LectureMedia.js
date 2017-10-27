@@ -40,7 +40,7 @@ export default class LectureMedia extends React.Component {
 		return (
 			<div className="lecture-media">
 				<div className="container">
-					<div className="video-wrapper">
+					<div>
 						<VideoView
 							videoSrc={'/video/' + this.props.courseId + "/" + this.props.lectureId } onVideoTimeUpdate={this.onVideoTimeUpdate} />
 					</div>

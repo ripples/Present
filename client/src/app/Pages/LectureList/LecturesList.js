@@ -10,22 +10,22 @@ export default class LecturesList extends Component {
 				</div>
 
 				<div className="col-md-6">
-				<h1 style={headerStyle}>Lecture Dates:</h1>
-				
-				{( typeof this.props.course !== "undefined" && typeof this.props.course.children !== "undefined") ?
-					this.props.course.children.map((course, i) => {
-						var patt = /^\d\d-\d\d-\d\d\d\d--\d\d-\d\d-\d\d$/;
-						if (patt.test(course.name)) { 
-							return (
-							<div key={i}>
-								<Link to={"course/" + this.props.courseId + "/lecture/" + course.name}>
-									<button type="button" style={buttonStyle}>{course.name}</button>
-								</Link>
-							</div>
-						)
+					<h2 style={headerStyle}>Lecture Dates:</h2>
+					
+					{( typeof this.props.course !== "undefined" && typeof this.props.course.children !== "undefined") ?
+						this.props.course.children.map((course, i) => {
+							var patt = /^\d\d-\d\d-\d\d\d\d--\d\d-\d\d-\d\d$/;
+							if (patt.test(course.name)) { 
+								return (
+								<div key={i}>
+									<Link to={"course/" + this.props.courseId + "/lecture/" + course.name}>
+										<button type="button" style={buttonStyle}>{course.name}</button>
+									</Link>
+								</div>
+							)
+						}
+						}) : null
 					}
-					}) : null
-				}
 
 				</div>
 
