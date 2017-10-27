@@ -17,13 +17,15 @@ export default class LecturesList extends Component {
 							var patt = /^\d\d-\d\d-\d\d\d\d--\d\d-\d\d-\d\d$/;
 							if (patt.test(course.name)) { 
 								return (
-								<div key={i}>
-									<Link to={"course/" + this.props.courseId + "/lecture/" + course.name}>
-										<button type="button" style={buttonStyle}>{course.name}</button>
-									</Link>
-								</div>
-							)
-						}
+									<div key={i}>
+										<Link to={"course/" + this.props.courseId + "/lecture/" + course.name}>
+											<button type="button" style={buttonStyle}>{course.name}</button>
+										</Link>
+									</div>
+								);
+							} else {
+								return (<div key={i}></div>)
+							}
 						}) : null
 					}
 
