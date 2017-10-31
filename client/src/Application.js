@@ -1,12 +1,11 @@
 import React, { Component } from 'react';
-import './App.css';
 import Navbar from './app/components/Navbar/Navbar.js';
 
 export default class Application extends Component {
 
   render() {
     return (
-      <div className="App">
+      <div style={app}>
         <Navbar />
         {
             this.props.children
@@ -14,4 +13,8 @@ export default class Application extends Component {
       </div>
     );
   }
+}
+
+var app = {
+  textAlign: "center"
 }
