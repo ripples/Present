@@ -4,13 +4,9 @@ var dirToJson = require('dir-to-json');
 var path = require('path')
 const fs = require('fs')
 const util = require('util')
+var auth = require('../app.js');
 
-// TODO do encryption properly
-const key = "You/'ll never walk alone"
-var encryptor = require('simple-encryptor')(key)
-var courseId = ''; //temporarily using variable since req.sessions is finicky
-
-router.post('/data', function (req, res) {
+/*router.post('/data', function (req, res) {
 	var course = req.body.lis_course_section_sourcedid;
 	if(course) {
 		const hashed = encryptor.encrypt(req.body).replace(/\//g, '-');
@@ -32,11 +28,9 @@ router.get('/identify/*', function (req, res) {
 	else {
 		res.send(unhashed);
 	}
-});
+});*/
 
-router.get('/listOfCourseLectures/:courseId', function (req, res) {
-	console.log(courseId);
-	if(courseId === req.params.courseId) {
+/*router.get('/listOfCourseLectures/:courseId', auth.isAuthenticated, function (req, res) {
 		dirToJson("./lectures/" + req.params.courseId.toString(), function (err, dirTree) {
 			if (err) {
 				throw err;
@@ -45,11 +39,9 @@ router.get('/listOfCourseLectures/:courseId', function (req, res) {
 				res.send(dirTree);
 			}
 		});
-	}
 });
 
-router.get('/manifest/:courseId/:lectureName', function (req, res) {
-	if(courseId === req.params.courseId) {
+router.get('/manifest/:courseId/:lectureName', auth.isAuthenticated, function (req, res) {
 		const fpath = "./lectures/" + req.params.courseId.toString() + '/' + req.params.lectureName.toString() + '/INFO'
 		fs.readFile(fpath, 'utf8', function (err, contents) {
 			if (err) {
@@ -66,12 +58,10 @@ router.get('/manifest/:courseId/:lectureName', function (req, res) {
 				res.send(manifest)
 			}
 		})
-	}
 })
 
 
-router.get('/video/:courseId/:lectureName', function (req, res) {
-	if(courseId === req.params.courseId) {
+router.get('/video/:courseId/:lectureName', auth.isAuthenticated, function (req, res) {
 		const fpath = "./lectures/" + req.params.courseId.toString() + '/' + req.params.lectureName.toString() + '/videoLarge.mp4'  // TODO tie this to absolute location
 		const stat = fs.statSync(fpath)
 		const fileSize = stat.size
@@ -101,7 +91,6 @@ router.get('/video/:courseId/:lectureName', function (req, res) {
 			res.writeHead(200, head)
 			fs.createReadStream(fpath).pipe(res)
 		}
-	}
 });
 
 
@@ -111,8 +100,7 @@ Scheme for sourceID
 2-x is for a whiteboard, x is for feed number
 Maybe some diffing... 
 */
-router.get('/image/:courseId/:lectureName/:sourceId/:time', function (req, res) {
-	if(courseId == req.params.courseId) {
+/*router.get('/image/:courseId/:lectureName/:sourceId/:time', auth.isAuthenticated, function (req, res) {
 		const feedType = (req.params["sourceId"].split("-")[0] === "1") ? "computer" : "whiteBoard"
 		const feedId = req.params["sourceId"].split("-")[1]
 		const fpath = "./lectures/" + req.params.courseId.toString() + '/' + req.params.lectureName.toString()
@@ -143,7 +131,6 @@ router.get('/image/:courseId/:lectureName/:sourceId/:time', function (req, res) 
 		}).catch( err => {
 			res.status(404).send(err)
 		})
-	}
 });
 
-module.exports = router;
+module.exports = router;*/
