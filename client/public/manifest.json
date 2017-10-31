@@ -1,6 +1,6 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
+  "short_name": "LV2",
+  "name": "Lecture Viewer 2",
   "icons": [
     {
       "src": "favicon.ico",

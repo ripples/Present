@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import { IndexRoute, Router, Route, hashHistory } from 'react-router';
-import ReactDOM from 'react-dom';
 import Application from './Application.js';
 import LecturesList from './app/Pages/LectureList/LecturesList';
 import Lecture from './app/Pages/Lecture/Lecture.js';
@@ -45,8 +44,3 @@ export default class App extends Component {
     );
   }
 }
-
-ReactDOM.render(
-  <App />,
-  document.getElementById('root')
-)
