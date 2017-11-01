@@ -10,6 +10,7 @@ class CalendarForm extends React.Component {
     this.handleAddInclude = this.handleAddInclude.bind(this);
     this.handleIncludeChange = this.handleIncludeChange.bind(this);
     this.formatDate = this.formatDate.bind(this);
+    this.revertDate = this.revertDate.bind(this);
     this.handleCheckboxChange = this.handleCheckboxChange.bind(this);
     this.formatTime = this.formatTime.bind(this);
     this.handleSTime = this.handleSTime.bind(this);
@@ -85,9 +86,7 @@ class CalendarForm extends React.Component {
     e.preventDefault();
     const currentExcludes = this.state.excludeDates;
     const newExcludes = currentExcludes.concat(this.formatDate(this.state.currentExclude));
-    this.setState({excludeDates: newExcludes}, function(){
-      console.log(this.state.excludeDates);
-    });
+    this.setState({excludeDates: newExcludes});
   }
 
   handleIncludeChange(e) {
@@ -99,14 +98,20 @@ class CalendarForm extends React.Component {
     e.preventDefault();
     const currentIncludes = this.state.includeDates;
     const newIncludes = currentIncludes.concat(this.formatDate(this.state.currentInclude));
-    this.setState({includeDates: newIncludes}, function(){
-      console.log(this.state.includeDates);
-    });
+    this.setState({includeDates: newIncludes});
   }
 
   formatDate(date) {
     var split = date.split("-");
     return split[0] + split[1] + split[2];
+  }
+
+  revertDate(date) { //20171014
+    var yyyy = date.substring(0, 4);
+    var mm = date.substring(4, 6);
+    var dd = date.substring(6, 8);
+
+    return mm + "/" + dd + "/" + yyyy;
   }
 
   formatTime(time) { //Formats time from form format to ics format
@@ -115,39 +120,27 @@ class CalendarForm extends React.Component {
   }
 
   handleSDate(e) {
-   this.setState({sDate: this.formatDate(e.target.value)}, function () {
-     console.log(this.state.sDate);
-   });
+   this.setState({sDate: this.formatDate(e.target.value)});
   }
 
   handleEDate(e) {
-   this.setState({eDate: this.formatDate(e.target.value)}, function () {
-     console.log(this.state.eDate);
-   });
+   this.setState({eDate: this.formatDate(e.target.value)});
   }
 
   handleSTime(e) {
-   this.setState({sTime: this.formatTime(e.target.value)}, function () {
-     console.log(this.state.sTime);
-   });
+   this.setState({sTime: this.formatTime(e.target.value)});
   }
 
   handleETime(e){
-    this.setState({eTime: this.formatTime(e.target.value)}, function () {
-      console.log(this.state.eTime);
-    });
+    this.setState({eTime: this.formatTime(e.target.value)});
   }
 
   handleLocation(e){
-    this.setState({location: e.target.value}, function () {
-      console.log(this.state.location);
-    });
+    this.setState({location: e.target.value});
   }
 
   handleDescription(e){
-    this.setState({description: e.target.value}, function () {
-      console.log(this.state.description);
-    });
+    this.setState({description: e.target.value});
   }
 
   handleCheckboxChange(e){
@@ -162,9 +155,7 @@ class CalendarForm extends React.Component {
       rDays.splice(index, 1);
     }
 
-    this.setState({recurDays: rDays}, function() {
-      console.log(this.state.recurDays);
-    });
+    this.setState({recurDays: rDays});
   }
 
   render() {
@@ -173,56 +164,108 @@ class CalendarForm extends React.Component {
     return (
       <div className='calForm'>
         <form onSubmit={this.handleSubmit}>
-          <fieldset>
-            <legend>New Recording Schedule: {this.props.courseId}</legend>
-            <div className='input_block'>
-              <label className='datelbl' htmlFor='sDate'>Start Date: </label>
-              <input className='dateInput' id='startDate' type='date' placeholder='Start Date: mm/dd/yyyy hh:mm' name='sDate' onChange={this.handleSDate}/>
+          <fieldset style={fieldsetStyle}>
+            <legend style={legendStyle}>New Recording Schedule: {this.props.courseId}</legend>
+            <div>
+              <label style={labelStyle} htmlFor='sDate'>Start Date: </label>
+              <input style={inputStyle} id='startDate' type='date' placeholder='Start Date: mm/dd/yyyy hh:mm' name='sDate' onChange={this.handleSDate}/>
             </div>
-            <div className='input_block'>
-              <label className='datelbl' htmlFor='sTime'>Start Time: </label>
-              <input className='dateInput' id='begin' type='time' placeholder='Start Time: hh:mm AM/PM' name='sTime' onChange={this.handleSTime}/>
-              <label className='datelbl' htmlFor='eTime'>End Time: </label>
-              <input className='dateInput' id='endTime' type='time' placeholder='End Time: hh:mm AM/PM' name='eTime' onChange={this.handleETime}/>
+            <div>
+              <label style={labelStyle} htmlFor='sTime'>Start Time: </label>
+              <input style={inputStyle} id='begin' type='time' placeholder='Start Time: hh:mm AM/PM' name='sTime' onChange={this.handleSTime}/>
+              <label style={labelStyle} htmlFor='eTime'>End Time: </label>
+              <input style={inputStyle} id='endTime' type='time' placeholder='End Time: hh:mm AM/PM' name='eTime' onChange={this.handleETime}/>
             </div>
-            <div className='input_block'>
-              <label className='datelbl' htmlFor='eDate'>End Date: </label>
-              <input className='dateInput' id='endDate' type='date' placeholder='End Date: mm/dd/yyyy' name='eDate' onChange={this.handleEDate}/>
+            <div>
+              <label style={labelStyle} htmlFor='eDate'>End Date: </label>
+              <input style={inputStyle} id='endDate' type='date' placeholder='End Date: mm/dd/yyyy' name='eDate' onChange={this.handleEDate}/>
             </div>
-            <div className='input_block'>
-              <p>Repeat (WEEKLY): </p>
-              <label className='chkbxlbl' htmlFor='Monday'><input className='repeat' type='checkbox' name='Monday' onChange={this.handleCheckboxChange}/>Monday</label>
-              <label className='chkbxlbl' htmlFor='Tuesday'><input className='repeat' type='checkbox' name='Tuesday' onChange={this.handleCheckboxChange}/>Tuesday</label>
-              <label className='chkbxlbl' htmlFor='Wednesday'><input className='repeat' type='checkbox' name='Wednesday' onChange={this.handleCheckboxChange}/>Wednesday</label>
-              <label className='chkbxlbl' htmlFor='Thursday'><input className='repeat' type='checkbox' name='Thursday' onChange={this.handleCheckboxChange}/>Thursday</label>
-              <label className='chkbxlbl' htmlFor='Friday'><input className='repeat' type='checkbox' name='Friday' onChange={this.handleCheckboxChange}/>Friday</label>
+            <div>
+              <label style={labelStyle}>Repeat (WEEKLY): </label>
+              <label style={labelStyle} htmlFor='Monday'><input style={chkbxStyle} type='checkbox' name='Monday' onChange={this.handleCheckboxChange}/>Monday</label>
+              <label style={labelStyle} htmlFor='Tuesday'><input style={chkbxStyle} type='checkbox' name='Tuesday' onChange={this.handleCheckboxChange}/>Tuesday</label>
+              <label style={labelStyle} htmlFor='Wednesday'><input style={chkbxStyle} type='checkbox' name='Wednesday' onChange={this.handleCheckboxChange}/>Wednesday</label>
+              <label style={labelStyle} htmlFor='Thursday'><input style={chkbxStyle} type='checkbox' name='Thursday' onChange={this.handleCheckboxChange}/>Thursday</label>
+              <label style={labelStyle} htmlFor='Friday'><input style={chkbxStyle} type='checkbox' name='Friday' onChange={this.handleCheckboxChange}/>Friday</label>
             </div>
-            <div className='input_block'>
-              <label className='datelbl' htmlFor='exclude'>Exclude Date: </label>
-              <input className='dateInput' type='date' placeholder='Exclude: mm/dd/yyyy' name='exclude' onChange={this.handleExcludeChange}/>
-              <button className='exclude-button' className='pure-button pure-button-primary' onClick={this.handleAddExclude}>Exclude</button>
-              <label className='datelbl' name='excludeDates'>Currently Excluded: [{this.state.excludeDates}]</label>
+            <div>
+              <label style={labelStyle} htmlFor='exclude'>Exclude Date: </label>
+              <input style={inputStyle} type='date' placeholder='Exclude: mm/dd/yyyy' name='exclude' onChange={this.handleExcludeChange}/>
+              <button style={buttonStyle} onClick={this.handleAddExclude}>Exclude</button>
+              <label name='excludeDates'>Currently Excluded: [{this.state.excludeDates.map((date, i) => {
+                var newDate = this.revertDate(date);
+                return (<p key={i} style={dateStyle}>{newDate},&nbsp;</p>)})}]
+              </label>
             </div>
-            <div className='input_block'>
-              <label className='datelbl' htmlFor='include'>Add Extra Date: </label>
-              <input className='dateInput' type='date' placeholder='Add: mm/dd/yyyy' name='include' onChange={this.handleIncludeChange}/>
-              <button className='include-button' className='pure-button pure-button-primary' onClick={this.handleAddInclude}>Add</button>
-              <label className='datelbl' name='includeDates'>Currently Added: [{this.state.includeDates}]</label>
+            <div>
+              <label style={labelStyle} htmlFor='include'>Add Extra Date: </label>
+              <input style={inputStyle} type='date' placeholder='Add: mm/dd/yyyy' name='include' onChange={this.handleIncludeChange}/>
+              <button style={buttonStyle} className='pure-button pure-button-primary' onClick={this.handleAddInclude}>Add</button>
+              <label name='includeDates'>Currently Added: [{this.state.includeDates.map((date, i) => {
+                var newDate = this.revertDate(date);
+                return (<p key={i} style={dateStyle}>{newDate},&nbsp;</p>)})}]
+              </label>
             </div>
-            <div className='input_block'>
+            <div>
               <label className='datelbl' htmlFor='description'>Description: </label>
-              <input className='dateInput' id='description' type='text' placeholder='Class description...' name='description' onChange={this.handleDescription}/>
+              <input className='dateInput' style={inputStyle} id='description' type='text' placeholder='Class description...' name='description' onChange={this.handleDescription}/>
               <label className='datelbl' htmlFor='location'>Location: </label>
-              <input className='dateInput' id='location' type='text' placeholder='Class location...' name='location' onChange={this.handleLocation}/>
+              <input className='dateInput' style={inputStyle} id='location' type='text' placeholder='Class location...' name='location' onChange={this.handleLocation}/>
             </div>
-            <div className='input_block'>
-              <input type='submit' disabled={!isEnabled} value='Create Schedule'/>
+            <div>
+              <input type='submit' style={buttonStyle} disabled={!isEnabled} value='Create Schedule'/>
             </div>
           </fieldset>
         </form>
       </div>
     );
   }
+}
+
+var buttonStyle = {
+    backgroundColor: "white",
+    borderRadius: "4px",
+    marginTop: "10px",
+    marginRight: "5px",
+    color: "#000080",
+    paddingLeft: "10px",
+    paddingRight: "10px",
+    paddingTop: "4px",
+    paddingBottom: "4px"
+}
+
+var dateStyle = {
+  display: "inline-block"
+}
+
+var inputStyle = {
+  margin: "10px 5px 10px",
+  boxSizing: "border-box"
+
+}
+
+var chkbxStyle = {
+  marginRight: "2px"
+}
+
+var labelStyle = {
+  fontWeight: "bold",
+  marginRight: "5px"
+}
+
+var fieldsetStyle = {
+  border: "1px solid black",
+  width: "50%",
+  background: "white",
+  padding: "3px",
+  margin: "auto"
+}
+
+var legendStyle = {
+  background: "#000080",
+  padding: "6px",
+  fontWeight: "bold",
+  color: "white"
 }
 
 export default CalendarForm;
