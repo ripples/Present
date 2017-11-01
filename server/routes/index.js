@@ -141,7 +141,7 @@ router.get('/image/:courseId/:lectureName/:sourceId/:time', isAuthenticated, fun
 		  const found = contents.match(re)[1];
 		  return parseInt(req.params.time) + parseInt(found)
 		}).then( cTime => {
-		  util.promisify(fs.readdir)(fpath + '/' + feedType).then( files => {
+		  util.promisify(fs.readdir)(fpath + '/' + feedType.toLowerCase()).then( files => {
 			const fileName = files.reduce((result, file) => {
 			  const splitFileName = file.split('-')
 			  const fileTime = parseInt(splitFileName[2].split('.')[0])
@@ -155,13 +155,18 @@ router.get('/image/:courseId/:lectureName/:sourceId/:time', isAuthenticated, fun
 			}, []).sort((left, right) => left.time - right.time).pop() //this should be the file
 			if(typeof fileName != 'undefined' && fileName != null){
 				appGetLectureImages = false;
-			  res.sendFile(path.resolve('lectures', req.params.courseId.toString(), req.params.lectureName.toString(), feedType, fileName.name))
+			  res.sendFile(path.resolve('lectures', req.params.courseId.toString(), req.params.lectureName.toString(), feedType.toLowerCase(), fileName.name))
 			}
 			else{
+				console.log("ERROR", fpath + '/' + feedType.toLowerCase())
 			  res.status(404).send()
 			}
-		  }).catch( err => res.status(404).send(err))
+		  }).catch( err => {
+				console.log(err)
+				res.status(404).send(err)
+			})
 		}).catch( err => {
+			console.log(err);
 		  res.status(404).send(err)
 		})
 });
