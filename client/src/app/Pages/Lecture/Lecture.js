@@ -18,20 +18,33 @@ export default class Lecture extends React.Component {
 
 	render() {
 		return (
-			<div className="lecture">
-				<div className="lecture-header">
-					<h2>
-						{"Lecture: " + this.props.params.lectureId}
-					</h2>
+			<div className="container-fluid">
+				<div className="col-md-2">
 				</div>
-				<div className="lecture-body">
-					<LectureMedia
-						manifest = {this.state.manifest}
-						lectureId = {this.props.params.lectureId}
-						courseId = {this.props.params.courseId}
-					/>
+				
+				<div className="col-md-8">
+					<div>
+						<h2 style={headerStyle}>
+							{"Lecture: " + this.props.params.lectureId}
+						</h2>
+					</div>
+					<div>
+						<LectureMedia
+							manifest = {this.state.manifest}
+							lectureId = {this.props.params.lectureId}
+							courseId = {this.props.params.courseId}
+						/>
+					</div>
+				</div>
+
+				<div className="col-md-2">
 				</div>
 			</div>
 		);
 	}
+}
+
+
+var headerStyle = {
+	fontWeight: "bold"
 }

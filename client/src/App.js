@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import { IndexRoute, Router, Route, hashHistory } from 'react-router';
-import ReactDOM from 'react-dom';
 import Application from './Application.js';
 import LecturesList from './app/Pages/LectureList/LecturesList';
 import Lecture from './app/Pages/Lecture/Lecture.js';
@@ -18,7 +17,9 @@ export default class App extends Component {
   }
 
   componentDidMount() {
-    fetch(('/identify/' + window.location.pathname.substr(1))).then(
+    fetch(('/identify/' + window.location.pathname.substr(1)), {
+      credentials: 'same-origin' // or 'include'
+    }).then(
       res => (res.status === 200) ? res.json() : ""
     ).then(
       dat =>
@@ -45,8 +46,3 @@ export default class App extends Component {
     );
   }
 }
-
-ReactDOM.render(
-  <App />,
-  document.getElementById('root')
-)

@@ -31,16 +31,16 @@ export default class LectureMedia extends React.Component {
 		};
 		if(this.props.manifest){
 			var computerImages = this.range(this.props.manifest.computerCount).map( (e, i) => {
-				return <img key={i} src={'/image/' + this.props.courseId + "/" + this.props.lectureId + '/1-' + i + '/' + this.state.time} style={style}/> 
+				return <img key={i} src={'/image/' + this.props.courseId + "/" + this.props.lectureId + '/1-' + i + '/' + this.state.time} style={style} alt="Computer Screen"/>
 			})
 			var whiteBoardImages = this.range(this.props.manifest.whiteboardCount).map( (e, i) => {
-				return <img key={computerImages.length + i} src={'/image/' + this.props.courseId + "/" + this.props.lectureId + '/2-' + i + '/' + this.state.time} style={style}/> 
+				return <img key={computerImages.length + i} src={'/image/' + this.props.courseId + "/" + this.props.lectureId + '/2-' + i + '/' + this.state.time} style={style} alt="Whiteboard"/> 
 			})
 		}
 		return (
 			<div className="lecture-media">
 				<div className="container">
-					<div className="video-wrapper">
+					<div>
 						<VideoView
 							videoSrc={'/video/' + this.props.courseId + "/" + this.props.lectureId } onVideoTimeUpdate={this.onVideoTimeUpdate} />
 					</div>
