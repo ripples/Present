@@ -12,6 +12,7 @@ var appGetLectures = true;
 var appGetLectureNames = true;
 var appGetLectureFile = true;
 var appGetLectureImages = true;
+var useAuth = true; // set this to false to test the routes through postman
 
 function isAuthenticated(req, res, next) {
 	var token = req.body.oauth_signature;
@@ -25,7 +26,7 @@ function isAuthenticated(req, res, next) {
 	else {
 	  res.status(404).send('Not Found');
 	}
-  }
+}
 
 router.post('/data', isAuthenticated, function (req, res) {
 	const hashed = encryptor.encrypt(req.body).replace(/\//g, '-');
@@ -39,7 +40,7 @@ router.post('/data', isAuthenticated, function (req, res) {
 });
 
 router.get('/identify/*', isAuthenticated, function (req, res) {
-	if(logged && appGetAuth) {
+	if((logged && appGetAuth) || !useAuth) {
     const tok = req.params[0].replace(/-/g, '/');
     const unhashed = encryptor.decrypt(tok);
     if (typeof unhashed == 'undefined' || unhashed === null) {
@@ -56,20 +57,20 @@ router.get('/identify/*', isAuthenticated, function (req, res) {
 });
 
 router.get('/listOfCourseLectures/:courseId', isAuthenticated, function (req, res) {
-	if(logged && appGetLectures) {
+	if((logged && appGetLectures) || !useAuth) {
 		dirToJson("./lectures/" + req.params.courseId.toString(), function (err, dirTree) {
 		  if (err) {
-			throw err;
+				throw err;
 		  } else {
-			appGetLectures = false;
-			res.send(dirTree);
+				appGetLectures = false;
+				res.send(dirTree);
 		  }
 		});
 	  }
 });
 
 router.get('/manifest/:courseId/:lectureName', isAuthenticated, function (req, res) {
-	if(logged && appGetLectureNames) {
+	if((logged && appGetLectureNames) || !useAuth) {
 		const fpath = "./lectures/" + req.params.courseId.toString() + '/' + req.params.lectureName.toString() + '/INFO'
 			fs.readFile(fpath, 'utf8', function (err, contents) {
 				if (err) {
@@ -91,7 +92,7 @@ router.get('/manifest/:courseId/:lectureName', isAuthenticated, function (req, r
 
 
 router.get('/video/:courseId/:lectureName', isAuthenticated, function (req, res) {
-	if(logged && appGetLectureFile) {
+	if((logged && appGetLectureFile) || !useAuth) {
 		const fpath = "./lectures/" + req.params.courseId.toString() + '/' + req.params.lectureName.toString() + '/videoLarge.mp4'  // TODO tie this to absolute location
 			const stat = fs.statSync(fpath)
 			const fileSize = stat.size
