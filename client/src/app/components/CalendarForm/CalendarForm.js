@@ -192,7 +192,13 @@ class CalendarForm extends React.Component {
               <input style={inputStyle} type='date' placeholder='Exclude: mm/dd/yyyy' name='exclude' onChange={this.handleExcludeChange}/>
               <button style={buttonStyle} onClick={this.handleAddExclude}>Exclude</button>
               <label name='excludeDates'>Currently Excluded: [{this.state.excludeDates.map((date, i) => {
-                var newDate = this.revertDate(date);
+                var newDate = "";
+                if(i == 0){
+                  newDate = this.revertDate(date);
+                }
+                else{
+                  newDate = ", " + this.revertDate(date);
+                }
                 return (<p key={i} style={dateStyle}>{newDate},&nbsp;</p>)})}]
               </label>
             </div>
@@ -201,8 +207,14 @@ class CalendarForm extends React.Component {
               <input style={inputStyle} type='date' placeholder='Add: mm/dd/yyyy' name='include' onChange={this.handleIncludeChange}/>
               <button style={buttonStyle} className='pure-button pure-button-primary' onClick={this.handleAddInclude}>Add</button>
               <label name='includeDates'>Currently Added: [{this.state.includeDates.map((date, i) => {
-                var newDate = this.revertDate(date);
-                return (<p key={i} style={dateStyle}>{newDate},&nbsp;</p>)})}]
+                var newDate = "";
+                if(i == 0){
+                  newDate = this.revertDate(date);
+                }
+                else{
+                  newDate = ", " + this.revertDate(date);
+                }
+                return (<p key={i} style={dateStyle}>{newDate}</p>)})}]
               </label>
             </div>
             <div>

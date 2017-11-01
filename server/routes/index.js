@@ -189,8 +189,9 @@ function generateCalendar(sDate, eDate, sTime, eTime, recurDays, excludeDates, i
   var start = moment(sDate, "YYYYMMDD"), end = moment(eDate, "YYYYMMDD");
   var recurrence = moment.recur(start, end).every(recurDays).daysOfWeek(); //Create moment recurrence object of date list
   var initialDates = recurrence.all("YYYYMMDD"); //Generate string array of dates in "YYYY-MM-DD" format, in chronological order
-  var filteredDates = initialDates.filter(function(e){return excludeDates.indexOf(e)<0}); //Returns array with excluded dates removed, still in chronological order
-  generateICS(filteredDates.concat(includeDates).sort(), [sDate, eDate, sTime, eTime, description, location, summary, courseId])
+	var addedIncludes = incDates(includeDates, initialDates, excludeDates);
+  var filteredDates = addedIncludes.filter(function(e){return excludeDates.indexOf(e)<0}); //Returns array with excluded dates removed, still in chronological order
+  generateICS(filteredDates.sort(), [sDate, eDate, sTime, eTime, description, location, summary, courseId])
 }
 
 function generateICS(dates, tags) {
@@ -219,6 +220,20 @@ function generateICS(dates, tags) {
   fs.writeFile("./lectures/" + tags[COURSEID] + "/Calendar.ics", fileText, function (err) {
     if (err) return console.log(err);
   });
+}
+
+function isDuplicate(date, dates, excludes){
+	return (dates.includes(date) && !excludes.includes(date));
+}
+
+function incDates(dates, initial, excludes) {
+	var newArr = initial;
+	for(var i = 0; i < dates.length; i++){
+		if(!isDuplicate(dates[i], initial, excludes)){
+			newArr = newArr.concat(dates[i]);
+		}
+	}
+	return newArr;
 }
 
 function getCurrentSemester(){
