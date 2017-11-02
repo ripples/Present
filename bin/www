@@ -10,7 +10,7 @@ var app = require('../server/app');
 var debug = require('debug')('lv-client2:server');
 var http = require('http');
 require('dotenv').config()
-
+//https://www.npmjs.com/package/node-env-config-loader maybe this instead
 console.log("Enviornmental Variables Loaded", process.env)
 
 /**
