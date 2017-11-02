@@ -35,3 +35,21 @@ file tree should be:
 16. select the new configuration for your activities preconfigured tool
 17. finish creating the activity
 18. leave editing mode and click on the activiy. If it brings you to our web app, everything is working properly.
+
+Production
+---
+When running in production, one may wish to set env files, that may be done with the following:
+
+In the root directory, make a file with `.env` that contains the following keys, but different values (default values shown):
+```
+KEY="You'll Never Walk Alone"
+HOST=http://localhost/
+PORT=3001
+```
+
+In `/client` make another `.env ` with the following keys and some value
+
+```
+HOST=http://present.cs.umass.edu/
+PORT=80
+```

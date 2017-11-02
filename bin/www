@@ -9,6 +9,9 @@ console.log("Starting server");
 var app = require('../server/app');
 var debug = require('debug')('lv-client2:server');
 var http = require('http');
+require('dotenv').config()
+
+console.log("Enviornmental Variables Loaded", process.env)
 
 /**
  * Get port from environment and store in Express.
