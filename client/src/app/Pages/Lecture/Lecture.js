@@ -25,7 +25,7 @@ export default class Lecture extends React.Component {
 				<div className="col-md-8">
 					<div>
 						<h2 style={headerStyle}>
-							{"Lecture: " + this.props.params.lectureId}
+							{"Lecture: " + this.props.params.lectureId.substring(0,10)}
 						</h2>
 					</div>
 					<div>
