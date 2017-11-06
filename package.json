@@ -9,6 +9,7 @@
     "start-all": "concurrent \"npm run start\" \"npm run start-client\" "
   },
   "dependencies": {
+    "base-64": "^0.1.0",
     "body-parser": "^1.18.2",
     "cookie-parser": "~1.4.3",
     "debug": "~2.6.9",

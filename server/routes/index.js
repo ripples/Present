@@ -222,9 +222,31 @@ function generateICS(dates, tags) {
 
   fileText += END_TAG;
 
-  fs.writeFile("./lectures/" + tags[COURSEID] + "/Calendar.ics", fileText, function (err) {
+  fs.writeFileSync("./lectures/" + tags[COURSEID] + "/Calendar.ics", fileText, function (err) {
     if (err) return console.log(err);
   });
+
+	//Send the newly created schedule to the capture server
+	let fetch = require('node-fetch');
+	let base64 = require('base-64');
+	const stats = fs.statSync("./lectures/" + tags[COURSEID] + "/Calendar.ics");
+	const fileSizeInBytes = stats.size;
+	let readStream = fs.createReadStream("./lectures/" + tags[COURSEID] + "/Calendar.ics");
+	let username = 'paol'
+	let password = 'secretPAOL'
+	fetch('cap142.cs.umass.edu', {
+	    method: 'POST',
+	    headers: {
+				'Content-length': fileSizeInBytes,
+				'Authorization': 'Basic' + base64.encode(username + ":" + password)
+			},
+	    body: readStream
+	})
+	.then(function(res) {
+	    return res.status();
+	}).then(function(status) {
+	    console.log(status);
+	});
 }
 
 function isDuplicate(date, dates, excludes){

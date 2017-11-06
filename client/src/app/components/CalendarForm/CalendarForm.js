@@ -193,7 +193,7 @@ class CalendarForm extends React.Component {
               <button style={buttonStyle} onClick={this.handleAddExclude}>Exclude</button>
               <label name='excludeDates'>Currently Excluded: [{this.state.excludeDates.map((date, i) => {
                 var newDate = "";
-                if(i == 0){
+                if(i === 0){
                   newDate = this.revertDate(date);
                 }
                 else{
@@ -208,7 +208,7 @@ class CalendarForm extends React.Component {
               <button style={buttonStyle} className='pure-button pure-button-primary' onClick={this.handleAddInclude}>Add</button>
               <label name='includeDates'>Currently Added: [{this.state.includeDates.map((date, i) => {
                 var newDate = "";
-                if(i == 0){
+                if(i === 0){
                   newDate = this.revertDate(date);
                 }
                 else{
