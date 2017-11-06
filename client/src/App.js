@@ -3,6 +3,7 @@ import { IndexRoute, Router, Route, hashHistory } from 'react-router';
 import Application from './Application.js';
 import LecturesList from './app/Pages/LectureList/LecturesList';
 import Lecture from './app/Pages/Lecture/Lecture.js';
+import InstructorSettings from './app/Pages/InstructorSettings/InstructorSettings.js';
 
 
 export default class App extends Component {
@@ -39,6 +40,7 @@ export default class App extends Component {
         <Route path="/" component={Application}>
           <IndexRoute component={() => <LecturesList courseId={this.state.data.lis_course_section_sourcedid} course={this.state.course}/>} />
           <Route path="course/:courseId/lecture/:lectureId" component={Lecture} />
+          <Route path="course/:courseId/instructorSettings" component={InstructorSettings} />
         </Route>
       </Router>
     );
