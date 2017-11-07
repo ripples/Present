@@ -2,20 +2,23 @@ import React, { Component } from 'react';
 import { Link } from 'react-router';
 
 export default class Navbar extends Component {
-    
+
 	constructor(props){
 		super(props)
 		this.state = {courseId: "TEMP_COURSE"}
 	}
 
     render(){
-        
+
         return(
             <div className="navbar navbar-fixed-top navbar-default" style={barStyle}>
-                <div className="container-fluid"> 
+                <div className="container-fluid">
                     <div className="col-md-3">
                         <Link to="/">
                             <button style={buttonStyle}>Lecture List</button>
+                        </Link>
+                        <Link to="/calendar">
+                          <button style={buttonStyle}>Calendar</button>
                         </Link>
                     </div>
                     <div className="col-md-6" >
