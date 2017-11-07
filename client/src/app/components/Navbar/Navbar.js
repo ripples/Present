@@ -17,9 +17,6 @@ export default class Navbar extends Component {
                         <Link to="/">
                             <button style={buttonStyle}>Lecture List</button>
                         </Link>
-                        <Link to="/calendar">
-                          <button style={buttonStyle}>Calendar</button>
-                        </Link>
                     </div>
                     <div className="col-md-6" >
                         <h1 style={headerStyle}>Lecture Viewer 2</h1>

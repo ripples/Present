@@ -17,10 +17,24 @@ export default class InstructorSettings extends Component {
                         The props are needed so the button only shows for certain people, and so the course can be identified.
                         This should be removed once these issues are fixed.
                     </p>
+                    <Link to="/calendar">
+                      <button style={buttonStyle}>Calendar</button>
+                    </Link>
                 </div>
                 <div className="col-md-2">
                 </div>
             </div>
         );
     }
+}
+
+var buttonStyle= {
+    backgroundColor: "white",
+    borderRadius: "4px",
+    marginTop: "20px",
+    color: "#000080",
+    paddingLeft: "10px",
+    paddingRight: "10px",
+    paddingTop: "4px",
+    paddingBottom: "4px"
 }
