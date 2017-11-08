@@ -227,25 +227,38 @@ function generateICS(dates, tags) {
   });
 
 	//Send the newly created schedule to the capture server
+
+	//let base64 = require('base-64');
+	//let username = 'paol'
+	//let password = 'secretPAOL'
 	let fetch = require('node-fetch');
-	let base64 = require('base-64');
+	let FormData = require('form-data');
 	const stats = fs.statSync("./lectures/" + tags[COURSEID] + "/Calendar.ics");
 	const fileSizeInBytes = stats.size;
-	let readStream = fs.createReadStream("./lectures/" + tags[COURSEID] + "/Calendar.ics");
-	let username = 'paol'
-	let password = 'secretPAOL'
-	fetch('cap142.cs.umass.edu', {
+	console.log('File Size: ' + fileSizeInBytes);
+	var body = new FormData();
+	var filedata = 0
+	try {
+    filedata = fs.readFileSync("./lectures/" + tags[COURSEID] + "/Calendar.ics", 'utf8');
+	} catch(e) {
+	    console.log('Error:', e.stack);
+	}
+	body.append('file', filedata);
+	console.log(body)
+	fetch('http://cap142.cs.umass.edu:8001/', {
 	    method: 'POST',
 	    headers: {
-				'Content-length': fileSizeInBytes,
-				'Authorization': 'Basic' + base64.encode(username + ":" + password)
+				'Content-length': fileSizeInBytes
+				//'Authorization': 'Basic' + base64.encode(username + ":" + password)
 			},
-	    body: readStream
+	    body: body
 	})
 	.then(function(res) {
-	    return res.status();
-	}).then(function(status) {
-	    console.log(status);
+	    return res.text();
+	}).then(function(text) {
+	    console.log(text);
+	}).catch(function(error) {
+  		console.log('Fetch operation error: ' + error.message);
 	});
 }
 
