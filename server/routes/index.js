@@ -12,9 +12,13 @@ var appGetLectures = true;
 var appGetLectureNames = true;
 var appGetLectureFile = true;
 var appGetLectureImages = true;
-var useAuth = true; // set this to false to test the routes through postman
+var useAuth = false; // set this to false to test the routes through postman
 
 function isAuthenticated(req, res, next) {
+	if(!useAuth){
+		logged = true;
+		next();
+	}
 	var token = req.body.oauth_signature;
 	if(token) {
 	  logged = true;
@@ -28,7 +32,7 @@ function isAuthenticated(req, res, next) {
 	}
 }
 
-router.post('/data', function (req, res) {
+router.post('/data', isAuthenticated, function (req, res) {
 	const hashed = encryptor.encrypt(req.body).replace(/\//g, '-');
 	const url = "http://localhost:3000/" // TODO Global constant
 	appGetAuth = true;
@@ -40,24 +44,24 @@ router.post('/data', function (req, res) {
 });
 
 router.get('/identify/*', isAuthenticated, function (req, res) {
-	if((logged && appGetAuth) || !useAuth) {
-    const tok = req.params[0].replace(/-/g, '/');
-    const unhashed = encryptor.decrypt(tok);
-    if (typeof unhashed == 'undefined' || unhashed === null) {
-      res.status(404).send('Not Found');
-    }
-    else {
-      appGetAuth = false;
-      res.send(unhashed);
-    }
-  }
-  else {
-    logged = false;
-  }
+	if (logged && appGetAuth) {
+		const tok = req.params[0].replace(/-/g, '/');
+		const unhashed = encryptor.decrypt(tok);
+		if (typeof unhashed == 'undefined' || unhashed === null) {
+			res.status(404).send('Not Found');
+		}
+		else {
+			appGetAuth = false;
+			res.send(unhashed);
+		}
+	}
+	else {
+		logged = false;
+	}
 });
 
 router.get('/listOfCourseLectures/:courseId', isAuthenticated, function (req, res) {
-	if((logged && appGetLectures) || !useAuth) {
+	if(logged && appGetLectures) {
 		dirToJson("./lectures/" + req.params.courseId.toString(), function (err, dirTree) {
 		  if (err) {
 				throw err;
@@ -70,7 +74,7 @@ router.get('/listOfCourseLectures/:courseId', isAuthenticated, function (req, re
 });
 
 router.get('/manifest/:courseId/:lectureName', isAuthenticated, function (req, res) {
-	if((logged && appGetLectureNames) || !useAuth) {
+	if(logged && appGetLectureNames) {
 		const fpath = "./lectures/" + req.params.courseId.toString() + '/' + req.params.lectureName.toString() + '/INFO'
 			fs.readFile(fpath, 'utf8', function (err, contents) {
 				if (err) {
@@ -92,7 +96,7 @@ router.get('/manifest/:courseId/:lectureName', isAuthenticated, function (req, r
 
 
 router.get('/video/:courseId/:lectureName', isAuthenticated, function (req, res) {
-	if((logged && appGetLectureFile) || !useAuth) {
+	if(logged && appGetLectureFile) {
 		const fpath = "./lectures/" + req.params.courseId.toString() + '/' + req.params.lectureName.toString() + '/videoLarge.mp4'  // TODO tie this to absolute location
 			const stat = fs.statSync(fpath)
 			const fileSize = stat.size
