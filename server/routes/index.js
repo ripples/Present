@@ -28,7 +28,7 @@ function isAuthenticated(req, res, next) {
 	}
 }
 
-router.post('/data', isAuthenticated, function (req, res) {
+router.post('/data', function (req, res) {
 	const hashed = encryptor.encrypt(req.body).replace(/\//g, '-');
 	const url = "http://localhost:3000/" // TODO Global constant
 	appGetAuth = true;
