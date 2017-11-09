@@ -227,10 +227,6 @@ function generateICS(dates, tags) {
   });
 
 	//Send the newly created schedule to the capture server
-
-	//let base64 = require('base-64');
-	//let username = 'paol'
-	//let password = 'secretPAOL'
 	let fetch = require('node-fetch');
 	let FormData = require('form-data');
 	const stats = fs.statSync("./lectures/" + tags[COURSEID] + "/Calendar.ics");
@@ -243,12 +239,14 @@ function generateICS(dates, tags) {
 	} catch(e) {
 	    console.log('Error:', e.stack);
 	}
+
 	body.append('file', filedata);
 	console.log(body)
 	fetch('http://cap142.cs.umass.edu:8001/', {
 	    method: 'POST',
 	    headers: {
-				'Content-length': fileSizeInBytes
+				'Content-Length': fileSizeInBytes,
+				'Content-Type': undefined //To set data boundaries automatically... workaround
 				//'Authorization': 'Basic' + base64.encode(username + ":" + password)
 			},
 	    body: body
