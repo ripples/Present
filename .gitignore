@@ -60,3 +60,5 @@ typings/
 .vscode/launch.json
 
 lectures/*
+
+package-lock.json

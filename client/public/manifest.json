@@ -1,10 +1,10 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
+  "short_name": "LV2",
+  "name": "Lecture Viewer 2",
   "icons": [
     {
-      "src": "favicon.ico",
-      "sizes": "192x192",
+      "src": "logo.png",
+      "sizes": "101x119",
       "type": "image/png"
     }
   ],
