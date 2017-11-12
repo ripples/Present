@@ -18,6 +18,7 @@ function isAuthenticated(req, res, next) {
 	if(!useAuth){
 		logged = true;
 		next();
+		return;
 	}
 	var token = req.body.oauth_signature;
 	if(token) {
@@ -79,6 +80,7 @@ router.get('/manifest/:courseId/:lectureName', isAuthenticated, function (req, r
 			fs.readFile(fpath, 'utf8', function (err, contents) {
 				if (err) {
 					res.status(404).send('Not Found');
+					return;
 				}
 				else {
 					const re = /(?:whiteboardCount: (\d))(?:\s|.*)*(?:computerCount: (\d))/ //this is a little bit more delicate than I'd like it to be
