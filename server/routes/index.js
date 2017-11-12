@@ -4,6 +4,8 @@ var dirToJson = require('dir-to-json');
 var path = require('path')
 const fs = require('fs')
 const util = require('util')
+const unzip = require('unzip')
+var rimraf = require('rimraf');
 const key = "You/'ll never walk alone"
 var encryptor = require('simple-encryptor')(key)
 var logged = false;
@@ -179,24 +181,19 @@ router.get('/image/:courseId/:lectureName/:sourceId/:time', isAuthenticated, fun
 
 router.post('/upload/lecture-zip', function (req, res) {
 	const file = req.files.file
-	const tmp_path = file.path;
-	const target_path = './lectures/' + file.name;
-	util.promisify(fs.rename)(tmp_path, target_path).then((err) => {
-		if (err) throw err;
-	}).then(
-		util.promisify(fs.unlink)(tmp_path) ((err) => {
-			if (err) throw err;
-			res.send('File uploaded to: ' + target_path + ' - ' + req.file.size + ' bytes');
-		})
-	).then(
-		fs.createReadStream(target_path).pipe(unzip.Extract({ path: 'target_path' }))
-	).then(
-		util.promisify(fs.unlink)(target_path) ((err) => {
-			if (err) throw err;
-		})
-	).catch( err => {
-		console.log(err)
-		res.status(500).send(err)
+	const tmp_path = file.file;
+	const target_path = './lectures/' + file.filename;
+	try{
+		fs.createReadStream(tmp_path).pipe(unzip.Extract({ path: './lectures' }));			
+		res.status(200).send()
+	}
+	catch(err){
+		res.status(400).send(err)
+	}
+	
+	//now cleanup
+	fs.unlink(tmp_path, (err) => {
+		if(err) console.log("Error deleting file \"" + tmp_path+"\", consider removing files in tmp upload directory \nERR: " + err)
 	})
 });
 
