@@ -6,6 +6,7 @@ var moment = require('moment');
 require('moment-recur');
 const fs = require('fs')
 const util = require('util')
+const unzip = require('unzip')
 const key = "You/'ll never walk alone"
 var encryptor = require('simple-encryptor')(key)
 var logged = false;
@@ -14,9 +15,14 @@ var appGetLectures = true;
 var appGetLectureNames = true;
 var appGetLectureFile = true;
 var appGetLectureImages = true;
-var useAuth = true; // set this to false to test the routes through postman
+var useAuth = false; // set this to false to test the routes through postman
 
 function isAuthenticated(req, res, next) {
+	if(!useAuth){
+		logged = true;
+		next();
+		return;
+	}
 	var token = req.body.oauth_signature;
 	if(token) {
 	  logged = true;
@@ -59,24 +65,24 @@ router.post('/data', isAuthenticated, function (req, res) {
 });
 
 router.get('/identify/*', isAuthenticated, function (req, res) {
-	if((logged && appGetAuth) || !useAuth) {
-    const tok = req.params[0].replace(/-/g, '/');
-    const unhashed = encryptor.decrypt(tok);
-    if (typeof unhashed == 'undefined' || unhashed === null) {
-      res.status(404).send('Not Found');
-    }
-    else {
-      appGetAuth = false;
-      res.send(unhashed);
-    }
-  }
-  else {
-    logged = false;
-  }
+	if (logged && appGetAuth) {
+		const tok = req.params[0].replace(/-/g, '/');
+		const unhashed = encryptor.decrypt(tok);
+		if (typeof unhashed == 'undefined' || unhashed === null) {
+			res.status(404).send('Not Found');
+		}
+		else {
+			appGetAuth = false;
+			res.send(unhashed);
+		}
+	}
+	else {
+		logged = false;
+	}
 });
 
 router.get('/listOfCourseLectures/:courseId', isAuthenticated, function (req, res) {
-	if((logged && appGetLectures) || !useAuth) {
+	if(logged && appGetLectures) {
 		dirToJson("./lectures/" + req.params.courseId.toString(), function (err, dirTree) {
 		  if (err) {
 				throw err;
@@ -89,11 +95,12 @@ router.get('/listOfCourseLectures/:courseId', isAuthenticated, function (req, re
 });
 
 router.get('/manifest/:courseId/:lectureName', isAuthenticated, function (req, res) {
-	if((logged && appGetLectureNames) || !useAuth) {
+	if(logged && appGetLectureNames) {
 		const fpath = "./lectures/" + req.params.courseId.toString() + '/' + req.params.lectureName.toString() + '/INFO'
 			fs.readFile(fpath, 'utf8', function (err, contents) {
 				if (err) {
 					res.status(404).send('Not Found');
+					return;
 				}
 				else {
 					const re = /(?:whiteboardCount: (\d))(?:\s|.*)*(?:computerCount: (\d))/ //this is a little bit more delicate than I'd like it to be
@@ -111,7 +118,7 @@ router.get('/manifest/:courseId/:lectureName', isAuthenticated, function (req, r
 
 
 router.get('/video/:courseId/:lectureName', isAuthenticated, function (req, res) {
-	if((logged && appGetLectureFile) || !useAuth) {
+	if(logged && appGetLectureFile) {
 		const fpath = "./lectures/" + req.params.courseId.toString() + '/' + req.params.lectureName.toString() + '/videoLarge.mp4'  // TODO tie this to absolute location
 			const stat = fs.statSync(fpath)
 			const fileSize = stat.size
@@ -337,5 +344,41 @@ function getICSDateNow() { //Gets the current timestamp in YYYYMMDDTHHMMSS forma
   var second = "" + now.getSeconds(); if (second.length == 1) { second = "0" + second; }
   return [year, month, day, "T", hour, minute, second];
 }
+router.post('/upload/lecture-zip', function (req, res) {
+	const file = req.files.file
+	const tmp_path = file.file;
+	const target_path = './lectures';
+	try{
+		fs.createReadStream(tmp_path).pipe(unzip.Extract({ path: target_path }));			
+		res.status(200).send()
+	}
+	catch(err){
+		res.status(400).send(err)
+	}
+	
+	//now cleanup
+	fs.unlink(tmp_path, (err) => {
+		if(err) console.log("Error deleting file \"" + tmp_path+"\", consider removing files in tmp upload directory \nERR: " + err)
+	})
+});
+
+router.post('/upload/:courseId/lecture-zip', function (req, res) {
+	const file = req.files.file
+	const courseId =req.params.courseId
+	const tmp_path = file.file;
+	const target_path = './lectures/' + courseId;
+	try{
+		fs.createReadStream(tmp_path).pipe(unzip.Extract({ path: target_path}));			
+		res.status(200).send()
+	}
+	catch(err){
+		res.status(400).send(err)
+	}
+	
+	//now cleanup
+	fs.unlink(tmp_path, (err) => {
+		if(err) console.log("Error deleting file \"" + tmp_path+"\", consider removing files in tmp upload directory \nERR: " + err)
+	})
+});
 
 module.exports = router;
