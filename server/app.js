@@ -1,21 +1,21 @@
 var express = require('express');
-var passport = require('passport');
 var path = require('path');
-var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bb = require('express-busboy');
 var session = require('express-session');
+var csurf = require('csurf')
 
 var index = require('./routes/index');
-//var users = require('./routes/users');
+
+var csrfProtection = csrf({ cookie: false })
+
 var app = express();
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
 
-// uncomment after placing your favicon in /public
 app.use(logger('dev'));
 
 bb.extend(app, {
@@ -24,20 +24,8 @@ bb.extend(app, {
     allowedPath: /./
 });
 
-app.use(cookieParser());
+//app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
-app.use(session({
-    secret: '_secret_',
-    resave: false,
-    saveUninitialized: true,
-    cookie: {
-      secure: true
-    }
-}));
-
-app.use(passport.initialize());
-app.use(passport.session());
-
 app.use('/', index);
 
 // catch 404 and forward to error handler
