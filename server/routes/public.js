@@ -16,7 +16,6 @@ let routes = path => {
 			res.status(404).send('Not Found');
 		}
 		else {
-			appGetAuth = false;
 			res.send(unhashed);
 		}
 	});
