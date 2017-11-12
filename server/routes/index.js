@@ -5,7 +5,6 @@ var path = require('path')
 const fs = require('fs')
 const util = require('util')
 const unzip = require('unzip')
-var rimraf = require('rimraf');
 const key = "You/'ll never walk alone"
 var encryptor = require('simple-encryptor')(key)
 var logged = false;
