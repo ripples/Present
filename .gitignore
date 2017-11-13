@@ -61,4 +61,6 @@ typings/
 
 lectures/*
 
+uploads/*
+
 package-lock.json
