@@ -65,7 +65,7 @@ export default class App extends Component {
             <IndexRoute component={LecturesList} />
             <Route path="course/:courseId/lecture/:lectureId" component={Lecture} />
             <Route path="calendar" component={() => <Calendar courseId={this.state.data.lis_course_section_sourcedid}/>} />
-            <Route path="course/:courseId/instructorSettings" component={() => <InstructorSettings courseId={this.state.data.lis_course_section_sourcedid}/>} />
+            <Route path="course/:courseId/instructorSettings" component={InstructorSettings} />
           </Route>
         </Router>
       </Provider>
