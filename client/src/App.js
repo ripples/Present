@@ -5,10 +5,10 @@ import {Provider} from "react-redux";
 import thunkMiddleware from "redux-thunk";
 
 import appReducer from './app/Reducers/reducer.js';
-import {setToken} from './app/Actions/action.js';
+import {setToken, setCourseFiles} from './app/Actions/action.js';
 
 import Application from './Application.js';
-import LecturesList from './app/Pages/LectureList/LecturesList';
+import LecturesList from './app/Pages/LecturesList/LecturesList';
 import Lecture from './app/Pages/Lecture/Lecture.js';
 import Calendar from './app/Pages/Calendar/Calendar.js';
 import InstructorSettings from './app/Pages/InstructorSettings/InstructorSettings.js';
@@ -44,6 +44,7 @@ export default class App extends Component {
       {
         fetch('/listofCourseLectures/' + dat.lis_course_section_sourcedid).then(res => res.json()).then(cour => {
           this.store.dispatch(setToken(dat));
+          this.store.dispatch(setCourseFiles(cour));
           this.setState({
             data: dat,
             course: cour
@@ -61,7 +62,7 @@ export default class App extends Component {
       <Provider store={this.store}>
         <Router history={hashHistory}>
           <Route path="/" component={Application}>
-            <IndexRoute component={() => <LecturesList courseId={this.state.data.lis_course_section_sourcedid} course={this.state.course}/>} />
+            <IndexRoute component={LecturesList} />
             <Route path="course/:courseId/lecture/:lectureId" component={Lecture} />
             <Route path="calendar" component={() => <Calendar courseId={this.state.data.lis_course_section_sourcedid}/>} />
             <Route path="course/:courseId/instructorSettings" component={() => <InstructorSettings courseId={this.state.data.lis_course_section_sourcedid}/>} />

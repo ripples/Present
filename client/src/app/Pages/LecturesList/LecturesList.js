@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
+import {connect} from "react-redux";
 import { Link } from 'react-router';
 
-export default class LecturesList extends Component {
+class LecturesList extends Component {
 
 	render() {
 		return (
@@ -38,6 +39,14 @@ export default class LecturesList extends Component {
 	}
 }
 
+const mapStateToProps = state => {
+	 return {
+		 courseId: state.token.lis_course_section_sourcedid,
+		 course: state.courseFiles
+	 };
+};
+
+
 var headerStyle= {
 	fontWeight: "bold"
 }
@@ -53,3 +62,5 @@ var buttonStyle= {
 	paddingBottom: "4px",
 	border: "solid black 1px"
 }
+
+export default connect(mapStateToProps)(LecturesList);
