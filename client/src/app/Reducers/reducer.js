@@ -1,5 +1,5 @@
 import {combineReducers} from 'redux'
-import {SET_TOKEN, SET_COURSE_FILES, SET_LECTURE_MANIFEST} from '../Actions/action.js';
+import {SET_TOKEN, SET_COURSE_FILES, SET_LECTURE_MANIFEST, SET_LECTURE_TIME} from '../Actions/action.js';
 
 function token(state = {}, action){
     switch(action.type){
@@ -31,10 +31,21 @@ function lectureManifest(state = {}, action){
     }
 }
 
+function lectureTime(state = 0, action){
+    switch(action.type){
+        case SET_LECTURE_TIME:
+            return action.time;
+
+        default:
+            return state;
+    }
+}
+
 const appReducer = combineReducers({
     token,
     courseFiles,
-    lectureManifest
+    lectureManifest,
+    lectureTime
 });
 
 export default appReducer;

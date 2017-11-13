@@ -10,9 +10,13 @@ class Lecture extends React.Component {
 			res => (res.status === 200 ) ? res.json() : {}
 		).then(
 			json => {
-				this.props.setManifest(json)
+				this.props.setManifest(json);
 			}
 		)
+	}
+
+	componentWillUnmount(){
+		this.props.setManifest({});
 	}
 
 	render() {
@@ -44,6 +48,7 @@ class Lecture extends React.Component {
 }
 
 const mapStateToProps = state => {
+	
 	return {
 		manifest: state.lectureManifest
 	};
