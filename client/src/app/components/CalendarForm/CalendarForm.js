@@ -4,21 +4,9 @@ class CalendarForm extends React.Component {
 
   constructor(props){
     super(props);
-    this.handleAddExclude = this.handleAddExclude.bind(this);
-    this.handleExcludeChange = this.handleExcludeChange.bind(this);
-    this.handleAddInclude = this.handleAddInclude.bind(this);
-    this.handleIncludeChange = this.handleIncludeChange.bind(this);
     this.formatDate = this.formatDate.bind(this);
     this.revertDate = this.revertDate.bind(this);
-    this.handleCheckboxChange = this.handleCheckboxChange.bind(this);
     this.formatTime = this.formatTime.bind(this);
-    this.handleSTime = this.handleSTime.bind(this);
-    this.handleETime = this.handleETime.bind(this);
-    this.handleSDate = this.handleSDate.bind(this);
-    this.handleEDate = this.handleEDate.bind(this);
-    this.handleDescription = this.handleDescription.bind(this);
-    this.handleLocation = this.handleLocation.bind(this);
-    this.handleSubmit = this.handleSubmit.bind(this);
     this.state ={
       sDate: "",
       eDate: "",
@@ -37,13 +25,13 @@ class CalendarForm extends React.Component {
 
   canBeSubmitted() {
     return (
-      this.state.sDate.length > 0 &&
-      this.state.eDate.length > 0 &&
-      this.state.sTime.length > 0 &&
-      this.state.eTime.length > 0 &&
-      this.state.recurDays.length > 0 &&
-      this.state.description.length > 0 &&
-      this.state.location.length > 0
+      (this.state.sDate.length > 0) &&
+      (this.state.eDate.length > 0) &&
+      (this.state.sTime.length > 0) &&
+      (this.state.eTime.length > 0) &&
+      (this.state.recurDays.length > 0) &&
+      (this.state.description.length > 0) &&
+      (this.state.location.length > 0)
     );
   }
 
@@ -76,9 +64,34 @@ class CalendarForm extends React.Component {
     }
   }
 
-  handleExcludeChange(e) {
-    e.preventDefault();
-    this.setState({ currentExclude: e.target.value });
+  handleChange(e) {
+    //e.preventDefault();
+    var change = {};
+    if(e.target.name === 'sDate' || e.target.name === 'eDate'){
+      change[e.target.name] = this.formatDate(e.target.value);
+    }
+    else if(e.target.name === 'sTime' || e.target.name === 'eTime'){
+      change[e.target.name] = this.formatTime(e.target.value);
+    }
+    else {
+      change[e.target.name] = e.target.value;
+    }
+    this.setState(change);
+  }
+
+  handleCheckboxChange(e){
+    const rDays = this.state.recurDays;
+    let index
+
+    if(e.target.checked) {
+      rDays.push(e.target.name);
+    }
+    else {
+      index = rDays.indexOf(e.target.name);
+      rDays.splice(index, 1);
+    }
+
+    this.setState({recurDays: rDays});
   }
 
   handleAddExclude(e){
@@ -86,11 +99,6 @@ class CalendarForm extends React.Component {
     const currentExcludes = this.state.excludeDates;
     const newExcludes = currentExcludes.concat(this.formatDate(this.state.currentExclude));
     this.setState({excludeDates: newExcludes});
-  }
-
-  handleIncludeChange(e) {
-    e.preventDefault();
-    this.setState({ currentInclude: e.target.value });
   }
 
   handleAddInclude(e){
@@ -118,79 +126,40 @@ class CalendarForm extends React.Component {
     return str[0] + str[1] + "00";
   }
 
-  handleSDate(e) {
-   this.setState({sDate: this.formatDate(e.target.value)});
-  }
-
-  handleEDate(e) {
-   this.setState({eDate: this.formatDate(e.target.value)});
-  }
-
-  handleSTime(e) {
-   this.setState({sTime: this.formatTime(e.target.value)});
-  }
-
-  handleETime(e){
-    this.setState({eTime: this.formatTime(e.target.value)});
-  }
-
-  handleLocation(e){
-    this.setState({location: e.target.value});
-  }
-
-  handleDescription(e){
-    this.setState({description: e.target.value});
-  }
-
-  handleCheckboxChange(e){
-    const rDays = this.state.recurDays;
-    let index
-
-    if(e.target.checked) {
-      rDays.push(e.target.name);
-    }
-    else {
-      index = rDays.indexOf(e.target.name);
-      rDays.splice(index, 1);
-    }
-
-    this.setState({recurDays: rDays});
-  }
-
   render() {
     const isEnabled = this.canBeSubmitted();
 
     return (
       <div className='calForm'>
-        <form onSubmit={this.handleSubmit}>
+        <form onSubmit={this.handleSubmit.bind(this)}>
           <fieldset style={fieldsetStyle}>
             <legend style={legendStyle}>New Recording Schedule: {this.props.courseId}</legend>
             <div>
               <label style={labelStyle} htmlFor='sDate'>Start Date: </label>
-              <input style={inputStyle} id='startDate' type='date' placeholder='Start Date: mm/dd/yyyy hh:mm' name='sDate' onChange={this.handleSDate}/>
+              <input style={inputStyle} type='date' placeholder='Start Date: mm/dd/yyyy hh:mm' name='sDate' onChange={this.handleChange.bind(this)}/>
             </div>
             <div>
               <label style={labelStyle} htmlFor='sTime'>Start Time: </label>
-              <input style={inputStyle} id='begin' type='time' placeholder='Start Time: hh:mm AM/PM' name='sTime' onChange={this.handleSTime}/>
+              <input style={inputStyle} type='time' placeholder='Start Time: hh:mm AM/PM' name='sTime' onChange={this.handleChange.bind(this)}/>
               <label style={labelStyle} htmlFor='eTime'>End Time: </label>
-              <input style={inputStyle} id='endTime' type='time' placeholder='End Time: hh:mm AM/PM' name='eTime' onChange={this.handleETime}/>
+              <input style={inputStyle} type='time' placeholder='End Time: hh:mm AM/PM' name='eTime' onChange={this.handleChange.bind(this)}/>
             </div>
             <div>
               <label style={labelStyle} htmlFor='eDate'>End Date: </label>
-              <input style={inputStyle} id='endDate' type='date' placeholder='End Date: mm/dd/yyyy' name='eDate' onChange={this.handleEDate}/>
+              <input style={inputStyle} type='date' placeholder='End Date: mm/dd/yyyy' name='eDate' onChange={this.handleChange.bind(this)}/>
             </div>
             <div>
               <label style={labelStyle}>Repeat (WEEKLY): </label>
-              <label style={labelStyle} htmlFor='Monday'><input style={chkbxStyle} type='checkbox' name='Monday' onChange={this.handleCheckboxChange}/>Monday</label>
-              <label style={labelStyle} htmlFor='Tuesday'><input style={chkbxStyle} type='checkbox' name='Tuesday' onChange={this.handleCheckboxChange}/>Tuesday</label>
-              <label style={labelStyle} htmlFor='Wednesday'><input style={chkbxStyle} type='checkbox' name='Wednesday' onChange={this.handleCheckboxChange}/>Wednesday</label>
-              <label style={labelStyle} htmlFor='Thursday'><input style={chkbxStyle} type='checkbox' name='Thursday' onChange={this.handleCheckboxChange}/>Thursday</label>
-              <label style={labelStyle} htmlFor='Friday'><input style={chkbxStyle} type='checkbox' name='Friday' onChange={this.handleCheckboxChange}/>Friday</label>
+              <label style={labelStyle} htmlFor='Monday'><input style={chkbxStyle} type='checkbox' name='Monday' onChange={this.handleCheckboxChange.bind(this)}/>Monday</label>
+              <label style={labelStyle} htmlFor='Tuesday'><input style={chkbxStyle} type='checkbox' name='Tuesday' onChange={this.handleCheckboxChange.bind(this)}/>Tuesday</label>
+              <label style={labelStyle} htmlFor='Wednesday'><input style={chkbxStyle} type='checkbox' name='Wednesday' onChange={this.handleCheckboxChange.bind(this)}/>Wednesday</label>
+              <label style={labelStyle} htmlFor='Thursday'><input style={chkbxStyle} type='checkbox' name='Thursday' onChange={this.handleCheckboxChange.bind(this)}/>Thursday</label>
+              <label style={labelStyle} htmlFor='Friday'><input style={chkbxStyle} type='checkbox' name='Friday' onChange={this.handleCheckboxChange.bind(this)}/>Friday</label>
             </div>
             <div>
               <label style={labelStyle} htmlFor='exclude'>Exclude Date: </label>
-              <input style={inputStyle} type='date' placeholder='Exclude: mm/dd/yyyy' name='exclude' onChange={this.handleExcludeChange}/>
-              <button style={buttonStyle} onClick={this.handleAddExclude}>Exclude</button>
+              <input style={inputStyle} type='date' placeholder='Exclude: mm/dd/yyyy' name='currentExclude' onChange={this.handleChange.bind(this)}/>
+              <button style={buttonStyle} onClick={this.handleAddExclude.bind(this)}>Exclude</button>
               <label name='excludeDates'>Currently Excluded: [{this.state.excludeDates.map((date, i) => {
                 var newDate = "";
                 if(i === 0){
@@ -199,13 +168,13 @@ class CalendarForm extends React.Component {
                 else{
                   newDate = ", " + this.revertDate(date);
                 }
-                return (<p key={i} style={dateStyle}>{newDate},&nbsp;</p>)})}]
+                return (<p key={i} style={dateStyle}>{newDate}</p>)})}]
               </label>
             </div>
             <div>
               <label style={labelStyle} htmlFor='include'>Add Extra Date: </label>
-              <input style={inputStyle} type='date' placeholder='Add: mm/dd/yyyy' name='include' onChange={this.handleIncludeChange}/>
-              <button style={buttonStyle} className='pure-button pure-button-primary' onClick={this.handleAddInclude}>Add</button>
+              <input style={inputStyle} type='date' placeholder='Add: mm/dd/yyyy' name='currentInclude' onChange={this.handleChange.bind(this)}/>
+              <button style={buttonStyle} className='pure-button pure-button-primary' onClick={this.handleAddInclude.bind(this)}>Add</button>
               <label name='includeDates'>Currently Added: [{this.state.includeDates.map((date, i) => {
                 var newDate = "";
                 if(i === 0){
@@ -218,10 +187,10 @@ class CalendarForm extends React.Component {
               </label>
             </div>
             <div>
-              <label className='datelbl' htmlFor='description'>Description: </label>
-              <input className='dateInput' style={inputStyle} id='description' type='text' placeholder='Class description...' name='description' onChange={this.handleDescription}/>
-              <label className='datelbl' htmlFor='location'>Location: </label>
-              <input className='dateInput' style={inputStyle} id='location' type='text' placeholder='Class location...' name='location' onChange={this.handleLocation}/>
+              <label htmlFor='description'>Description: </label>
+              <input style={inputStyle} type='text' placeholder='Class description...' name='description' onChange={this.handleChange.bind(this)}/>
+              <label htmlFor='location'>Location: </label>
+              <input style={inputStyle} type='text' placeholder='Class location...' name='location' onChange={this.handleChange.bind(this)}/>
             </div>
             <div>
               <input type='submit' style={buttonStyle} disabled={!isEnabled} value='Create Schedule'/>
