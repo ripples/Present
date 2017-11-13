@@ -4,15 +4,14 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bb = require('express-busboy');
 var session = require('express-session');
-var csurf = require('csurf')
+var csrf = require('csurf')
 
 var public = require('./routes/public');
 var api = require('./routes/api');
 var upload = require('./routes/upload')
 
-var csrfProtection = csrf({ cookie: false })
-
 var app = express();
+app.use(cookieParser())
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -28,8 +27,10 @@ bb.extend(app, {
 
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', public);
-app.use('/api', api)
 app.user('/upload', upload)
+
+app.use(csrfProtection)
+app.use('/api', api)
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
