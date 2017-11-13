@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
+import {connect} from "react-redux";
 import CalendarForm from '../../components/CalendarForm/CalendarForm';
 
-export default class Calendar extends Component {
+class Calendar extends Component {
 
     render(){
         return(
@@ -11,3 +12,11 @@ export default class Calendar extends Component {
         );
     }
 }
+
+const mapStateToProps = state => {
+    return {
+        courseId: state.token.lis_course_section_sourcedid
+    };
+};
+
+export default connect(mapStateToProps)(Calendar);
