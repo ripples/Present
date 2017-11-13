@@ -26,10 +26,12 @@ bb.extend(app, {
 });
 
 app.use(express.static(path.join(__dirname, 'public')));
-app.use('/', public);
-app.user('/upload', upload)
+app.use('/upload', upload)
 
-app.use(csrfProtection)
+app.use(csrf({ cookie: true, ignoreMethods: ['POST', 'GET',] })) //Tokens may be generated from these routes
+app.use('/', public);
+
+app.use(csrf({ cookie: true, ignoreMethods: [] })) //this actualy uses them
 app.use('/api', api)
 
 // catch 404 and forward to error handler

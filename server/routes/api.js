@@ -4,6 +4,19 @@ var dirToJson = require('dir-to-json');
 var path = require('path')
 var fs = require('fs')
 var util = require('util')
+var key = "You/'ll never walk alone"
+var encryptor = require('simple-encryptor')(key)
+
+router.get('/identify/*', function (req, res) {
+	const tok = req.params[0].replace(/-/g, '/');
+	const unhashed = encryptor.decrypt(tok);
+	if (typeof unhashed == 'undefined' || unhashed === null) {
+		res.status(404).send('Not Found');
+	}
+	else {
+		res.send(unhashed);
+	}
+});
 
 router.get('/listOfCourseLectures/:courseId', function (req, res) {
 	dirToJson("./lectures/" + req.params.courseId.toString(), function (err, dirTree) {

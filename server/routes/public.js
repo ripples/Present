@@ -4,7 +4,10 @@ var key = "You/'ll never walk alone"
 var encryptor = require('simple-encryptor')(key)
 
 router.post('/data', function (req, res) {
-	const hashed = encryptor.encrypt(req.body).replace(/\//g, '-');
+	const hashed = encryptor.encrypt({
+		lti: req.body,
+		csrf: req.csrfToken()
+	}).replace(/\//g, '-');
 	const url = "http://localhost:3000/" // TODO Global constant
 
 	res.redirect(url + hashed);

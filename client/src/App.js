@@ -16,7 +16,7 @@ export default class App extends Component {
   }
 
   componentDidMount() {
-    fetch(('/api/identify/' + window.location.pathname.substr(1)), {
+    fetch(('/identify/' + window.location.pathname.substr(1)), {
       credentials: 'same-origin' // or 'include'
     }).then(
       res => (res.status === 200) ? res.json() : ""
