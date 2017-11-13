@@ -6,8 +6,9 @@ var bb = require('express-busboy');
 var session = require('express-session');
 var csurf = require('csurf')
 
-var index = require('./routes/index');
-var api = require('./routes/api/api');
+var public = require('./routes/public');
+var api = require('./routes/api');
+var upload = require('./routes/upload')
 
 var csrfProtection = csrf({ cookie: false })
 
@@ -25,10 +26,10 @@ bb.extend(app, {
     allowedPath: /./
 });
 
-//app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
-app.use('/', index);
+app.use('/', public);
 app.use('/api', api)
+app.user('/upload', upload)
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
