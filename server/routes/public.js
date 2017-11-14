@@ -1,7 +1,5 @@
 var express = require('express');
 var router = express.Router();
-var key = "You/'ll never walk alone"
-var encryptor = require('simple-encryptor')(key)
 
 router.post('/data', function (req, res) {
 	req.session.lti_token = req.body;

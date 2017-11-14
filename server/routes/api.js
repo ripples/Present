@@ -4,8 +4,6 @@ var dirToJson = require('dir-to-json');
 var path = require('path')
 var fs = require('fs')
 var util = require('util')
-var key = "You/'ll never walk alone"
-var encryptor = require('simple-encryptor')(key)
 
 router.get('/identify/', function (req, res) {
 	res.send(req.session.lti_token);
