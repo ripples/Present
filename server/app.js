@@ -1,21 +1,24 @@
 var express = require('express');
-var passport = require('passport');
 var path = require('path');
-var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bb = require('express-busboy');
 var session = require('express-session');
+var passport = require('passport')
+var lti = require('ims-lti')
+var CustomStrategy = require('passport-custom')
 
-var index = require('./routes/index');
-//var users = require('./routes/users');
+var public = require('./routes/public');
+var api = require('./routes/api');
+var upload = require('./routes/upload')
+
 var app = express();
+app.use(cookieParser())
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
 
-// uncomment after placing your favicon in /public
 app.use(logger('dev'));
 
 bb.extend(app, {
@@ -24,21 +27,48 @@ bb.extend(app, {
     allowedPath: /./
 });
 
-app.use(cookieParser());
+app.use(session({secret: 'It never rains in Southern California'}))
+
+//Passport
+passport.use('lti-strategy', new CustomStrategy(
+	function(req, callback) {
+		var val = (req.body.oauth_consumer_key) ? req.body.oauth_consumer_key : req.user		
+		try{
+			var provider = new lti.Provider(val , "secret")			
+		}
+		catch(err){
+			callback(err, val)
+		}
+		if(!req.user){
+			provider.valid_request(req, function(err, isValid) {
+				if(err){
+					console.log(err)
+				}
+				callback(err, val)
+			});
+		}
+		else(
+			callback(null, val)
+		)
+	}
+));
+
+passport.serializeUser(function(user, done) {
+	done(null, user);
+  });
+  
+  passport.deserializeUser(function(user, done) {
+	done(null, user);
+  });
+
 app.use(express.static(path.join(__dirname, 'public')));
-app.use(session({
-    secret: '_secret_',
-    resave: false,
-    saveUninitialized: true,
-    cookie: {
-      secure: true
-    }
-}));
+app.use('/upload', upload)
+app.use(passport.initialize())
+app.use(passport.session())
+app.use(passport.authenticate('lti-strategy'));
+app.use('/', public);
 
-app.use(passport.initialize());
-app.use(passport.session());
-
-app.use('/', index);
+app.use('/api', api)
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

@@ -30,14 +30,14 @@ export default class LectureMedia extends React.Component {
 			var computerImages = this.range(this.props.manifest.computerCount).map( (e, i) => {
 				return (
 					<div key={i}>
-						<LectureImage src={'/image/' + this.props.courseId + "/" + this.props.lectureId + '/1-' + i + '/' + this.state.time} alt="Computer Screen" />
+						<LectureImage src={'/api/image/' + this.props.courseId + "/" + this.props.lectureId + '/1-' + i + '/' + this.state.time} alt="Computer Screen" />
 					</div>
 				);
 			})
 			var whiteBoardImages = this.range(this.props.manifest.whiteboardCount).map( (e, i) => {
 				return (
 					<div key={i}>
-						<LectureImage src={'/image/' + this.props.courseId + "/" + this.props.lectureId + '/2-' + i + '/' + this.state.time} alt="Whiteboard"/>
+						<LectureImage src={'/api/image/' + this.props.courseId + "/" + this.props.lectureId + '/2-' + i + '/' + this.state.time} alt="Whiteboard"/>
 					</div>
 				);
 			})
@@ -47,7 +47,7 @@ export default class LectureMedia extends React.Component {
 				<div className="container">
 					<div>
 						<VideoView
-							videoSrc={'/video/' + this.props.courseId + "/" + this.props.lectureId } onVideoTimeUpdate={this.onVideoTimeUpdate} />
+							videoSrc={'/api/video/' + this.props.courseId + "/" + this.props.lectureId } onVideoTimeUpdate={this.onVideoTimeUpdate} />
 					</div>
 				</div>
 				<div>
