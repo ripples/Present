@@ -6,7 +6,9 @@
 		"start": "node ./bin/www",
 		"start-server": "npm start",
 		"start-client": "cd client && npm start",
-		"start-all": "concurrent \"npm run start\" \"npm run start-client\" "
+		"start-proxy": "node ./proxy/proxy.js",
+		"start-production": "concurrent \"npm run start\" \"npm run start-proxy\"",
+		"start-all": "concurrent \"npm run start\" \"npm run start-client\" \"npm run start-proxy\""
 	},
 	"dependencies": {
 		"cookie-parser": "~1.4.3",
