@@ -10,7 +10,8 @@ export default class VideoView extends React.Component {
       controls: true,
       sources: [{
         src: this.props.videoSrc,
-        type: "video/mp4"
+		type: "video/mp4",
+		withCredentials: true
       }]
     };
     this.player = videojs(this.videoNode, videoJsOptions, () => {

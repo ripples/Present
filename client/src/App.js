@@ -23,7 +23,9 @@ export default class App extends Component {
     ).then(
       dat => 
       {
-        fetch('/api/listofCourseLectures/' + dat.lis_course_section_sourcedid).then(res => res.json()).then(cour => {
+        fetch(('/api/listofCourseLectures/' + dat.lis_course_section_sourcedid), {
+			credentials: 'same-origin' // or 'include'
+		  }).then(res => res.json()).then(cour => {
           this.setState({
             data: dat,
             course: cour

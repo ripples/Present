@@ -32,20 +32,24 @@ app.use(session({secret: 'It never rains in Southern California'}))
 //Passport
 passport.use('lti-strategy', new CustomStrategy(
 	function(req, callback) {
-		console.log("authing", req.sessionID)
+		var val = (req.body.oauth_consumer_key) ? req.body.oauth_consumer_key : req.user		
 		try{
-			var provider = new lti.Provider((req.body.oauth_consumer_key) ? req.body.oauth_consumer_key : null, "secret")			
+			var provider = new lti.Provider(val , "secret")			
 		}
 		catch(err){
 			console.log("ERR", err, req.sessionID)
 		}
-		console.log("here")
-		provider.valid_request(req, function(err, isValid) {
-			if(err){
-				console.log(err)
-			}
-			callback(err, req.body)
-		  });
+		if(!req.user){
+			provider.valid_request(req, function(err, isValid) {
+				if(err){
+					console.log(err)
+				}
+				callback(err, val)
+			});
+		}
+		else(
+			callback(null, val)
+		)
 	}
 ));
 
