@@ -11,8 +11,6 @@ export const SET_CAL_E_TIME = 'SET_CAL_E_TIME';
 export const SET_CAL_RECUR_DAYS = 'SET_CAL_RECUR_DAYS';
 export const SET_CAL_EXCLUDE_DATES = 'SET_CAL_EXCLUDE_DATES';
 export const SET_CAL_INCLUDE_DATES = 'SET_CAL_INCLUDE_DATES';
-export const SET_CAL_CUR_EX_DATES = 'SET_CAL_CUR_EX_DATES';
-export const SET_CAL_CUR_INC_DATES = 'SET_CAL_CUR_INC_DATES';
 export const SET_CAL_DESCRIPTION = 'SET_CAL_DESCRIPTION';
 export const SET_CAL_LOC = 'SET_CAL_LOC';
 export const SET_CAL_COURSE_ID = 'SET_CAL_COURSE_ID';
@@ -47,31 +45,31 @@ export function setLectureTime(newTime){
     }
 }
 
-export function setCalSDate(date){
+export function setCalSDate(sDate){
     return {
         type: SET_CAL_S_DATE,
-        date
+        sDate
     }
 }
 
-export function setCalEDate(date){
+export function setCalEDate(eDate){
     return {
         type: SET_CAL_E_DATE,
-        date
+        eDate
     }
 }
 
-export function setCalSTime(time){
+export function setCalSTime(sTime){
     return {
         type: SET_CAL_S_TIME,
-        time
+        sTime
     }
 }
 
-export function setCalETime(time){
+export function setCalETime(eTime){
     return {
         type: SET_CAL_E_TIME,
-        time
+        eTime
     }
 }
 
@@ -96,24 +94,10 @@ export function setCalIncludeDates(includeDates){
     }
 }
 
-export function setCalCurExDates(dates){
-    return {
-        type: SET_CAL_CUR_EX_DATES,
-        dates
-    }
-}
-
-export function setCalCurIncDates(dates){
-    return {
-        type: SET_CAL_CUR_INC_DATES,
-        dates
-    }
-}
-
-export function setCalDescription(desc){
+export function setCalDescription(description){
     return {
         type: SET_CAL_DESCRIPTION,
-        desc
+        description
     }
 }
 
