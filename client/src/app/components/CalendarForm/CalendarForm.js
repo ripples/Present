@@ -1,4 +1,9 @@
 import React from 'react';
+import moment from 'moment';
+import DatePicker from 'react-datepicker';
+
+import 'react-datepicker/dist/react-datepicker.css';
+
 
 class CalendarForm extends React.Component {
 
@@ -7,31 +12,44 @@ class CalendarForm extends React.Component {
     this.formatDate = this.formatDate.bind(this);
     this.revertDate = this.revertDate.bind(this);
     this.formatTime = this.formatTime.bind(this);
-    this.state ={
-      sDate: "",
-      eDate: "",
+    this.state = {
+      sDate: moment().format("YYYYMMDD").toString(),
+      eDate: moment().add(1, 'M').format("YYYYMMDD").toString(),
       sTime: "",
       eTime: "",
       recurDays: [],
       excludeDates: [],
       includeDates: [],
-      currentExclude: "",
-      currentInclude: "",
       description: "",
       location: "",
       courseId: this.props.courseId
     };
   }
 
+  isValidated(value, name) {
+    if(name === 'sDate' || name === 'eDate'){
+      return (value.length === 8);
+    }
+    else if(name === 'sTime' || name === 'eTime'){
+      return (value.length === 6);
+    }
+    else if(name === 'recurDays' || name === 'description' || name === 'location'){
+      return (value.length > 0);
+    }
+    else{
+      return false;
+    }
+  }
+
   canBeSubmitted() {
     return (
-      (this.state.sDate.length > 0) &&
-      (this.state.eDate.length > 0) &&
-      (this.state.sTime.length > 0) &&
-      (this.state.eTime.length > 0) &&
-      (this.state.recurDays.length > 0) &&
-      (this.state.description.length > 0) &&
-      (this.state.location.length > 0)
+      (this.isValidated(this.state.sDate, 'sDate')) &&
+      (this.isValidated(this.state.eDate, 'eDate')) &&
+      (this.isValidated(this.state.sTime, 'sTime')) &&
+      (this.isValidated(this.state.eTime, 'eTime')) &&
+      (this.isValidated(this.state.recurDays, 'recurDays')) &&
+      (this.isValidated(this.state.description, 'description')) &&
+      (this.isValidated(this.state.location, 'location'))
     );
   }
 
@@ -64,17 +82,16 @@ class CalendarForm extends React.Component {
     }
   }
 
-  handleChange(e) {
-    //e.preventDefault();
+  handleChange(name, e) {
     var change = {};
-    if(e.target.name === 'sDate' || e.target.name === 'eDate'){
-      change[e.target.name] = this.formatDate(e.target.value);
+    if(name === 'sDate' || name === 'eDate'){
+      change[name] = e.format("YYYYMMDD").toString();
     }
-    else if(e.target.name === 'sTime' || e.target.name === 'eTime'){
-      change[e.target.name] = this.formatTime(e.target.value);
+    else if(name === 'sTime' || name === 'eTime'){
+      change[name] = this.formatTime(e.target.value);
     }
-    else {
-      change[e.target.name] = e.target.value;
+    else{
+      change[name] = e.target.value
     }
     this.setState(change);
   }
@@ -94,18 +111,19 @@ class CalendarForm extends React.Component {
     this.setState({recurDays: rDays});
   }
 
-  handleAddExclude(e){
-    e.preventDefault();
-    const currentExcludes = this.state.excludeDates;
-    const newExcludes = currentExcludes.concat(this.formatDate(this.state.currentExclude));
-    this.setState({excludeDates: newExcludes});
-  }
-
-  handleAddInclude(e){
-    e.preventDefault();
-    const currentIncludes = this.state.includeDates;
-    const newIncludes = currentIncludes.concat(this.formatDate(this.state.currentInclude));
-    this.setState({includeDates: newIncludes});
+  handleAddDate(name, e){
+    if(e.format("YYYYMMDD").toString() !== moment().format("YYYYMMDD").toString()){
+      if(name === 'exclude'){
+        const currentExcludes = this.state.excludeDates;
+        const newExcludes = currentExcludes.concat(this.formatDate(e.format("YYYY-MM-DD").toString()));
+        this.setState({excludeDates: newExcludes});
+      }
+      else if(name === 'include'){
+        const currentIncludes = this.state.includeDates;
+        const newIncludes = currentIncludes.concat(this.formatDate(e.format("YYYY-MM-DD").toString()));
+        this.setState({includeDates: newIncludes});
+      }
+    }
   }
 
   formatDate(date) {
@@ -136,17 +154,17 @@ class CalendarForm extends React.Component {
             <legend style={legendStyle}>New Recording Schedule: {this.props.courseId}</legend>
             <div>
               <label style={labelStyle} htmlFor='sDate'>Start Date: </label>
-              <input style={inputStyle} type='date' placeholder='Start Date: mm/dd/yyyy hh:mm' name='sDate' onChange={this.handleChange.bind(this)}/>
+              <DatePicker customInput={<button style={buttonStyle}>{moment(this.state.sDate).format("MM/DD/YYYY").toString()}</button>} openToDate={moment(this.state.sDate)} onChange={this.handleChange.bind(this, 'sDate')}/>
             </div>
             <div>
               <label style={labelStyle} htmlFor='sTime'>Start Time: </label>
-              <input style={inputStyle} type='time' placeholder='Start Time: hh:mm AM/PM' name='sTime' onChange={this.handleChange.bind(this)}/>
+              <input style={inputStyle} type='time' placeholder='Start Time: hh:mm AM/PM' name='sTime' onChange={this.handleChange.bind(this, 'sTime')}/>
               <label style={labelStyle} htmlFor='eTime'>End Time: </label>
-              <input style={inputStyle} type='time' placeholder='End Time: hh:mm AM/PM' name='eTime' onChange={this.handleChange.bind(this)}/>
+              <input style={inputStyle} type='time' placeholder='End Time: hh:mm AM/PM' name='eTime' onChange={this.handleChange.bind(this, 'eTime')}/>
             </div>
             <div>
               <label style={labelStyle} htmlFor='eDate'>End Date: </label>
-              <input style={inputStyle} type='date' placeholder='End Date: mm/dd/yyyy' name='eDate' onChange={this.handleChange.bind(this)}/>
+              <DatePicker customInput={<button style={buttonStyle}>{moment(this.state.eDate).format("MM/DD/YYYY").toString()}</button>} openToDate={moment(this.state.eDate)} onChange={this.handleChange.bind(this, 'eDate')}/>
             </div>
             <div>
               <label style={labelStyle}>Repeat (WEEKLY): </label>
@@ -157,9 +175,7 @@ class CalendarForm extends React.Component {
               <label style={labelStyle} htmlFor='Friday'><input style={chkbxStyle} type='checkbox' name='Friday' onChange={this.handleCheckboxChange.bind(this)}/>Friday</label>
             </div>
             <div>
-              <label style={labelStyle} htmlFor='exclude'>Exclude Date: </label>
-              <input style={inputStyle} type='date' placeholder='Exclude: mm/dd/yyyy' name='currentExclude' onChange={this.handleChange.bind(this)}/>
-              <button style={buttonStyle} onClick={this.handleAddExclude.bind(this)}>Exclude</button>
+              <DatePicker customInput={<button style={buttonStyle}>Exclude A Date</button>} openToDate={moment()} onChange={this.handleAddDate.bind(this, 'exclude')}/>
               <label name='excludeDates'>Currently Excluded: [{this.state.excludeDates.map((date, i) => {
                 var newDate = "";
                 if(i === 0){
@@ -172,9 +188,7 @@ class CalendarForm extends React.Component {
               </label>
             </div>
             <div>
-              <label style={labelStyle} htmlFor='include'>Add Extra Date: </label>
-              <input style={inputStyle} type='date' placeholder='Add: mm/dd/yyyy' name='currentInclude' onChange={this.handleChange.bind(this)}/>
-              <button style={buttonStyle} className='pure-button pure-button-primary' onClick={this.handleAddInclude.bind(this)}>Add</button>
+              <DatePicker customInput={<button style={buttonStyle}>Include Extra Date</button>} openToDate={moment()} value='Pick a date to include' onChange={this.handleAddDate.bind(this, 'include')}/>
               <label name='includeDates'>Currently Added: [{this.state.includeDates.map((date, i) => {
                 var newDate = "";
                 if(i === 0){
@@ -188,9 +202,9 @@ class CalendarForm extends React.Component {
             </div>
             <div>
               <label htmlFor='description'>Description: </label>
-              <input style={inputStyle} type='text' placeholder='Class description...' name='description' onChange={this.handleChange.bind(this)}/>
+              <input style={inputStyle} type='text' placeholder='Class description...' name='description' onChange={this.handleChange.bind(this, 'description')}/>
               <label htmlFor='location'>Location: </label>
-              <input style={inputStyle} type='text' placeholder='Class location...' name='location' onChange={this.handleChange.bind(this)}/>
+              <input style={inputStyle} type='text' placeholder='Class location...' name='location' onChange={this.handleChange.bind(this, 'location')}/>
             </div>
             <div>
               <input type='submit' style={buttonStyle} disabled={!isEnabled} value='Create Schedule'/>
@@ -205,13 +219,13 @@ class CalendarForm extends React.Component {
 var buttonStyle = {
     backgroundColor: "white",
     borderRadius: "4px",
-    marginTop: "10px",
-    marginRight: "5px",
+    marginTop: "5px",
+    marginBottom: "5px",
     color: "#000080",
     paddingLeft: "10px",
     paddingRight: "10px",
     paddingTop: "4px",
-    paddingBottom: "4px"
+    paddingBottom: "4px",
 }
 
 var dateStyle = {
@@ -221,7 +235,6 @@ var dateStyle = {
 var inputStyle = {
   margin: "10px 5px 10px",
   boxSizing: "border-box"
-
 }
 
 var chkbxStyle = {
@@ -230,7 +243,7 @@ var chkbxStyle = {
 
 var labelStyle = {
   fontWeight: "bold",
-  marginRight: "5px"
+  marginRight: "5px",
 }
 
 var fieldsetStyle = {
