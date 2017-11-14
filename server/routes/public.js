@@ -11,12 +11,10 @@ router.post('/data', function (req, res) {
 
 if(process.env.PRODUCTION){
 	router.get('/', function(req, res){
-		console.log("hello")
 		res.sendFile(process.env.PATH_TO_BUILD + "index.html")
 	});
 
 	router.get('/static/*', function(req, res){
-		console.log(req.params)
 		res.sendFile(process.env.PATH_TO_BUILD + "/static/" + req.params[0])
 	});
 }
