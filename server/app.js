@@ -4,7 +4,9 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bb = require('express-busboy');
 var session = require('express-session');
-var csrf = require('csurf')
+var passport = require('passport')
+var lti = require('ims-lti')
+var CustomStrategy = require('passport-custom')
 
 var public = require('./routes/public');
 var api = require('./routes/api');
@@ -25,13 +27,43 @@ bb.extend(app, {
     allowedPath: /./
 });
 
+app.use(session({secret: 'It never rains in Southern California'}))
+
+//Passport
+passport.use('lti-strategy', new CustomStrategy(
+	function(req, callback) {
+		console.log("authing", req.sessionID)
+		try{
+			var provider = new lti.Provider((req.body.oauth_consumer_key) ? req.body.oauth_consumer_key : null, "secret")			
+		}
+		catch(err){
+			console.log("ERR", err, req.sessionID)
+		}
+		console.log("here")
+		provider.valid_request(req, function(err, isValid) {
+			if(err){
+				console.log(err)
+			}
+			callback(err, req.body)
+		  });
+	}
+));
+
+passport.serializeUser(function(user, done) {
+	done(null, user);
+  });
+  
+  passport.deserializeUser(function(user, done) {
+	done(null, user);
+  });
+
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/upload', upload)
-
-app.use(csrf({ cookie: true, ignoreMethods: ['POST', 'GET',] })) //Tokens may be generated from these routes
+app.use(passport.initialize())
+app.use(passport.session())
+app.use(passport.authenticate('lti-strategy'));
 app.use('/', public);
 
-app.use(csrf({ cookie: true, ignoreMethods: [] })) //this actualy uses them
 app.use('/api', api)
 
 // catch 404 and forward to error handler
