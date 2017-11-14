@@ -37,7 +37,7 @@ passport.use('lti-strategy', new CustomStrategy(
 			var provider = new lti.Provider(val , "secret")			
 		}
 		catch(err){
-			console.log("ERR", err, req.sessionID)
+			callback(err, val)
 		}
 		if(!req.user){
 			provider.valid_request(req, function(err, isValid) {
