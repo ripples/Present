@@ -73,26 +73,52 @@ function calendarForm(state = calInit, action){
             return action.time;
 
         case SET_CAL_RECUR_DAYS:
-        return {
-            sDate: state.sDate,
-            eDate: state.eDate,
-            sTime: state.sTime,
-            eTime: state.eTime,
-            recurDays: action.recurDays,
-            excludeDates: state.excludeDates,
-            includeDates: state.includeDates,
-            currentExclude: state.currentExclude,
-            currentInclude: state.currentInclude,
-            description: state.description,
-            location: state.location,
-            courseId: state.courseId
-        };
+            return {
+                sDate: state.sDate,
+                eDate: state.eDate,
+                sTime: state.sTime,
+                eTime: state.eTime,
+                recurDays: action.recurDays,
+                excludeDates: state.excludeDates,
+                includeDates: state.includeDates,
+                currentExclude: state.currentExclude,
+                currentInclude: state.currentInclude,
+                description: state.description,
+                location: state.location,
+                courseId: state.courseId
+            };
 
         case SET_CAL_EXCLUDE_DATES:
-            return action.dates;
+            return {
+                sDate: state.sDate,
+                eDate: state.eDate,
+                sTime: state.sTime,
+                eTime: state.eTime,
+                recurDays: state.recurDays,
+                excludeDates: action.excludeDates,
+                includeDates: state.includeDates,
+                currentExclude: state.currentExclude,
+                currentInclude: state.currentInclude,
+                description: state.description,
+                location: state.location,
+                courseId: state.courseId
+            };
 
         case SET_CAL_INCLUDE_DATES:
-            return action.dates;
+            return {
+                sDate: state.sDate,
+                eDate: state.eDate,
+                sTime: state.sTime,
+                eTime: state.eTime,
+                recurDays: state.recurDays,
+                excludeDates: state.excludeDates,
+                includeDates: action.includeDates,
+                currentExclude: state.currentExclude,
+                currentInclude: state.currentInclude,
+                description: state.description,
+                location: state.location,
+                courseId: state.courseId
+            };
 
         case SET_CAL_CUR_EX_DATES:
             return action.dates;

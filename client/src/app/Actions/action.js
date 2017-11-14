@@ -82,17 +82,17 @@ export function setCalRecurDays(recurDays){
     }
 }
 
-export function setCalExcludeDates(dates){
+export function setCalExcludeDates(excludeDates){
     return {
         type: SET_CAL_EXCLUDE_DATES,
-        dates
+        excludeDates
     }
 }
 
-export function setCalIncludeDates(dates){
+export function setCalIncludeDates(includeDates){
     return {
         type: SET_CAL_INCLUDE_DATES,
-        dates
+        includeDates
     }
 }
 

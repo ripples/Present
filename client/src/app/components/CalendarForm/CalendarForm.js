@@ -123,6 +123,7 @@ class CalendarForm extends React.Component {
     const currentExcludes = this.state.excludeDates;
     const newExcludes = currentExcludes.concat(this.formatDate(this.state.currentExclude));
     this.setState({excludeDates: newExcludes});
+    this.props.setCalExcludeDates({excludeDates: newExcludes});
   }
 
   handleAddInclude(e){
@@ -130,6 +131,7 @@ class CalendarForm extends React.Component {
     const currentIncludes = this.state.includeDates;
     const newIncludes = currentIncludes.concat(this.formatDate(this.state.currentInclude));
     this.setState({includeDates: newIncludes});
+    this.props.setCalIncludeDates({includeDates: newIncludes});
   }
 
   formatDate(date) {
@@ -242,7 +244,9 @@ const mapDispatchToProps = (dispatch, ownProps) => {
 	return {
     clearForm: () => dispatch(clearForm()),
     setCourseId: id => dispatch(setCalCourseId(id)),
-    setCalRecurDays : (days) => dispatch(setCalRecurDays(days))
+    setCalRecurDays: (days) => dispatch(setCalRecurDays(days)),
+    setCalExcludeDates: (dates) => dispatch(setCalExcludeDates(dates)),
+    setCalIncludeDates: (dates) => dispatch(setCalIncludeDates(dates))
 	}
 };
 
@@ -265,7 +269,6 @@ var dateStyle = {
 var inputStyle = {
   margin: "10px 5px 10px",
   boxSizing: "border-box"
-
 }
 
 var chkbxStyle = {
