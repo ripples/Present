@@ -1,6 +1,6 @@
 import React from "react";
 import VideoView from "../../components/VideoView/VideoView";
-//import ImageView from "../../components/ImageView/ImageView";
+import LectureImage from '../LectureImage/LectureImage.js';
 
 export default class LectureMedia extends React.Component {
 
@@ -25,16 +25,21 @@ export default class LectureMedia extends React.Component {
 
 
 	render() {
-		const style = {
-			'maxWidth': '500px',
-			'maxHeight': '500px'
-		};
+
 		if(this.props.manifest){
 			var computerImages = this.range(this.props.manifest.computerCount).map( (e, i) => {
-				return <img key={i} src={'/image/' + this.props.courseId + "/" + this.props.lectureId + '/1-' + i + '/' + this.state.time} style={style} alt="Computer Screen"/>
+				return (
+					<div key={i}>
+						<LectureImage src={'/api/image/' + this.props.courseId + "/" + this.props.lectureId + '/1-' + i + '/' + this.state.time} alt="Computer Screen" />
+					</div>
+				);
 			})
 			var whiteBoardImages = this.range(this.props.manifest.whiteboardCount).map( (e, i) => {
-				return <img key={computerImages.length + i} src={'/image/' + this.props.courseId + "/" + this.props.lectureId + '/2-' + i + '/' + this.state.time} style={style} alt="Whiteboard"/> 
+				return (
+					<div key={i}>
+						<LectureImage src={'/api/image/' + this.props.courseId + "/" + this.props.lectureId + '/2-' + i + '/' + this.state.time} alt="Whiteboard"/>
+					</div>
+				);
 			})
 		}
 		return (
@@ -42,10 +47,22 @@ export default class LectureMedia extends React.Component {
 				<div className="container">
 					<div>
 						<VideoView
-							videoSrc={'/video/' + this.props.courseId + "/" + this.props.lectureId } onVideoTimeUpdate={this.onVideoTimeUpdate} />
+							videoSrc={'/api/video/' + this.props.courseId + "/" + this.props.lectureId } onVideoTimeUpdate={this.onVideoTimeUpdate} />
 					</div>
 				</div>
 				<div>
+					<style>{"\
+						img{\
+							max-width : 750px;\
+							max-height : 750px;\
+							border : solid black 1px;\
+							margin : 10px;\
+						}\
+						img:hover{\
+						max-width : 100%;\
+						max-height : 100%;\
+						}\
+					"}</style>
 					{computerImages ? computerImages: null}
 					{whiteBoardImages ? whiteBoardImages: null}
 				</div>

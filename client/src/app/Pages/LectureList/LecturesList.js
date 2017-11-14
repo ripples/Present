@@ -19,7 +19,7 @@ export default class LecturesList extends Component {
 								return (
 									<div key={i}>
 										<Link to={"course/" + this.props.courseId + "/lecture/" + course.name}>
-											<button type="button" style={buttonStyle}>{course.name}</button>
+											<button type="button" style={buttonStyle}>{course.name.substring(0,10)}</button>
 										</Link>
 									</div>
 								);

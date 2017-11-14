@@ -9,7 +9,9 @@ export default class Lecture extends React.Component {
 	}
 
 	componentDidMount(){
-		fetch('/manifest/' + this.props.params.courseId + '/' + this.props.params.lectureId).then(
+		fetch(('/api/manifest/' + this.props.params.courseId + '/' + this.props.params.lectureId), {
+			credentials: 'same-origin' // or 'include'
+		  }).then(
 			res => (res.status === 200 ) ? res.json() : {}
 		).then(
 			json => this.setState({manifest: json})
@@ -25,7 +27,7 @@ export default class Lecture extends React.Component {
 				<div className="col-md-8">
 					<div>
 						<h2 style={headerStyle}>
-							{"Lecture: " + this.props.params.lectureId}
+							{"Lecture: " + this.props.params.lectureId.substring(0,10)}
 						</h2>
 					</div>
 					<div>
