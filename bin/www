@@ -1,6 +1,9 @@
 #!/usr/bin/env node
 
+require("./init.js")
+require("../proxy/proxy.js")
 console.log("Starting server");
+console.log("env in server ", process.env.production)
 
 /**
  * Module dependencies.
@@ -9,15 +12,12 @@ console.log("Starting server");
 var app = require('../server/app');
 var debug = require('debug')('lv-client2:server');
 var http = require('http');
-require('dotenv').config()
-//https://www.npmjs.com/package/node-env-config-loader maybe this instead
-console.log("Enviornmental Variables Loaded", process.env)
 
 /**
  * Get port from environment and store in Express.
  */
 
-var port = normalizePort(process.env.PORT || '3001');
+var port = normalizePort(process.env.SERVER_PORT || '3001');
 app.set('port', port);
 
 /**

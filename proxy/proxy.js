@@ -1,7 +1,17 @@
 var proxy = require('redbird')({port: 80});
 
-proxy.register("localhost", "http://localhost:3000");
+console.log(process.env);
 
-proxy.register("localhost/api", "http://localhost:3001/api");
+const serverPathAndPort = process.env.SERVER_PATH + ":" + process.env.SERVER_PORT
 
-proxy.register("localhost/upload", "http://localhost:3001/upload");
+if(process.env.PRODUCTION){
+	proxy.register(process.env.PRESENT_PATH, "http://" + serverPathAndPort+ "/");		
+}
+else{
+	proxy.register(process.env.PRESENT_PATH, "http://" + process.env.PRESENT_PATH + ":" + process.env.PRESENT_PORT + "/");
+}
+//proxy.register(process.env.PRESENT_PATH)
+
+proxy.register(process.env.PRESENT_PATH + "/api", "http://" + serverPathAndPort + "/api");
+
+proxy.register(process.env.PRESENT_PATH + "/upload", "http://" + serverPathAndPort + "/upload");
