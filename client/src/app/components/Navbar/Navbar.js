@@ -9,11 +9,12 @@ export default class Navbar extends Component {
                 <div className="container-fluid"> 
                     <div className="col-md-3">
                         <Link to="/">
-                            <button style={buttonStyle}>Lecture List</button>
+                            <button style={buttonStyle}>
+                                <h1 style={headerStyle}>Lecture Viewer 2</h1>
+                            </button>
                         </Link>
                     </div>
                     <div className="col-md-6" >
-                        <h1 style={headerStyle}>Lecture Viewer 2</h1>
                     </div>
                     <div className="col-md-3">
                     </div>
@@ -24,21 +25,21 @@ export default class Navbar extends Component {
 }
 
 var barStyle = {
-    backgroundColor: "#000080",
+    backgroundColor: "#0074D9",
     color: "white"
 }
 
 var buttonStyle= {
-    backgroundColor: "white",
-    borderRadius: "4px",
-    marginTop: "20px",
-    color: "#000080",
+    backgroundColor: "#0074D9",
+    border: "none",
+    outline: "none",
+    fontWeight: "bold",
     paddingLeft: "10px",
     paddingRight: "10px",
-    paddingTop: "4px",
-    paddingBottom: "4px"
+    paddingBottom: "6px"
 }
 
 var headerStyle= {
-	fontWeight: "bold"
+    fontWeight: "bold",
+    color: "white"
 }
