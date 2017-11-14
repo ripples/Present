@@ -3,7 +3,7 @@ var router = express.Router();
 
 router.post('/data', function (req, res) {
 	req.session.lti_token = req.body;
-	const url = "http://localhost:3000/" // TODO Global constant
+	const url = "http://localhost/" // TODO Global constant
 
 	res.redirect(url);
 });
