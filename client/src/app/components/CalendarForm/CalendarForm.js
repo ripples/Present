@@ -1,4 +1,19 @@
 import React from 'react';
+import {connect} from "react-redux";
+import {setCalSDate,
+  setCalEDate,
+  setCalSTime,
+  setCalETime,
+  setCalRecurDays,
+  setCalExcludeDates,
+  setCalIncludeDates,
+  setCalCurExDates,
+  setCalCurIncDates,
+  setCalDescription,
+  setCalLoc,
+  setCalCourseId,
+  clearForm
+  } from '../../Actions/action.js';
 
 class CalendarForm extends React.Component {
 
@@ -21,6 +36,14 @@ class CalendarForm extends React.Component {
       location: "",
       courseId: this.props.courseId
     };
+  }
+
+  componentWillMount(){
+    this.props.setCourseId(this.props.courseId);
+  }
+
+  componentWillUnmount(){
+    this.props.clearForm();
   }
 
   canBeSubmitted() {
@@ -92,6 +115,7 @@ class CalendarForm extends React.Component {
     }
 
     this.setState({recurDays: rDays});
+    this.props.setCalRecurDays({recurDays: rDays});
   }
 
   handleAddExclude(e){
@@ -127,6 +151,9 @@ class CalendarForm extends React.Component {
   }
 
   render() {
+
+    console.log("Cal State", this.props.calendarForm);
+
     const isEnabled = this.canBeSubmitted();
 
     return (
@@ -202,6 +229,23 @@ class CalendarForm extends React.Component {
   }
 }
 
+const mapStateToProps = state => {
+	
+	return {
+    calendarForm: state.calendarForm,
+		courseId: state.token.lis_course_section_sourcedid
+	};
+};
+
+const mapDispatchToProps = (dispatch, ownProps) => {
+	
+	return {
+    clearForm: () => dispatch(clearForm()),
+    setCourseId: id => dispatch(setCalCourseId(id)),
+    setCalRecurDays : (days) => dispatch(setCalRecurDays(days))
+	}
+};
+
 var buttonStyle = {
     backgroundColor: "white",
     borderRadius: "4px",
@@ -248,4 +292,4 @@ var legendStyle = {
   color: "white"
 }
 
-export default CalendarForm;
+export default connect(mapStateToProps, mapDispatchToProps)(CalendarForm);

@@ -18,11 +18,6 @@ export default class App extends Component {
 
   constructor(props) {
     super(props);
-    this.state = {
-      data: {},
-      course: {}
-    };
-
 
     const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
     this.store = createStore(
@@ -45,16 +40,13 @@ export default class App extends Component {
         fetch('/listofCourseLectures/' + dat.lis_course_section_sourcedid).then(res => res.json()).then(cour => {
           this.store.dispatch(setToken(dat));
           this.store.dispatch(setCourseFiles(cour));
-          this.setState({
-            data: dat,
-            course: cour
-          });
         });
       }
     );
   }
 
   render() {
+    console.log(this.store.getState());
     return (
       <Provider store={this.store}>
         <Router history={hashHistory}>
