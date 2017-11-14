@@ -7,15 +7,8 @@ var util = require('util')
 var key = "You/'ll never walk alone"
 var encryptor = require('simple-encryptor')(key)
 
-router.get('/identify/*', function (req, res) {
-	const tok = req.params[0].replace(/-/g, '/');
-	const unhashed = encryptor.decrypt(tok);
-	if (typeof unhashed == 'undefined' || unhashed === null) {
-		res.status(404).send('Not Found');
-	}
-	else {
-		res.send(unhashed);
-	}
+router.get('/identify/', function (req, res) {
+	res.send(req.session.lti_token);
 });
 
 router.get('/listOfCourseLectures/:courseId', function (req, res) {

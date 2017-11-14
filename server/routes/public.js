@@ -4,24 +4,10 @@ var key = "You/'ll never walk alone"
 var encryptor = require('simple-encryptor')(key)
 
 router.post('/data', function (req, res) {
-	const hashed = encryptor.encrypt(
-		req.body
-		//csrf: req.csrfToken()
-	).replace(/\//g, '-');
+	req.session.lti_token = req.body;
 	const url = "http://localhost:3000/" // TODO Global constant
 
-	res.redirect(url + hashed);
-});
-
-router.get('/identify/*', function (req, res) {
-	const tok = req.params[0].replace(/-/g, '/');
-	const unhashed = encryptor.decrypt(tok);
-	if (typeof unhashed == 'undefined' || unhashed === null) {
-		res.status(404).send('Not Found');
-	}
-	else {
-		res.send(unhashed);
-	}
+	res.redirect(url);
 });
 
 module.exports = router;
