@@ -9,14 +9,14 @@ class Navbar extends Component {
         return(
             <div className="navbar navbar-fixed-top navbar-default" style={barStyle}>
                 <div className="container-fluid">
-                    <div className="col-md-3">
+                    <div className="col-md-4">
                         <Link to="/">
                             <button style={buttonStyle}>
                                 <h1 style={headerStyle}>Lecture Viewer 2</h1>
                             </button>
                         </Link>
                     </div>
-                    <div className="col-md-6" >
+                    <div className="col-md-5" >
                     </div>
                     <div className="col-md-3">
                     {
