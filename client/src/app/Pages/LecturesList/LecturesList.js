@@ -8,17 +8,15 @@ class LecturesList extends Component {
 	render() {
 		return (
 			<div className="container-fluid">
-				<div className="col-md-3">
-				</div>
-
-				<div className="col-md-6">
+				<div className="row">
+				<div className="col-md-12">
 					<h2 style={headerStyle}>{this.props.courseTitle} Lectures:</h2>
 					{( typeof this.props.course !== "undefined" && typeof this.props.course.children !== "undefined") ?
 						this.props.course.children.map((course, i) => {
 							var patt = /^\d\d-\d\d-\d\d\d\d--\d\d-\d\d-\d\d$/;
 							if (patt.test(course.name)) { 
 								return (
-									<div key={i}>
+									<div className = "col-md-3" style={buttonStyles} key={i}>
 										<div style = {courseStyle}>{convertMonth(course.name.substring(0,10)) + course.name.substring(3,5) + ", " + course.name.substring(6,10)}</div>
 										<Link to={"course/" + this.props.courseId + "/lecture/" + course.name}>
 											<button type="button" style={buttonStyle} />
@@ -31,8 +29,6 @@ class LecturesList extends Component {
 						}) : null
 					}
 				</div>
-
-				<div className="col-md-3">
 				</div>
 			</div>
 		);
@@ -51,6 +47,7 @@ const mapStateToProps = state => {
 var headerStyle= {
 	fontWeight: "bold",
 	fontSize: "36px",
+	marginRight: "40px",
 	marginBottom: "40px"
 }
 
@@ -75,6 +72,10 @@ var buttonStyle= {
 	position: "relative",
 	boxShadow: "10px 10px 5px #888888",
 	outline: "none"
+}
+
+var buttonStyles= {
+	overflow: "auto"
 }
 
 export default connect(mapStateToProps)(LecturesList);
