@@ -5,7 +5,7 @@ export default class LectureImage extends Component {
     render(){
         return(
             <div>
-                <img src={this.props.src} alt={this.props.alt} />
+                <img src={this.props.src} alt={this.props.alt} cross-origin="use-credentials"/>
             </div>
         );
     }

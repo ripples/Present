@@ -30,16 +30,18 @@ export default class App extends Component {
   }
   
   componentDidMount() {
-    fetch(('/identify/' + window.location.pathname.substr(1)), {
+    fetch(('/api/identify/'), {
       credentials: 'same-origin' // or 'include'
     }).then(
       res => (res.status === 200) ? res.json() : ""
     ).then(
       dat =>
       {
-        fetch('/listofCourseLectures/' + dat.lis_course_section_sourcedid).then(res => res.json()).then(cour => {
-          this.store.dispatch(setToken(dat));
-          this.store.dispatch(setCourseFiles(cour));
+        fetch(('/api/listofCourseLectures/' + dat.lis_course_section_sourcedid), {
+			credentials: 'same-origin' // or 'include'
+		  }).then(res => res.json()).then(cour => {
+        this.store.dispatch(setToken(dat));
+        this.store.dispatch(setCourseFiles(cour));
         });
       }
     );

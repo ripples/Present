@@ -72,20 +72,10 @@ class CalendarForm extends React.Component {
 
       var options = {method: 'POST',
                     headers: {"Content-Type": "application/json"},
-                    body: JSON.stringify({
-                      sDate: this.props.calendarForm.sDate,
-                      eDate: this.props.calendarForm.eDate,
-                      sTime: this.props.calendarForm.sTime,
-                      eTime: this.props.calendarForm.eTime,
-                      recurDays: this.props.calendarForm.recurDays,
-                      excludeDates: this.props.calendarForm.excludeDates,
-                      includeDates: this.props.calendarForm.includeDates,
-                      description: this.props.calendarForm.description,
-                      location: this.props.calendarForm.location,
-                      courseId: this.props.calendarForm.courseId
-                    })};
+                    credentials: 'same-origin',
+                    body: JSON.stringify(this.props.calendarForm)};
 
-      fetch('/calendar', options).then((response) => {
+      fetch('/api/calendar', options).then((response) => {
         return response.text()
       }).then((data) => console.log(data)).catch((err) => console.log(err));
     }
