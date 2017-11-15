@@ -39,7 +39,7 @@ export default class App extends Component {
     return (
       <Router history={hashHistory}>
         <Route path="/" component={Application}>
-          <IndexRoute component={() => <LecturesList courseId={this.state.data.lis_course_section_sourcedid} course={this.state.course}/>} />
+          <IndexRoute component={() => <LecturesList courseId={this.state.data.lis_course_section_sourcedid} course={this.state.course} courseTitle={this.state.data.context_title}/>} />
           <Route path="course/:courseId/lecture/:lectureId" component={Lecture} />
         </Route>
       </Router>

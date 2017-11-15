@@ -30,7 +30,7 @@ export default class LectureMedia extends React.Component {
 			var computerImages = this.range(this.props.manifest.computerCount).map( (e, i) => {
 				return (
 					<div key={i}>
-						<LectureImage src={'/api/image/' + this.props.courseId + "/" + this.props.lectureId + '/1-' + i + '/' + this.state.time} alt="Computer Screen" />
+						<LectureImage src={'/api/image/' + this.props.courseId + "/" + this.props.lectureId + '/1-' + i + '/' + this.state.time} alt={altImage} />
 					</div>
 				);
 			})
@@ -69,4 +69,8 @@ export default class LectureMedia extends React.Component {
 			</div>
 		);
 	}
+}
+
+var altImage = {
+	backgroundImage: "url(no-comp-image-found.png)"
 }
