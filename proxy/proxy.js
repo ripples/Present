@@ -10,8 +10,6 @@ if(process.env.PRODUCTION){
 else{
 	proxy.register(process.env.PRESENT_PATH, "http://" + process.env.PRESENT_PATH + ":" + process.env.PRESENT_PORT + "/");
 }
-//proxy.register(process.env.PRESENT_PATH)
-
 proxy.register(process.env.PRESENT_PATH + "/api", "http://" + serverPathAndPort + "/api");
 
 proxy.register(process.env.PRESENT_PATH + "/upload", "http://" + serverPathAndPort + "/upload");

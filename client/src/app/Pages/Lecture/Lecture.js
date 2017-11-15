@@ -1,12 +1,9 @@
 import React from "react";
+import {connect} from "react-redux";
+import {setLectureManifest} from '../../Actions/action.js';
 import LectureMedia from "../../components/LectureMedia/LectureMedia";
 
-export default class Lecture extends React.Component {
-
-	constructor(props){
-		super(props)
-		this.state = {}
-	}
+class Lecture extends React.Component {
 
 	componentDidMount(){
 		fetch(('/api/manifest/' + this.props.params.courseId + '/' + this.props.params.lectureId), {
@@ -14,8 +11,14 @@ export default class Lecture extends React.Component {
 		  }).then(
 			res => (res.status === 200 ) ? res.json() : {}
 		).then(
-			json => this.setState({manifest: json})
+			json => {
+				this.props.setManifest(json);
+			}
 		)
+	}
+
+	componentWillUnmount(){
+		this.props.setManifest({});
 	}
 
 	render() {
@@ -32,7 +35,7 @@ export default class Lecture extends React.Component {
 					</div>
 					<div>
 						<LectureMedia
-							manifest = {this.state.manifest}
+							manifest = {this.props.manifest}
 							lectureId = {this.props.params.lectureId}
 							courseId = {this.props.params.courseId}
 						/>
@@ -46,7 +49,23 @@ export default class Lecture extends React.Component {
 	}
 }
 
+const mapStateToProps = state => {
+	
+	return {
+		manifest: state.lectureManifest
+	};
+};
+
+const mapDispatchToProps = (dispatch, ownProps) => {
+	
+	return {
+		setManifest: json => dispatch(setLectureManifest(json))
+	}
+};
+
 
 var headerStyle = {
 	fontWeight: "bold"
 }
+
+export default connect(mapStateToProps, mapDispatchToProps)(Lecture);
