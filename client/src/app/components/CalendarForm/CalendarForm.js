@@ -173,9 +173,6 @@ class CalendarForm extends React.Component {
   }
 
   render() {
-
-    console.log("Cal State", this.props.calendarForm);
-
     const isEnabled = this.canBeSubmitted();
 
     return (
