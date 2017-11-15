@@ -120,7 +120,6 @@ router.get('/video/:courseId/:lectureName', function (req, res) {
 });
 
 router.post('/calendar', function (req, res) {
-	console.log("TEST");
 	var sDate = req.body.sDate;
 	var eDate = req.body.eDate;
 	var sTime = req.body.sTime;
@@ -178,7 +177,6 @@ function generateICS(dates, tags) {
 	  let FormData = require('form-data');
 	  const stats = fs.statSync("./lectures/" + tags[COURSEID] + "/Calendar.ics");
 	  const fileSizeInBytes = stats.size;
-	  console.log('File Size: ' + fileSizeInBytes);
 	  var body = new FormData();
 	  var filedata = 0
 	  try {
@@ -188,7 +186,6 @@ function generateICS(dates, tags) {
 	  }
   
 	  body.append('file', filedata);
-	  console.log(body)
 	  fetch('http://cap142.cs.umass.edu:8001/', {
 		  method: 'POST',
 		  headers: {

@@ -169,7 +169,7 @@ class CalendarForm extends React.Component {
       <div className='calForm'>
         <form onSubmit={this.handleSubmit.bind(this)}>
           <fieldset style={fieldsetStyle}>
-            <legend style={legendStyle}>New Recording Schedule: {this.props.courseId}</legend>
+            <legend style={legendStyle}>New Recording Schedule: {this.props.courseTitle}</legend>
             <div>
               <label style={labelStyle} htmlFor='sDate'>Start Date: </label>
               <DatePicker customInput={<button style={buttonStyle}>{moment(this.props.calendarForm.sDate).format("MM/DD/YYYY").toString()}</button>} openToDate={moment(this.props.calendarForm.sDate)} onChange={this.handleChange.bind(this, 'sDate')}/>
@@ -238,7 +238,8 @@ const mapStateToProps = state => {
 	
 	return {
     calendarForm: state.calendarForm,
-		courseId: state.token.lis_course_section_sourcedid
+    courseId: state.token.lis_course_section_sourcedid,
+    courseTitle: state.token.context_title
 	};
 };
 
