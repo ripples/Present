@@ -50,9 +50,8 @@ var buttonStyle= {
     border: "none",
     outline: "none",
     fontWeight: "bold",
-    paddingLeft: "10px",
-    paddingRight: "10px",
-    marginBottom: "10px"
+    marginBottom: "10px",
+    marginRight: "120px"
 }
 
 var headerStyle= {
