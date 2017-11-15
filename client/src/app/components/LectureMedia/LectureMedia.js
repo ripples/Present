@@ -1,18 +1,13 @@
 import React from "react";
+import {connect} from "react-redux";
+import {setLectureTime} from '../../Actions/action.js';
 import VideoView from "../../components/VideoView/VideoView";
 import LectureImage from '../LectureImage/LectureImage.js';
 
-export default class LectureMedia extends React.Component {
-
-	constructor(props){
-		super(props)
-		this.state = {
-			time: 0
-		}
-	}
+class LectureMedia extends React.Component {
 
 	onVideoTimeUpdate = (newTime) => {
-		this.setState({time: newTime})
+		this.props.setTime(newTime);
 	}
 
 	range(l){
@@ -23,21 +18,23 @@ export default class LectureMedia extends React.Component {
 		return x
 	}
 
+	componentWillUnmount(){
+		this.props.setTime(0);
+	}
 
 	render() {
-
 		if(this.props.manifest){
 			var computerImages = this.range(this.props.manifest.computerCount).map( (e, i) => {
 				return (
 					<div key={i}>
-						<LectureImage src={'/api/image/' + this.props.courseId + "/" + this.props.lectureId + '/1-' + i + '/' + this.state.time} alt={altImage} />
+						<LectureImage src={'/api/image/' + this.props.courseId + "/" + this.props.lectureId + '/1-' + i + '/' + this.props.time} fallbackImage = "no-comp-image-found.png"/>
 					</div>
 				);
 			})
 			var whiteBoardImages = this.range(this.props.manifest.whiteboardCount).map( (e, i) => {
 				return (
 					<div key={i}>
-						<LectureImage src={'/api/image/' + this.props.courseId + "/" + this.props.lectureId + '/2-' + i + '/' + this.state.time} alt="Whiteboard"/>
+						<LectureImage src={'/api/image/' + this.props.courseId + "/" + this.props.lectureId + '/2-' + i + '/' + this.props.time} fallbackImage = "no-comp-image-found.png"/>
 					</div>
 				);
 			})
@@ -71,6 +68,18 @@ export default class LectureMedia extends React.Component {
 	}
 }
 
-var altImage = {
-	backgroundImage: "url(no-comp-image-found.png)"
-}
+const mapStateToProps = state => {
+	
+	return {
+		time: state.lectureTime
+	};
+};
+
+const mapDispatchToProps = (dispatch, ownProps) => {
+	
+	return {
+		setTime: json => dispatch(setLectureTime(json))
+	}
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(LectureMedia);

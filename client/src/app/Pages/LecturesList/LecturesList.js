@@ -1,49 +1,9 @@
 import React, { Component } from 'react';
+import {connect} from "react-redux";
 import { Link } from 'react-router';
+import {convertMonth} from '../../utils/utils.js';
 
-export default class LecturesList extends Component {
-
-	convertMonth(date) {
-		if(date.substring(0,2) === "01") {
-			return "January ";
-		}
-		else if(date.substring(0,2) === "02") {
-			return "February ";
-		}
-		else if(date.substring(0,2) === "03") {
-			return "March ";
-		}
-		else if(date.substring(0,2) === "04") {
-			return "April ";
-		}
-		else if(date.substring(0,2) === "05") {
-			return "May ";
-		}
-		else if(date.substring(0,2) === "06") {
-			return "June ";
-		}
-		else if(date.substring(0,2) === "07") {
-			return "July ";
-		}
-		else if(date.substring(0,2) === "08") {
-			return "August ";
-		}
-		else if(date.substring(0,2) === "09") {
-			return "September ";
-		}
-		else if(date.substring(0,2) === "10") {
-			return "October ";
-		}
-		else if(date.substring(0,2) === "11") {
-			return "November ";
-		}
-		else if(date.substring(0,2) === "12") {
-			return "December ";
-		}
-		else {
-			return date;
-		}
-	}
+class LecturesList extends Component {
 
 	render() {
 		return (
@@ -59,16 +19,9 @@ export default class LecturesList extends Component {
 							if (patt.test(course.name)) { 
 								return (
 									<div key={i}>
-										<div style = {courseStyle}>{this.convertMonth(course.name.substring(0,10)) + course.name.substring(3,5) + " " + course.name.substring(6,10)}</div>
+										<div style = {courseStyle}>{convertMonth(course.name.substring(0,10)) + course.name.substring(3,5) + ", " + course.name.substring(6,10)}</div>
 										<Link to={"course/" + this.props.courseId + "/lecture/" + course.name}>
-											<button type="button" style={buttonStyle}>
-											<style>{"\
-											button:hover {\
-												max-width : 200%;\
-												max-height : 200%;\
-											}\
-											"}</style>
-											</button>
+											<button type="button" style={buttonStyle} />
 										</Link>
 									</div>
 								);
@@ -85,6 +38,15 @@ export default class LecturesList extends Component {
 		);
 	}
 }
+
+const mapStateToProps = state => {
+	 return {
+		 courseId: state.token.lis_course_section_sourcedid,
+		 course: state.courseFiles,
+		 courseTitle: state.token.context_title
+	 };
+};
+
 
 var headerStyle= {
 	fontWeight: "bold",
@@ -114,3 +76,5 @@ var buttonStyle= {
 	boxShadow: "10px 10px 5px #888888",
 	outline: "none"
 }
+
+export default connect(mapStateToProps)(LecturesList);
