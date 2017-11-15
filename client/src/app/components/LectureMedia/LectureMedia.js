@@ -1,6 +1,6 @@
 import React from "react";
 import {connect} from "react-redux";
-import {setLectureTime} from '../../Actions/action.js';
+import {setLectureTime} from '../../Actions/lectureTimeActions.js';
 import VideoView from "../../components/VideoView/VideoView";
 import LectureImage from '../LectureImage/LectureImage.js';
 

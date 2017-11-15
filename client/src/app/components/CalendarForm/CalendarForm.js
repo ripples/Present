@@ -14,7 +14,7 @@ import {setCalSDate,
   setCalLoc,
   setCalCourseId,
   clearForm
-  } from '../../Actions/action.js';
+  } from '../../Actions/calFormActions.js';
 
 class CalendarForm extends React.Component {
 

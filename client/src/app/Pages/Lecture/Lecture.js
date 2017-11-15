@@ -1,6 +1,6 @@
 import React from "react";
 import {connect} from "react-redux";
-import {setLectureManifest} from '../../Actions/action.js';
+import {setLectureManifest} from '../../Actions/lectureManifestActions.js';
 import LectureMedia from "../../components/LectureMedia/LectureMedia";
 
 class Lecture extends React.Component {
