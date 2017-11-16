@@ -12,9 +12,16 @@ class InstructorSettings extends Component {
                 </div>
                 <div className="col-md-8">
                     <h1>Settings</h1>
-                    <Link to="/calendar">
-                      <button style={buttonStyle}>Calendar</button>
-                    </Link>
+                    <div>
+                        <Link to="/calendar/">
+                        <button style={buttonStyle}>Calendar</button>
+                        </Link>
+                    </div>
+                    <div>
+                        <Link to="/lectureUpload/">
+                        <button style={buttonStyle}>Lecture Upload</button>
+                        </Link>
+                    </div>
                 </div>
                 <div className="col-md-2">
                 </div>
