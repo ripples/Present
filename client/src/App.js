@@ -34,7 +34,7 @@ export default class App extends Component {
     fetch(('/api/identify/'), {
       credentials: 'same-origin' // or 'include'
     }).then(
-      res => (res.status === 200) ? res.json() : ""
+      res => (res.status < 400) ? res.json() : Promise.reject('bad identify')
     ).then(
       dat =>
       {
@@ -45,7 +45,7 @@ export default class App extends Component {
         this.store.dispatch(setCourseFiles(cour));
         });
       }
-    );
+    ).catch( err => console.log(err));
   }
 
   render() {
