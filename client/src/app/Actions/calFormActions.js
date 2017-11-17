@@ -1,5 +1,12 @@
 import {calFormConstants} from '../Constants/actions.js';
 
+export function setCalEvents(events){
+  return {
+    type: calFormConstants.SET_CAL_EVENTS,
+    events
+  }
+}
+
 export function setCalSDate(sDate){
     return {
         type: calFormConstants.SET_CAL_S_DATE,

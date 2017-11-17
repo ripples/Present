@@ -14,6 +14,7 @@ export const SET_LECTURE_TIME = 'SET_LECTURE_TIME';
 
 //calendar form actions
 export const calFormConstants = {
+    SET_CAL_EVENTS: 'SET_CAL_EVENTS',
     SET_CAL_S_DATE: 'SET_CAL_S_DATE',
     SET_CAL_E_DATE: 'SET_CAL_E_DATE',
     SET_CAL_S_TIME: 'SET_CAL_S_TIME',
