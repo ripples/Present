@@ -119,6 +119,26 @@ router.get('/video/:courseId/:lectureName', function (req, res) {
 	}
 });
 
+router.post("/lectureUpload", function(req, res){
+	var dir = "./lectures/added/";
+	var fileLoc = "./lectures/added/videoLarge.mp4";
+	if (!fs.existsSync(dir)){
+    fs.mkdirSync(dir);
+	}
+
+	if(!fs.existsSync(fileLoc)){
+		fs.closeSync(fs.openSync(fileLoc, 'w'));
+	}
+
+	const file = req.files.lectureVideo.file;
+	console.log(file);
+	var read = fs.createReadStream(file);
+	var write = fs.createWriteStream(fileLoc);
+	read.pipe(write);
+	
+	res.redirect("http://localhost:3000/#/lectureUpload/");
+});
+
 router.post('/calendar', function (req, res) {
 	var sDate = req.body.sDate;
 	var eDate = req.body.eDate;
