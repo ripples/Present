@@ -119,11 +119,12 @@ router.get('/video/:courseId/:lectureName', function (req, res) {
 	}
 });
 
-router.get('/calendar', function (req, res) { //Gets the calendar for a given class
-	res.send(200);
-	/*const fpath = "./lectures/" + req.params.courseId.toString() + "/Calendar.ics"
+router.get('/calendar/:courseId', function (req, res) { //Gets the calendar for a given class
+	console.log("PATH HIT");
+	//res.sendStatus(200);
+	const fpath = "./lectures/" + req.params.courseId.toString() + "/Calendar.ics"
 	console.log(fpath);
-	path.exists(fpath, function(exists) {
+	fs.exists(fpath, function(exists) {
 		console.log("checking path...");
 		if(exists) {
 			console.log("path exists... reading file...");
@@ -139,9 +140,9 @@ router.get('/calendar', function (req, res) { //Gets the calendar for a given cl
 			console.log("path doesn't exist, sending blank calendar");
 			const eventArray = [];
 			console.log(eventArray);
-			res.status(204).send(eventArray);
+			res.status(200).send(eventArray);
 		}
-	});*/
+	});
 });
 
 router.post('/calendar', function (req, res) {
@@ -248,51 +249,23 @@ function getCurrentSemester(){
 	var curMonth = new Date().getMonth(); //Jan:0, May=4, Aug=7, Dec=11, 1-3, 5-6, 8-10
 	var curDay = new Date().getDate();
 	var semester = "";
-
-	if(curMonth == 0){
-	  if(curDay < 21){
-		semester = "WINTER";
-	  }
-	  else{
-		semester = "SPRING";
-	  }
+	switch(curMonth){
+		case 0:
+			(curDay < 21) ? semester = "WINTER" : semester = "SPRING";
+			break;
+		case 4:
+			(curDay < 17) ? semester = "SPRING" : semester = "SUMMER";
+			break;
+		case 7:
+			(curDay < 24) ? semester = "SUMMER" : semester = "FALL";
+			break;
+		case 11:
+			(curDay < 22) ? semester = "FALL" : semester = "WINTER";
+			break;
+		default:
+			(curMonth >= 1 && curMonth <= 3) ? semester = "SPRING" : (curMonth >= 5 && curMonth <= 6) ? semester = "SUMMER" : semester = "FALL";
+			break;
 	}
-	else if(curMonth == 4){
-	  if(curDay < 17){
-		semester = "SPRING";
-	  }
-	  else{
-		semester = "SUMMER";
-	  }
-	}
-	else if(curMonth == 7){
-	  if(curDay < 24){
-		semester = "SUMMER";
-	  }
-	  else{
-		semester = "FALL";
-	  }
-	}
-	else if(curMonth == 11){
-	  if(curDay < 22){
-		semester = "FALL";
-	  }
-	  else{
-		semester = "WINTER";
-	  }
-	}
-	else{
-	  if(curMonth >= 1 && curMonth <= 3){
-		semester = "SPRING";
-	  }
-	  else if(curMonth >= 5 && curMonth <= 6){
-		semester = "SUMMER";
-	  }
-	  else{
-		semester = "FALL";
-	  }
-	}
-
 	return semester + year;
 }
 
@@ -309,41 +282,55 @@ function getICSDateNow() { //Gets the current timestamp in YYYYMMDDTHHMMSS forma
 
 function icsToEventObjectArray(icsFileText) { //Converts the text of an ics file to an array of JSON objects readable by the calendar component
 	var eventArray = [];
-	var filetextsplit = icsFileText.split('\n').splice(0, 3).splice(-1, 1); //Removes first 3 lines and last line of file so we just have events
-	var numEvents = parseInt(filetextsplit[filetextsplit.length-10].substring(0, 2)); //10 lines from end (with last line removed) substr(0,2) contains the number of events in calendar
+	var filetextsplit = icsFileText.split('\n');
+	filetextsplit.splice(0, 3); //Remove the first 3 unnecessary lines from file
+	filetextsplit.splice(-1, 1); //Remove last line from file, also don't need
+	var numEvents = parseInt(filetextsplit[filetextsplit.length-10].substring(0, 2)); //Contains the number of events in calendar
 	for(var i = 0; i < numEvents; i++){
 		var currentEvent = new Object();
-		for(var line = 0; line < 10; line++){
+		for(var line = 0; line < 11; line++){
 			var curline = filetextsplit[0];
-			if(line === 3) {
-				var description = curline.substring(12);
-				if(description === ''){
-					continue;
-				}
-				else{
-					currentEvent.desc = curline.substring(12);
-				}
+			switch(line){
+				case 3:
+					var description = curline.substring(12);
+					if(description === '') {continue;}
+					else {currentEvent.desc = curline.substring(12);}
+					filetextsplit.splice(0, 1);
+					break;
+				case 5:
+					var year = curline.substring(24, 28);
+					var month = curline.substring(28, 30);
+					var day = curline.substring(30, 32);
+					var hour = curline.substring(33, 35);
+					var min = curline.substring(35, 37);
+					if(month.length === 1) {month = '0' + month;}
+					if(day.length === 1) {day = '0' + day;}
+					var datestring = year + '-' + month + '-' + day + 'T' + hour + ':' + min + ':00Z';
+					currentEvent.start = new Date(datestring);
+					filetextsplit.splice(0, 1);
+					break;
+				case 6:
+					var year = curline.substring(22, 26);
+					var month = curline.substring(26, 28);
+					var day = curline.substring(28, 30);
+					var hour = curline.substring(31, 33);
+					var min = curline.substring(33, 35);
+					if(month.length === 1) {month = '0' + month;}
+					if(day.length === 1) {day = '0' + day;}
+					var datestring = year + '-' + month + '-' + day + 'T' + hour + ':' + min + ':00Z';
+					currentEvent.end = new Date(datestring);
+					filetextsplit.splice(0, 1);
+					break;
+				case 8:
+					var title = curline.substring(23);
+					if(title === '')  {continue;}
+					else {currentEvent.title = title;}
+					filetextsplit.splice(0, 1);
+					break;
+				default:
+					filetextsplit.splice(0, 1);
+					break;
 			}
-			else if(line === 5) {
-				var year = parseInt(curline.substring(24, 28));
-				var month = parseInt(curline.substring(28, 30));
-				var day = parseInt(curline.substring(30, 32));
-				var hour = parseInt(curline.substring(33, 35));
-				var min = parseInt(curline.substring(35, 37));
-				currentEvent.start = new Date(year,month,day,hour,min);
-			}
-			else if(line === 6) {
-				var year = parseInt(curline.substring(22, 26));
-				var month = parseInt(curline.substring(26, 28));
-				var day = parseInt(curline.substring(28, 30));
-				var hour = parseInt(curline.substring(31, 33));
-				var min = parseInt(curline.substring(33, 35));
-				currentEvent.end = new Date(year,month,day,hour,min);
-			}
-			else if(line === 8) {
-				currentEvent.title = curline.substring(23);
-			}
-			filetextsplit.splice(0, 1)
 		}
 		eventArray.push(currentEvent);
 	}
