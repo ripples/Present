@@ -46,7 +46,7 @@ router.get('/manifest/:courseId/:lectureName', function (req, res) {
 Scheme for sourceID
 1-x is for computer, x is an feed number
 2-x is for a whiteboard, x is for feed number
-Maybe some diffing... 
+Maybe some diffing...
 */
 router.get('/image/:courseId/:lectureName/:sourceId/:time', function (req, res) {
 	const feedType = (req.params["sourceId"].split("-")[0] === "1") ? "computer" : "whiteBoard"
@@ -119,6 +119,31 @@ router.get('/video/:courseId/:lectureName', function (req, res) {
 	}
 });
 
+router.get('/calendar', function (req, res) { //Gets the calendar for a given class
+	res.send(200);
+	/*const fpath = "./lectures/" + req.params.courseId.toString() + "/Calendar.ics"
+	console.log(fpath);
+	path.exists(fpath, function(exists) {
+		console.log("checking path...");
+		if(exists) {
+			console.log("path exists... reading file...");
+			fs.readFile(fpath, function(err, data) {
+				if (err) throw err;
+				console.log(data.toString());
+				const eventArray = icsToEventObjectArray(data.toString());
+				console.log(eventArray);
+				res.status(200).send(eventArray);
+			})
+		}
+		else {
+			console.log("path doesn't exist, sending blank calendar");
+			const eventArray = [];
+			console.log(eventArray);
+			res.status(204).send(eventArray);
+		}
+	});*/
+});
+
 router.post('/calendar', function (req, res) {
 	var sDate = req.body.sDate;
 	var eDate = req.body.eDate;
@@ -131,7 +156,7 @@ router.post('/calendar', function (req, res) {
 	var location = req.body.location;
 	var summary = getCurrentSemester() + " " + req.body.courseId;
 	var courseId = req.body.courseId;
-  
+
 	generateCalendar(sDate, eDate, sTime, eTime, recurDays, excludeDates, includeDates, description, location, summary, courseId);
 	res.status(201).send("Recording schedule successfully created: ./lectures/" + courseId + "/Calendar.ics");
 });
@@ -153,7 +178,7 @@ function generateICS(dates, tags) {
 	var DTSTAMP = dateNow[0] + dateNow[1] + dateNow[2] + dateNow[3] + dateNow[4] + dateNow[5] + dateNow[6];
 	var lectureDir = dateNow[1] + "-" + dateNow[2] + "-" + dateNow[0] + "--" + dateNow[4] + "-" + dateNow[5] + "-" + dateNow[6];
 	fileText += START_TAG;
-  
+
 	for(var i = 0; i < dates.length; i++){
 	  fileText += "BEGIN:VEVENT\n";
 	  fileText += (i + "@default\nCLASS:PUBLIC\n");
@@ -165,13 +190,13 @@ function generateICS(dates, tags) {
 	  fileText += ("SUMMARY;LANGUAGE=en-us:" + tags[SUMMARY] + "\n");
 	  fileText += "TRANSP:TRANSPARENT\nEND:VEVENT\n";
 	}
-  
+
 	fileText += END_TAG;
-  
+
 	fs.writeFileSync("./lectures/" + tags[COURSEID] + "/Calendar.ics", fileText, function (err) {
 	  if (err) return console.log(err);
 	});
-  
+
 	  //Send the newly created schedule to the capture server
 	  let fetch = require('node-fetch');
 	  let FormData = require('form-data');
@@ -184,7 +209,7 @@ function generateICS(dates, tags) {
 	  } catch(e) {
 		  console.log('Error:', e.stack);
 	  }
-  
+
 	  body.append('file', filedata);
 	  fetch('http://cap142.cs.umass.edu:8001/', {
 		  method: 'POST',
@@ -223,7 +248,7 @@ function getCurrentSemester(){
 	var curMonth = new Date().getMonth(); //Jan:0, May=4, Aug=7, Dec=11, 1-3, 5-6, 8-10
 	var curDay = new Date().getDate();
 	var semester = "";
-  
+
 	if(curMonth == 0){
 	  if(curDay < 21){
 		semester = "WINTER";
@@ -267,7 +292,7 @@ function getCurrentSemester(){
 		semester = "FALL";
 	  }
 	}
-  
+
 	return semester + year;
 }
 
@@ -280,6 +305,49 @@ function getICSDateNow() { //Gets the current timestamp in YYYYMMDDTHHMMSS forma
 	var minute = "" + now.getMinutes(); if (minute.length == 1) { minute = "0" + minute; }
 	var second = "" + now.getSeconds(); if (second.length == 1) { second = "0" + second; }
 	return [year, month, day, "T", hour, minute, second];
+}
+
+function icsToEventObjectArray(icsFileText) { //Converts the text of an ics file to an array of JSON objects readable by the calendar component
+	var eventArray = [];
+	var filetextsplit = icsFileText.split('\n').splice(0, 3).splice(-1, 1); //Removes first 3 lines and last line of file so we just have events
+	var numEvents = parseInt(filetextsplit[filetextsplit.length-10].substring(0, 2)); //10 lines from end (with last line removed) substr(0,2) contains the number of events in calendar
+	for(var i = 0; i < numEvents; i++){
+		var currentEvent = new Object();
+		for(var line = 0; line < 10; line++){
+			var curline = filetextsplit[0];
+			if(line === 3) {
+				var description = curline.substring(12);
+				if(description === ''){
+					continue;
+				}
+				else{
+					currentEvent.desc = curline.substring(12);
+				}
+			}
+			else if(line === 5) {
+				var year = parseInt(curline.substring(24, 28));
+				var month = parseInt(curline.substring(28, 30));
+				var day = parseInt(curline.substring(30, 32));
+				var hour = parseInt(curline.substring(33, 35));
+				var min = parseInt(curline.substring(35, 37));
+				currentEvent.start = new Date(year,month,day,hour,min);
+			}
+			else if(line === 6) {
+				var year = parseInt(curline.substring(22, 26));
+				var month = parseInt(curline.substring(26, 28));
+				var day = parseInt(curline.substring(28, 30));
+				var hour = parseInt(curline.substring(31, 33));
+				var min = parseInt(curline.substring(33, 35));
+				currentEvent.end = new Date(year,month,day,hour,min);
+			}
+			else if(line === 8) {
+				currentEvent.title = curline.substring(23);
+			}
+			filetextsplit.splice(0, 1)
+		}
+		eventArray.push(currentEvent);
+	}
+	return eventArray;
 }
 
 module.exports = router;

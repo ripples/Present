@@ -1,13 +1,14 @@
 import React, { Component } from 'react';
 import {connect} from "react-redux";
 import CalendarForm from '../../components/CalendarForm/CalendarForm';
+import CalendarRobust from '../../components/CalendarForm/CalendarRobust';
 
 class Calendar extends Component {
 
     render(){
         return(
             <div>
-                <CalendarForm courseId={this.props.courseId}/>
+                <CalendarRobust />
             </div>
         );
     }
