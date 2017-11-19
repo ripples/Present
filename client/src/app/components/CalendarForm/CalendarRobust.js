@@ -2,21 +2,14 @@ import React from 'react';
 import moment from 'moment';
 import BigCalendar from 'react-big-calendar';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
-//import events from './events';
+import Modal from 'react-responsive-modal';
+import Datetime from 'react-datetime';
+import 'react-datetime/css/react-datetime.css';
 import {connect} from "react-redux";
-import {setCalEvents,
-  setCalSDate,
-  setCalEDate,
-  setCalSTime,
-  setCalETime,
-  setCalRecurDays,
-  setCalExcludeDates,
-  setCalIncludeDates,
-  setCalDescription,
-  setCalLoc,
-  setCalCourseId,
-  clearForm
-  } from '../../Actions/calFormActions.js';
+import {getCurrentSemester, formatDate, revertDate} from './CalendarUtils.js';
+import {setCalModalState, setCalMessageState, setCalMessageText, setCalMessageTitle, setCalEvents,
+  setCalSDate, setCalEDate, setCalRepeatDays, setCalRecurrence, setCalExcludeDates, setCalShowRecur,
+  setCalIncludeDates, setCalDescription, setCalLoc, setCalCourseId, clearForm} from '../../Actions/calFormActions.js';
 
 BigCalendar.momentLocalizer(moment);
 
@@ -24,49 +17,431 @@ class CalendarRobust extends React.Component {
 
   constructor(props){
     super(props);
+    this.processEvents = this.processEvents.bind(this);
+    this.addNewEvent = this.addNewEvent.bind(this);
+    this.addRecurringEvent = this.addRecurringEvent.bind(this);
+    this.launchMessage = this.launchMessage.bind(this);
   }
 
-  componentWillMount(){
-    //Read any existing calendar file from server, if none exists, blank calendar. (GET)
+  componentWillMount(){ //Read any existing calendar file from server, if none exists, blank calendar. (GET)
     this.props.setCourseId(this.props.courseId);
     fetch(('/api/calendar/' + this.props.courseId), {
       credentials: 'same-origin' // or 'include'
     }).then(
       res => (res.status === 200 || res.status === 204) ? res.json() : []
-    ).then((json) => this.props.setCalEvents(json)).catch((err) => console.log(err)); //TODO: On JSON response, set state of current event array to the JSON response via redux and re-render the calendar to reflect it.
+    ).then((json) => this.props.setCalEvents(this.processEvents(json))).catch((err) => console.log(err));
   }
 
   componentWillUnmount(){
     this.props.clearForm();
   }
 
+  processEvents(events){ //Converts the JSON representation of the start/end times of each event from server into JS Date objects (required by calendar component for reading).
+    let processedEvents = []
+    for (let event of events){
+      let start = event.start;
+      let end = event.end;
+      event.start = new Date(start);
+      event.end = new Date(end);
+      processedEvents.push(event);
+    }
+    return processedEvents;
+  }
+
+  onOpenModal = () => {
+    this.props.setCalModalState(true);
+  };
+
+  onCloseModal = () => {
+    this.props.setCalShowRecur(false);
+    this.props.setCalModalState(false);
+  };
+
+  onOpenMessage = () => {
+    this.props.setCalMessageState(true);
+  };
+
+  onCloseMessage = () => {
+    this.props.setCalMessageText('');
+    this.props.setCalMessageState(false);
+  };
+
+  launchMessage(title, text){
+    this.props.setCalMessageTitle(title);
+    this.props.setCalMessageText(text);
+    this.onOpenMessage();
+  }
+
+  launchMessageButton(title, text, e){
+    e.preventDefault();
+    this.launchMessage(title, text);
+  }
+
+  handleChange(name, e){
+    switch(name){
+      case 'sDate':
+        this.props.setCalSDate(e.toDate());
+        return;
+
+      case 'eDate':
+        this.props.setCalEDate(e.toDate());
+        return;
+
+      case 'description':
+        this.props.setCalDescription(e.target.value);
+        return;
+
+      case 'location':
+        this.props.setCalLoc(e.target.value);
+        return;
+
+      case 'showRecur':
+        if(this.props.calendarForm.showRecur){
+          this.props.setCalShowRecur(false);
+        }
+        else{
+          this.props.setCalShowRecur(true);
+        }
+        return;
+
+      default:
+        console.log("error", name);
+        return;
+    }
+  }
+
+  handleCheckboxChange(e){
+    const rDays = this.props.calendarForm.repeatDays;
+    let index
+
+    if(e.target.checked) {
+      rDays.push(e.target.name);
+    }
+    else {
+      index = rDays.indexOf(e.target.name);
+      rDays.splice(index, 1);
+    }
+
+    this.props.setCalRepeatDays(rDays);
+  }
+
+  handleAddDate(type, e){
+    if(e.format("YYYYMMDD").toString() !== moment().format("YYYYMMDD").toString()){
+      if(type === 'exclude'){
+        const currentExcludes = this.props.calendarForm.excludeDates;
+        let newDate = formatDate(e.format("YYYY-MM-DD").toString());
+        if(!currentExcludes.includes(newDate)){
+          const newExcludes = currentExcludes.concat(newDate);
+          this.props.setCalExcludeDates(newExcludes);
+        }
+      }
+      else if(type === 'include'){
+        const currentIncludes = this.props.calendarForm.includeDates;
+        let newDate = formatDate(e.format("YYYY-MM-DD").toString());
+        if(!currentIncludes.includes(newDate)){
+          const newIncludes = currentIncludes.concat(newDate);
+          this.props.setCalIncludeDates(newIncludes);
+        }
+      }
+    }
+  }
+
+  undoAddDate(type, e){
+    e.preventDefault();
+    if(type === 'exclude'){
+      let newExcludes = this.props.calendarForm.excludeDates;
+      if(newExcludes.length !== 0){
+        newExcludes.pop();
+        this.props.setCalExcludeDates(newExcludes);
+      }
+    }
+    else if(type === 'include'){
+      let newIncludes = this.props.calendarForm.includeDates;
+      if(newIncludes.length !== 0){
+        newIncludes.pop();
+        this.props.setCalIncludeDates(newIncludes);
+      }
+    }
+  }
+
+  addNewEvent(event){ //TODO: Make num changes state variable and increment it here
+    let currentEvents = this.props.calendarForm.events;
+    currentEvents.push(event);
+    let newEvents = currentEvents;
+    this.props.setCalEvents(newEvents);
+    this.props.setCalSDate('');
+    this.props.setCalEDate('');
+    this.props.setCalDescription('');
+    this.props.setCalLoc('');
+  }
+
+  addRecurringEvent(){ //TODO: Make num changes state variable and increment it here
+    debugger;
+    let start = this.props.calendarForm.sDate;
+    let end = this.props.calendarForm.eDate;
+    let repeatDays = this.props.calendarForm.repeatDays;
+    let includes = this.props.calendarForm.includeDates;
+    let excludes = this.props.calendarForm.excludeDates;
+    fetch(('/api/calendar/' + repeatDays + '/' + start + '/' + end + '/' + includes + '/' + excludes), {
+      credentials: 'same-origin' // or 'include'
+    }).then(res => (res.status === 200 || res.status === 204 || res.status === 304) ? res.json() : []
+    ).then((json) => {
+    this.props.setCalRecurrence(json);
+    let recurrence = this.props.calendarForm.recurrence;
+    let currentEvents = this.props.calendarForm.events;
+    for (let date of recurrence){
+      let newEvent = {};
+      newEvent.title = this.props.courseTitle + ' ' + getCurrentSemester();
+      newEvent.description = this.props.calendarForm.description;
+      newEvent.location = this.props.calendarForm.location;
+      newEvent.start = new Date(parseInt(date.substring(0, 4), 10), parseInt(date.substring(4, 6), 10)-1, parseInt(date.substring(6,8), 10), this.props.calendarForm.sDate.getHours(), this.props.calendarForm.sDate.getMinutes());
+      newEvent.end = new Date(parseInt(date.substring(0, 4), 10), parseInt(date.substring(4, 6), 10)-1, parseInt(date.substring(6,8), 10), this.props.calendarForm.eDate.getHours(), this.props.calendarForm.eDate.getMinutes());
+      currentEvents.push(newEvent);
+    }
+    let newEvents = currentEvents;
+    this.props.setCalEvents(newEvents);
+    this.props.setCalRecurrence([]);
+    this.props.setCalRepeatDays([]);
+    this.props.setCalSDate('');
+    this.props.setCalEDate('');
+    this.props.setCalDescription('');
+    this.props.setCalLoc('');
+    this.props.setCalExcludeDates([]);
+    this.props.setCalIncludeDates([]);
+    }).catch((err) => console.log(err));
+  }
+
+  handleSubmit(e){
+    e.preventDefault();
+    debugger;
+    let start = this.props.calendarForm.sDate;
+    let end = this.props.calendarForm.eDate;
+    start = new Date(parseInt(start.getFullYear(), 10), parseInt(start.getMonth(), 10), parseInt(start.getDate(), 10));
+    end = new Date(parseInt(end.getFullYear(), 10), parseInt(end.getMonth(), 10), parseInt(end.getDate(), 10));
+    let repeatDays = this.props.calendarForm.repeatDays;
+    if(+start > +end){
+      this.launchMessage('ERROR: Start Date later than End Date', 'Your ending date must be later than or the same as your starting date.');
+    }
+    else if(repeatDays.length === 0){
+      let newEvent = {};
+      newEvent.title = this.props.courseTitle + ' ' + getCurrentSemester();
+      newEvent.description = this.props.calendarForm.description;
+      newEvent.location = this.props.calendarForm.location;
+      newEvent.start = this.props.calendarForm.sDate;
+      newEvent.end = this.props.calendarForm.eDate;
+      this.addNewEvent(newEvent); //Add a single event
+    }
+    else {
+      if(+start === +end && repeatDays.length !== 0){ //If the user input a recurrence but set the same start and end date
+        this.launchMessage('ERROR: Trying to create repeat event in single day', 'If you want a recurring date, you must have the start and end dates be different.');
+      }
+      else {
+        this.addRecurringEvent(); //Add a recurring event
+      }
+    }
+  }
+
+  handleSave(e){ //TODO: Take events array, check it for differences between that and the original one read in by file, then send off to server to save new ics
+    e.preventDefault();
+  }
+
   render() {
+
+    const helpMessage = (
+      <div>
+        <div>
+          <p>To add a single event:</p>
+          <ul>
+            <li>Select a starting date/time and ending date/time</li>
+            <li>Do NOT select any of the repeat checkboxes</li>
+            <li>Provide a description and location for your event</li>
+            <li>Click "Add Event"</li>
+          </ul>
+        </div>
+        <div>
+          <p>To add a recurring event:</p>
+          <ul>
+            <li>Click the checkbox in the upper left corner that says "Create Recurring Event?" to bring up the recurrence options</li>
+            <li>Select the date you wish the recurring event to start on as well as the time that the event will start at in every repitition</li>
+            <li>Select the date you wish the recurrence to end on (inclusive of selected date) and the time the recurring event will end every repitition</li>
+            <li>Click the checkboxes for the days of the week you wish the event to repeat on</li>
+            <li>If you want, you may select individual dates to exclude and/or include from the repeating event range of dates, if you make a mistake you can press the undo button to remove your last added date</li>
+            <li>Provide a description and location for the recurring event</li>
+            <li>Click "Add Event"</li>
+          </ul>
+        </div>
+      </div>
+    );
+
+    const addEventForm = (
+      <form onSubmit={this.handleSubmit.bind(this)}>
+        <fieldset style={fieldsetStyle}>
+          <legend style={legendStyle}>Add New Event(s)</legend>
+          <div>
+            <label style={labelStyle} htmlFor='showRecur'><input style={chkbxStyle} type='checkbox' name='showRecur' onChange={this.handleChange.bind(this, 'showRecur')}/>Create Recurring Event?</label>
+          </div>
+          <div>
+            <Datetime inputProps={{ placeholder: 'Start Date/Time: MM/DD/YYYY HH:MM AM/PM', style: pickerStyle }} onChange={this.handleChange.bind(this, 'sDate')}/>
+          </div>
+          <div>
+            <Datetime inputProps={{ placeholder: 'End Date/Time: MM/DD/YYYY HH:MM AM/PM', style: pickerStyle }} onChange={this.handleChange.bind(this, 'eDate')}/>
+          </div>
+          <div name='recurringEventDiv' hidden={!this.props.calendarForm.showRecur}>
+            <div>
+              <label style={labelStyle}>Repeat? (WEEKLY): </label>
+              <label style={labelStyle} htmlFor='Monday'><input style={chkbxStyle} type='checkbox' name='Monday' onChange={this.handleCheckboxChange.bind(this)}/>Monday</label>
+              <label style={labelStyle} htmlFor='Tuesday'><input style={chkbxStyle} type='checkbox' name='Tuesday' onChange={this.handleCheckboxChange.bind(this)}/>Tuesday</label>
+              <label style={labelStyle} htmlFor='Wednesday'><input style={chkbxStyle} type='checkbox' name='Wednesday' onChange={this.handleCheckboxChange.bind(this)}/>Wednesday</label>
+              <label style={labelStyle} htmlFor='Thursday'><input style={chkbxStyle} type='checkbox' name='Thursday' onChange={this.handleCheckboxChange.bind(this)}/>Thursday</label>
+              <label style={labelStyle} htmlFor='Friday'><input style={chkbxStyle} type='checkbox' name='Friday' onChange={this.handleCheckboxChange.bind(this)}/>Friday</label>
+            </div>
+            <div id='exclude/include'>
+              <div id='exclude'>
+                <Datetime inputProps={{ placeholder: 'Exclude A Date', style: pickerStyle }} onChange={this.handleAddDate.bind(this, 'exclude')} timeFormat={false} closeOnSelect={true}/>
+                <button type='button' style={undoStyle} onClick={this.undoAddDate.bind(this, 'exclude')}>Undo Exclude</button>
+                <label name='excludeDates'>Currently Excluded: [{this.props.calendarForm.excludeDates.map((date, i) => {
+                  var newDate = "";
+                  if(i === 0){
+                    newDate = revertDate(date);
+                  }
+                  else{
+                    newDate = ", " + revertDate(date);
+                  }
+                  return (<p key={i} style={dateStyle}>{newDate}</p>)})}]
+                </label>
+              </div>
+              <div id='include'>
+                <Datetime inputProps={{ placeholder: 'Include A Date', style: pickerStyle }} onChange={this.handleAddDate.bind(this, 'include')} timeFormat={false} closeOnSelect={true}/>
+                <button type='button' style={undoStyle} onClick={this.undoAddDate.bind(this, 'include')}>Undo Include</button>
+                <label name='includeDates'>Currently Added: [{this.props.calendarForm.includeDates.map((date, i) => {
+                  var newDate = "";
+                  if(i === 0){
+                    newDate = revertDate(date);
+                  }
+                  else{
+                    newDate = ", " + revertDate(date);
+                  }
+                  return (<p key={i} style={dateStyle}>{newDate}</p>)})}]
+                </label>
+              </div>
+            </div>
+          </div>
+          <div id='description/location'>
+            <input type='text' style={inputStyle} placeholder='Description' onChange={this.handleChange.bind(this, 'description')}></input>
+            <input type='text' style={inputStyle} placeholder='Location' onChange={this.handleChange.bind(this, 'location')}></input>
+          </div>
+          <div>
+            <input type='submit' style={buttonStyle} onClick={this.onCloseModal} value='Add Event'/>
+            <button type='button' style={buttonStyle} onClick={this.launchMessageButton.bind(this, 'How to add different types of events:', helpMessage)}>Need Help?</button>
+          </div>
+        </fieldset>
+      </form>
+    );
 
     return (
       <div>
-        <BigCalendar
-          selectable
-          events={this.props.calendarForm.events}
-          defaultView='month'
-          scrollToTime={new Date(1970, 1, 1, 6)}
-          defaultDate={new Date()}
-          onSelectEvent={event => alert(event.start)}
-          onSelectSlot={(slotInfo) => alert(
-            `selected slot: \n\nstart ${slotInfo.start.toLocaleString()} ` +
-            `\nend: ${slotInfo.end.toLocaleString()}` +
-            `\naction: ${slotInfo.action}`
-          )}
-        />
+        <div>
+          <button type='button' style={buttonStyle} onClick={this.onOpenModal}>Add Event(s)</button>
+          <Modal open={this.props.calendarForm.modalState} onClose={this.onCloseModal} little>
+            {addEventForm}
+          </Modal>
+          <Modal open={this.props.calendarForm.messageState} onClose={this.onCloseMessage} little>
+            <h2>{this.props.calendarForm.messageTitle}</h2>
+            {this.props.calendarForm.messageText}
+          </Modal>
+        </div>
+        <div>
+          <BigCalendar
+            selectable
+            events={this.props.calendarForm.events}
+            defaultView='month'
+            scrollToTime={new Date(1970, 1, 1, 6)}
+            defaultDate={new Date()}
+            onSelectEvent={event => alert(event.start)}
+            onSelectSlot={(slotInfo) => alert(
+              `selected slot: \n\nstart ${slotInfo.start.toLocaleString()} ` +
+              `\nend: ${slotInfo.end.toLocaleString()}` +
+              `\naction: ${slotInfo.action}`
+            )}
+          />
+        </div>
+        <button type='button' style={buttonStyle} onClick={this.handleSave.bind(this)}>Save Calendar</button>
       </div>
     );
   }
 
 }
 
+var labelStyle = {
+  fontWeight: "bold",
+  marginRight: "5px",
+}
+
+var fieldsetStyle = {
+  border: "1px solid black",
+  width: "100%",
+  background: "white",
+  padding: "3px",
+  margin: "auto"
+}
+
+var dateStyle = {
+  display: "inline-block"
+}
+
+var legendStyle = {
+  background: "#000080",
+  padding: "6px",
+  fontWeight: "bold",
+  color: "white",
+  textAlign: 'center'
+}
+
+var buttonStyle = {
+    display: 'flex',
+    margin: 'auto',
+    marginTop: '10px',
+    marginBottom: '10px',
+    paddingLeft: "10px",
+    paddingRight: "10px",
+    paddingTop: "4px",
+    paddingBottom: "4px",
+    backgroundColor: "white",
+    borderRadius: "4px",
+    color: "#000080"
+}
+
+var undoStyle = {
+  display: 'inline-block',
+  margin: '10px 10px 10px 0px',
+  paddingLeft: "10px",
+  paddingRight: "10px",
+  paddingTop: "4px",
+  paddingBottom: "4px",
+  backgroundColor: "white",
+  borderRadius: "4px",
+  color: "#000080"
+}
+
+var pickerStyle = {
+  display: 'inline-block',
+  margin: 'auto',
+  marginTop: '10px',
+  marginBottom: '10px'
+}
+
+var chkbxStyle = {
+  marginRight: "2px"
+}
+
+var inputStyle = {
+  width: '300px',
+  margin: '10px 5px 10px 5px'
+}
+
 const mapStateToProps = state => {
 
 	return {
-    events: state.events,
     calendarForm: state.calendarForm,
     courseId: state.token.lis_course_section_sourcedid,
     courseTitle: state.token.context_title
@@ -78,16 +453,20 @@ const mapDispatchToProps = (dispatch, ownProps) => {
 	return {
     clearForm: () => dispatch(clearForm()),
     setCourseId: (id) => dispatch(setCalCourseId(id)),
-    setCalRecurDays: (days) => dispatch(setCalRecurDays(days)),
+    setCalRepeatDays: (days) => dispatch(setCalRepeatDays(days)),
+    setCalRecurrence: (recurrence) => dispatch(setCalRecurrence(recurrence)),
     setCalExcludeDates: (dates) => dispatch(setCalExcludeDates(dates)),
     setCalIncludeDates: (dates) => dispatch(setCalIncludeDates(dates)),
     setCalSDate: (date) => dispatch(setCalSDate(date)),
     setCalEDate: (date) => dispatch(setCalEDate(date)),
-    setCalSTime: (time) => dispatch(setCalSTime(time)),
-    setCalETime: (time) => dispatch(setCalETime(time)),
     setCalDescription: (desc) => dispatch(setCalDescription(desc)),
     setCalLoc: (loc) => dispatch(setCalLoc(loc)),
-    setCalEvents: (events) => dispatch(setCalEvents(events))
+    setCalEvents: (events) => dispatch(setCalEvents(events)),
+    setCalModalState: (modalState) => dispatch(setCalModalState(modalState)),
+    setCalMessageState: (messageState) => dispatch(setCalMessageState(messageState)),
+    setCalMessageText: (messageText) => dispatch(setCalMessageText(messageText)),
+    setCalMessageTitle: (messageTitle) => dispatch(setCalMessageTitle(messageTitle)),
+    setCalShowRecur: (showRecur) => dispatch(setCalShowRecur(showRecur))
 	}
 };
 

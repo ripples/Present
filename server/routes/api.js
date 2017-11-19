@@ -120,29 +120,30 @@ router.get('/video/:courseId/:lectureName', function (req, res) {
 });
 
 router.get('/calendar/:courseId', function (req, res) { //Gets the calendar for a given class
-	console.log("PATH HIT");
-	//res.sendStatus(200);
 	const fpath = "./lectures/" + req.params.courseId.toString() + "/Calendar.ics"
-	console.log(fpath);
 	fs.exists(fpath, function(exists) {
-		console.log("checking path...");
 		if(exists) {
-			console.log("path exists... reading file...");
 			fs.readFile(fpath, function(err, data) {
 				if (err) throw err;
-				console.log(data.toString());
 				const eventArray = icsToEventObjectArray(data.toString());
-				console.log(eventArray);
 				res.status(200).send(eventArray);
 			})
 		}
 		else {
-			console.log("path doesn't exist, sending blank calendar");
 			const eventArray = [];
-			console.log(eventArray);
 			res.status(200).send(eventArray);
 		}
 	});
+});
+
+router.get('/calendar/:recurEvent/:start/:end/:includes/:excludes', function (req, res) {
+	let sDate = formatRecurringDate(new Date(req.params.start));
+	let eDate = formatRecurringDate(new Date(req.params.end));
+	var recurrence = moment.recur(sDate, eDate).every(req.params.recurEvent.split(',')).daysOfWeek();
+	var dates = recurrence.all("YYYYMMDD");
+	var addedIncludes = incDates(req.params.includes.split(","), dates, req.params.excludes.split(","));
+	var filteredDates = addedIncludes.filter(function(e){return req.params.excludes.indexOf(e)<0}); //Returns array with excluded dates removed, still in chronological order
+	res.status(200).send(filteredDates);
 });
 
 router.post('/calendar', function (req, res) {
@@ -166,7 +167,7 @@ function generateCalendar(sDate, eDate, sTime, eTime, recurDays, excludeDates, i
 	var start = moment(sDate, "YYYYMMDD"), end = moment(eDate, "YYYYMMDD");
 	var recurrence = moment.recur(start, end).every(recurDays).daysOfWeek(); //Create moment recurrence object of date list
 	var initialDates = recurrence.all("YYYYMMDD"); //Generate string array of dates in "YYYY-MM-DD" format, in chronological order
-	  var addedIncludes = incDates(includeDates, initialDates, excludeDates);
+	var addedIncludes = incDates(includeDates, initialDates, excludeDates);
 	var filteredDates = addedIncludes.filter(function(e){return excludeDates.indexOf(e)<0}); //Returns array with excluded dates removed, still in chronological order
 	generateICS(filteredDates.sort(), [sDate, eDate, sTime, eTime, description, location, summary, courseId])
 }
@@ -234,6 +235,15 @@ function isDuplicate(date, dates, excludes){
 	return (dates.includes(date) && !excludes.includes(date));
 }
 
+function formatRecurringDate(date){
+	let year = date.getFullYear().toString();
+	let month = (date.getMonth()+1).toString();
+	let day = date.getDate().toString();
+	if(month.length === 1) {month = '0' + month;}
+	if(day.length === 1) {day = '0' + day;}
+	return moment(year+month+day, "YYYYMMDD");
+}
+
 function incDates(dates, initial, excludes) {
 	var newArr = initial;
 	for(var i = 0; i < dates.length; i++){
@@ -287,7 +297,7 @@ function icsToEventObjectArray(icsFileText) { //Converts the text of an ics file
 	filetextsplit.splice(-1, 1); //Remove last line from file, also don't need
 	var numEvents = parseInt(filetextsplit[filetextsplit.length-10].substring(0, 2)); //Contains the number of events in calendar
 	for(var i = 0; i < numEvents; i++){
-		var currentEvent = new Object();
+		var currentEvent = {};
 		for(var line = 0; line < 11; line++){
 			var curline = filetextsplit[0];
 			switch(line){
@@ -318,7 +328,8 @@ function icsToEventObjectArray(icsFileText) { //Converts the text of an ics file
 					if(month.length === 1) {month = '0' + month;}
 					if(day.length === 1) {day = '0' + day;}
 					var datestring = year + '-' + month + '-' + day + 'T' + hour + ':' + min + ':00Z';
-					currentEvent.end = new Date(datestring);
+					let end = new Date(datestring);
+					currentEvent.end = end;
 					filetextsplit.splice(0, 1);
 					break;
 				case 8:
