@@ -34,22 +34,22 @@ passport.use('lti-strategy', new CustomStrategy(
 	function(req, callback) {
 		var val = (req.body.oauth_consumer_key) ? req.body.oauth_consumer_key : req.user		
 		try{
-			var provider = new lti.Provider(val , "secret")			
+			var provider = new lti.Provider(val , "secret")	
+			if(!req.user){
+				callback(null, val)			
+			}
+			else{
+				provider.valid_request(req, function(err, isValid) {
+					if(err){
+						console.log(err)
+					}
+					callback(err, val)
+				});
+			}		
 		}
 		catch(err){
-			callback(err, val)
+			callback(err, null)
 		}
-		if(!req.user){
-			provider.valid_request(req, function(err, isValid) {
-				if(err){
-					console.log(err)
-				}
-				callback(err, val)
-			});
-		}
-		else(
-			callback(null, val)
-		)
 	}
 ));
 
@@ -65,7 +65,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/upload', upload)
 app.use(passport.initialize())
 app.use(passport.session())
-app.use(passport.authenticate('lti-strategy'));
+app.use(passport.authenticate('lti-strategy', {failureFlash: true}));
 app.use('/', public);
 
 app.use('/api', api)

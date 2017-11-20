@@ -8,7 +8,12 @@ var moment = require('moment');
 require('moment-recur');
 
 router.get('/identify/', function (req, res) {
-	res.send(req.session.lti_token);
+	if(req.session.lti_token){
+		res.send(req.session.lti_token);
+	}
+	else{
+		res.status(401).send()
+	}
 });
 
 router.get('/listOfCourseLectures/:courseId', function (req, res) {
