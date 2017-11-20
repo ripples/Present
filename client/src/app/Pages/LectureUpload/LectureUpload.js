@@ -19,7 +19,7 @@ class LectureUpload extends React.Component {
                                 <br/>
                                 Lecture Date: <input type="date" name="lectureDate" required/>
                                 <br/>
-                                <input type="text" name="courseId" value={this.props.courseId} readonly required style={hideInput}/>
+                                <input type="text" name="courseId" value={this.props.courseId} readOnly required style={hideInput}/>
                                 <br/>
                                 <input type="submit" value="Submit" />
                             </form>
