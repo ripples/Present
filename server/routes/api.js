@@ -120,8 +120,12 @@ router.get('/video/:courseId/:lectureName', function (req, res) {
 });
 
 router.post("/lectureUpload", function(req, res){
-	var dir = "./lectures/added/";
-	var fileLoc = "./lectures/added/videoLarge.mp4";
+	
+	var date = req.body.lectureDate;
+	date = date.substring(5) + "-" + date.substring(0, 4);
+	var dir = "./lectures/" + req.body.courseId + "/" + date  + "--00-00-00/";
+	var fileLoc = dir + "videoLarge.mp4";
+	
 	if (!fs.existsSync(dir)){
     fs.mkdirSync(dir);
 	}
@@ -130,9 +134,7 @@ router.post("/lectureUpload", function(req, res){
 		fs.closeSync(fs.openSync(fileLoc, 'w'));
 	}
 
-	const file = req.files.lectureVideo.file;
-	console.log(file);
-	var read = fs.createReadStream(file);
+	var read = fs.createReadStream(req.files.lectureVideo.file);
 	var write = fs.createWriteStream(fileLoc);
 	read.pipe(write);
 	
