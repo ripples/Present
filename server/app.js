@@ -35,13 +35,13 @@ passport.use('lti-strategy', new CustomStrategy(
 		var val = (req.body.oauth_consumer_key) ? req.body.oauth_consumer_key : req.user		
 		try{
 			var provider = new lti.Provider(val , "secret")	
-			if(!req.user){
+			if(req.user){
 				callback(null, val)			
 			}
 			else{
 				provider.valid_request(req, function(err, isValid) {
 					if(err){
-						console.log(err)
+						console.log(req, err, isValid)
 					}
 					callback(err, val)
 				});
