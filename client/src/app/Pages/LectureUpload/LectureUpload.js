@@ -19,9 +19,7 @@ class LectureUpload extends React.Component {
                                 <br/>
                                 Lecture Date: <input type="date" name="lectureDate" required/>
                                 <br/>
-                                <br/>
-                                Course Id: <input type="text" name="courseId" value={this.props.courseId} readonly required/>
-                                <br/>
+                                <input type="text" name="courseId" value={this.props.courseId} readonly required style={hideInput}/>
                                 <br/>
                                 <input type="submit" value="Submit" />
                             </form>
@@ -52,5 +50,9 @@ const mapStateToProps = state => {
         roles: state.token.roles
     };
 };
+
+var hideInput = {
+    visibility: "hidden"
+}
 
 export default connect(mapStateToProps)(LectureUpload);
