@@ -1,5 +1,12 @@
 import {calFormConstants} from '../Constants/actions.js';
 
+export function setCalOriginalCal(originalCal){
+  return {
+    type: calFormConstants.SET_CAL_ORIGINAL_CAL,
+    originalCal
+  }
+}
+
 export function setCalShowRecur(showRecur){
   return {
     type: calFormConstants.SET_CAL_SHOW_RECUR,

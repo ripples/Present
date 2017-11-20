@@ -6,9 +6,9 @@ import Modal from 'react-responsive-modal';
 import Datetime from 'react-datetime';
 import 'react-datetime/css/react-datetime.css';
 import {connect} from "react-redux";
-import {getCurrentSemester, formatDate, revertDate} from './CalendarUtils.js';
+import {getCurrentSemester, formatDate, revertDate, isEqual} from './CalendarUtils.js';
 import {setCalModalState, setCalMessageState, setCalMessageText, setCalMessageTitle, setCalEvents,
-  setCalSDate, setCalEDate, setCalRepeatDays, setCalRecurrence, setCalExcludeDates, setCalShowRecur,
+  setCalSDate, setCalEDate, setCalRepeatDays, setCalRecurrence, setCalExcludeDates, setCalShowRecur, setCalOriginalCal,
   setCalIncludeDates, setCalDescription, setCalLoc, setCalCourseId, clearForm} from '../../Actions/calFormActions.js';
 
 BigCalendar.momentLocalizer(moment);
@@ -21,6 +21,8 @@ class CalendarRobust extends React.Component {
     this.addNewEvent = this.addNewEvent.bind(this);
     this.addRecurringEvent = this.addRecurringEvent.bind(this);
     this.launchMessage = this.launchMessage.bind(this);
+    this.generateSelectedSlot = this.generateSelectedSlot.bind(this)
+    this.generateSelectedEvent = this.generateSelectedEvent.bind(this);
   }
 
   componentWillMount(){ //Read any existing calendar file from server, if none exists, blank calendar. (GET)
@@ -29,7 +31,10 @@ class CalendarRobust extends React.Component {
       credentials: 'same-origin' // or 'include'
     }).then(
       res => (res.status === 200 || res.status === 204) ? res.json() : []
-    ).then((json) => this.props.setCalEvents(this.processEvents(json))).catch((err) => console.log(err));
+    ).then((json) => {
+      this.props.setCalOriginalCal(this.processEvents(json))
+      this.props.setCalEvents(this.processEvents(json))
+    }).catch((err) => console.log(err));
   }
 
   componentWillUnmount(){
@@ -53,6 +58,14 @@ class CalendarRobust extends React.Component {
   };
 
   onCloseModal = () => {
+    this.props.setCalRecurrence([]);
+    this.props.setCalRepeatDays([]);
+    this.props.setCalSDate('');
+    this.props.setCalEDate('');
+    this.props.setCalDescription('');
+    this.props.setCalLoc('');
+    this.props.setCalExcludeDates([]);
+    this.props.setCalIncludeDates([]);
     this.props.setCalShowRecur(false);
     this.props.setCalModalState(false);
   };
@@ -75,6 +88,53 @@ class CalendarRobust extends React.Component {
   launchMessageButton(title, text, e){
     e.preventDefault();
     this.launchMessage(title, text);
+  }
+
+  generateSelectedSlot(slot){
+    const slotSelectMessage = (
+      <div>
+        <div>
+          <p style={{display: 'inline'}}>Start: </p>
+          <p style={{display: 'inline'}}>{slot.start.toLocaleString()}</p>
+        </div>
+        <div>
+          <p style={{display: 'inline'}}>End: </p>
+          <p style={{display: 'inline'}}>{slot.end.toLocaleString()}</p>
+        </div>
+        <div>
+          <p style={{display: 'inline'}}>Action: </p>
+          <p style={{display: 'inline'}}>{slot.action}</p>
+        </div>
+      </div>
+    );
+    this.launchMessage('You have selected a slot:', slotSelectMessage);
+  }
+
+  generateSelectedEvent(event){
+    const selectedEventMessage = (
+      <div>
+        <div>
+          <p style={{display: 'inline'}}>Start: </p>
+          <p style={{display: 'inline'}}>{event.start.toLocaleString()}</p>
+        </div>
+        <div>
+          <p style={{display: 'inline'}}>End: </p>
+          <p style={{display: 'inline'}}>{event.end.toLocaleString()}</p>
+        </div>
+        <div>
+          <p style={{display: 'inline'}}>Description: </p>
+          <p style={{display: 'inline'}}>{event.description}</p>
+        </div>
+        <div>
+          <p style={{display: 'inline'}}>Location: </p>
+          <p style={{display: 'inline'}}>{event.location}</p>
+        </div>
+        <div>
+          <button type='button' style={buttonStyle}>Edit Event</button>
+        </div>
+      </div>
+    );
+    this.launchMessage('Event Selected: ' + event.title, selectedEventMessage);
   }
 
   handleChange(name, e){
@@ -164,24 +224,22 @@ class CalendarRobust extends React.Component {
     }
   }
 
-  addNewEvent(event){ //TODO: Make num changes state variable and increment it here
+  addNewEvent(event){
     let currentEvents = this.props.calendarForm.events;
     currentEvents.push(event);
     let newEvents = currentEvents;
     this.props.setCalEvents(newEvents);
-    this.props.setCalSDate('');
-    this.props.setCalEDate('');
-    this.props.setCalDescription('');
-    this.props.setCalLoc('');
+    this.onCloseModal();
   }
 
-  addRecurringEvent(){ //TODO: Make num changes state variable and increment it here
-    debugger;
+  addRecurringEvent(){
     let start = this.props.calendarForm.sDate;
     let end = this.props.calendarForm.eDate;
     let repeatDays = this.props.calendarForm.repeatDays;
     let includes = this.props.calendarForm.includeDates;
+    if(includes.length === 0){includes = -1}
     let excludes = this.props.calendarForm.excludeDates;
+    if(excludes.length === 0){excludes = -1}
     fetch(('/api/calendar/' + repeatDays + '/' + start + '/' + end + '/' + includes + '/' + excludes), {
       credentials: 'same-origin' // or 'include'
     }).then(res => (res.status === 200 || res.status === 204 || res.status === 304) ? res.json() : []
@@ -196,24 +254,18 @@ class CalendarRobust extends React.Component {
       newEvent.location = this.props.calendarForm.location;
       newEvent.start = new Date(parseInt(date.substring(0, 4), 10), parseInt(date.substring(4, 6), 10)-1, parseInt(date.substring(6,8), 10), this.props.calendarForm.sDate.getHours(), this.props.calendarForm.sDate.getMinutes());
       newEvent.end = new Date(parseInt(date.substring(0, 4), 10), parseInt(date.substring(4, 6), 10)-1, parseInt(date.substring(6,8), 10), this.props.calendarForm.eDate.getHours(), this.props.calendarForm.eDate.getMinutes());
+      newEvent.summary = getCurrentSemester() + ' ' + this.props.courseId;
+      newEvent.courseId = this.props.courseId;
       currentEvents.push(newEvent);
     }
     let newEvents = currentEvents;
     this.props.setCalEvents(newEvents);
-    this.props.setCalRecurrence([]);
-    this.props.setCalRepeatDays([]);
-    this.props.setCalSDate('');
-    this.props.setCalEDate('');
-    this.props.setCalDescription('');
-    this.props.setCalLoc('');
-    this.props.setCalExcludeDates([]);
-    this.props.setCalIncludeDates([]);
+    this.onCloseModal();
     }).catch((err) => console.log(err));
   }
 
   handleSubmit(e){
     e.preventDefault();
-    debugger;
     let start = this.props.calendarForm.sDate;
     let end = this.props.calendarForm.eDate;
     start = new Date(parseInt(start.getFullYear(), 10), parseInt(start.getMonth(), 10), parseInt(start.getDate(), 10));
@@ -229,6 +281,8 @@ class CalendarRobust extends React.Component {
       newEvent.location = this.props.calendarForm.location;
       newEvent.start = this.props.calendarForm.sDate;
       newEvent.end = this.props.calendarForm.eDate;
+      newEvent.summary = getCurrentSemester() + ' ' + this.props.courseId;
+      newEvent.courseId = this.props.courseId;
       this.addNewEvent(newEvent); //Add a single event
     }
     else {
@@ -241,8 +295,24 @@ class CalendarRobust extends React.Component {
     }
   }
 
-  handleSave(e){ //TODO: Take events array, check it for differences between that and the original one read in by file, then send off to server to save new ics
+  handleSave(e){
     e.preventDefault();
+    if(!isEqual(this.props.calendarForm.originalCal, this.props.calendarForm.events)){
+      var options = {method: 'POST',
+                    headers: {"Content-Type": "application/json"},
+                    credentials: 'same-origin',
+                    body: JSON.stringify(this.props.calendarForm.events)};
+
+      fetch('/api/calendar', options).then((response) => {
+        return response.text()
+      }).then((data) => {
+        console.log(data);
+        this.props.setCalOriginalCal(this.props.calendarForm.events); //So user can't re-save the same calendar
+      }).catch((err) => console.log(err));
+    }
+    else{
+      this.launchMessage('ERROR: No Changes Made', 'You haven\'t made any changes to the current calendar.');
+    }
   }
 
   render() {
@@ -331,7 +401,7 @@ class CalendarRobust extends React.Component {
             <input type='text' style={inputStyle} placeholder='Location' onChange={this.handleChange.bind(this, 'location')}></input>
           </div>
           <div>
-            <input type='submit' style={buttonStyle} onClick={this.onCloseModal} value='Add Event'/>
+            <input type='submit' style={buttonStyle} value='Add Event'/>
             <button type='button' style={buttonStyle} onClick={this.launchMessageButton.bind(this, 'How to add different types of events:', helpMessage)}>Need Help?</button>
           </div>
         </fieldset>
@@ -357,12 +427,8 @@ class CalendarRobust extends React.Component {
             defaultView='month'
             scrollToTime={new Date(1970, 1, 1, 6)}
             defaultDate={new Date()}
-            onSelectEvent={event => alert(event.start)}
-            onSelectSlot={(slotInfo) => alert(
-              `selected slot: \n\nstart ${slotInfo.start.toLocaleString()} ` +
-              `\nend: ${slotInfo.end.toLocaleString()}` +
-              `\naction: ${slotInfo.action}`
-            )}
+            onSelectEvent={event => this.generateSelectedEvent(event)}
+            onSelectSlot={(slotInfo) => this.generateSelectedSlot(slotInfo)}
           />
         </div>
         <button type='button' style={buttonStyle} onClick={this.handleSave.bind(this)}>Save Calendar</button>
@@ -466,7 +532,8 @@ const mapDispatchToProps = (dispatch, ownProps) => {
     setCalMessageState: (messageState) => dispatch(setCalMessageState(messageState)),
     setCalMessageText: (messageText) => dispatch(setCalMessageText(messageText)),
     setCalMessageTitle: (messageTitle) => dispatch(setCalMessageTitle(messageTitle)),
-    setCalShowRecur: (showRecur) => dispatch(setCalShowRecur(showRecur))
+    setCalShowRecur: (showRecur) => dispatch(setCalShowRecur(showRecur)),
+    setCalOriginalCal: (originalCal) => dispatch(setCalOriginalCal(originalCal))
 	}
 };
 

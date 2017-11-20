@@ -137,98 +137,91 @@ router.get('/calendar/:courseId', function (req, res) { //Gets the calendar for 
 });
 
 router.get('/calendar/:recurEvent/:start/:end/:includes/:excludes', function (req, res) {
+	let includes = req.params.includes;
+	let excludes = req.params.excludes;
+	if(includes === '-1'){includes = [];}
+	else{includes = includes.split(',');}
+	if(excludes === '-1'){excludes = [];}
+	else{excludes = excludes.split(',');}
 	let sDate = formatRecurringDate(new Date(req.params.start));
 	let eDate = formatRecurringDate(new Date(req.params.end));
 	var recurrence = moment.recur(sDate, eDate).every(req.params.recurEvent.split(',')).daysOfWeek();
 	var dates = recurrence.all("YYYYMMDD");
-	var addedIncludes = incDates(req.params.includes.split(","), dates, req.params.excludes.split(","));
-	var filteredDates = addedIncludes.filter(function(e){return req.params.excludes.indexOf(e)<0}); //Returns array with excluded dates removed, still in chronological order
+	var addedIncludes = includeDates(includes, dates, excludes);
+	var filteredDates = addedIncludes.filter(function(e){return excludes.indexOf(e)<0}); //Returns array with excluded dates removed, still in chronological order
 	res.status(200).send(filteredDates);
 });
 
 router.post('/calendar', function (req, res) {
-	var sDate = req.body.sDate;
-	var eDate = req.body.eDate;
-	var sTime = req.body.sTime;
-	var eTime = req.body.eTime;
-	var recurDays = req.body.recurDays;
-	var excludeDates = req.body.excludeDates;
-	var includeDates = req.body.includeDates;
-	var description = req.body.description;
-	var location = req.body.location;
-	var summary = getCurrentSemester() + " " + req.body.courseId;
-	var courseId = req.body.courseId;
-
-	generateCalendar(sDate, eDate, sTime, eTime, recurDays, excludeDates, includeDates, description, location, summary, courseId);
-	res.status(201).send("Recording schedule successfully created: ./lectures/" + courseId + "/Calendar.ics");
+	var events = req.body;
+	generateICS(events);
+	res.status(201).send("Recording schedule successfully created: ./lectures/" + events[0].courseId + "/Calendar.ics");
 });
 
-function generateCalendar(sDate, eDate, sTime, eTime, recurDays, excludeDates, includeDates, description, location, summary, courseId) {
-	var start = moment(sDate, "YYYYMMDD"), end = moment(eDate, "YYYYMMDD");
-	var recurrence = moment.recur(start, end).every(recurDays).daysOfWeek(); //Create moment recurrence object of date list
-	var initialDates = recurrence.all("YYYYMMDD"); //Generate string array of dates in "YYYY-MM-DD" format, in chronological order
-	var addedIncludes = incDates(includeDates, initialDates, excludeDates);
-	var filteredDates = addedIncludes.filter(function(e){return excludeDates.indexOf(e)<0}); //Returns array with excluded dates removed, still in chronological order
-	generateICS(filteredDates.sort(), [sDate, eDate, sTime, eTime, description, location, summary, courseId])
-}
-
-function generateICS(dates, tags) {
+function generateICS(events) {
 	var fileText = "";
 	var START_TAG = "BEGIN:VCALENDAR\nPRODID:Calendar\nVERSION:2.0\n", END_TAG = "END:VCALENDAR";
-	const SDATE = 0, EDATE = 1, STIME = 2, ETIME = 3, DESCRIPTION = 4, LOCATION = 5, SUMMARY = 6, COURSEID = 7;
 	var dateNow = getICSDateNow();
 	var DTSTAMP = dateNow[0] + dateNow[1] + dateNow[2] + dateNow[3] + dateNow[4] + dateNow[5] + dateNow[6];
 	var lectureDir = dateNow[1] + "-" + dateNow[2] + "-" + dateNow[0] + "--" + dateNow[4] + "-" + dateNow[5] + "-" + dateNow[6];
 	fileText += START_TAG;
-
-	for(var i = 0; i < dates.length; i++){
-	  fileText += "BEGIN:VEVENT\n";
-	  fileText += (i + "@default\nCLASS:PUBLIC\n");
-	  fileText += ("DESCRIPTION:" + tags[DESCRIPTION] + "\n");
-	  fileText += ("DTSTAMP;VALUE=DATE-TIME:" + DTSTAMP + "\n");
-	  fileText += ("DTSTART;VALUE=DATE-TIME:" + dates[i] + "T" + tags[STIME] + "\n");
-	  fileText += ("DTEND;VALUE=DATE-TIME:" + dates[i] + "T" + tags[ETIME] + "\n");
-	  fileText += ("LOCATION:" + tags[LOCATION] + "\n");
-	  fileText += ("SUMMARY;LANGUAGE=en-us:" + tags[SUMMARY] + "\n");
-	  fileText += "TRANSP:TRANSPARENT\nEND:VEVENT\n";
+	var courseId = events[0].courseId;
+	var index = 0;
+	for(let event of events){
+		fileText += "BEGIN:VEVENT\n";
+		fileText += (index + "@default\nCLASS:PUBLIC\n");
+		fileText += ("DESCRIPTION:" + event.description + "\n");
+		fileText += ("DTSTAMP;VALUE=DATE-TIME:" + DTSTAMP + "\n");
+		fileText += ("DTSTART;VALUE=DATE-TIME:" + jsDateToICSDate(event.start) + "\n");
+		fileText += ("DTEND;VALUE=DATE-TIME:" + jsDateToICSDate(event.end) + "\n");
+		fileText += ("LOCATION:" + event.location + "\n");
+		fileText += ("SUMMARY;LANGUAGE=en-us:" + event.summary + "\n");
+		fileText += "TRANSP:TRANSPARENT\nEND:VEVENT\n";
+		index += 1;
 	}
-
 	fileText += END_TAG;
-
-	fs.writeFileSync("./lectures/" + tags[COURSEID] + "/Calendar.ics", fileText, function (err) {
+	fs.writeFileSync("./lectures/" + courseId + "/Calendar.ics", fileText, function (err) {
 	  if (err) return console.log(err);
 	});
+  let fetch = require('node-fetch');
+  let FormData = require('form-data');
+  const stats = fs.statSync("./lectures/" + courseId + "/Calendar.ics");
+  const fileSizeInBytes = stats.size;
+  var body = new FormData();
+  var filedata = 0
+  try {
+  filedata = fs.readFileSync("./lectures/" + courseId + "/Calendar.ics", 'utf8');
+  } catch(e) {
+	  console.log('Error:', e.stack);
+  }
 
-	  //Send the newly created schedule to the capture server
-	  let fetch = require('node-fetch');
-	  let FormData = require('form-data');
-	  const stats = fs.statSync("./lectures/" + tags[COURSEID] + "/Calendar.ics");
-	  const fileSizeInBytes = stats.size;
-	  var body = new FormData();
-	  var filedata = 0
-	  try {
-	  filedata = fs.readFileSync("./lectures/" + tags[COURSEID] + "/Calendar.ics", 'utf8');
-	  } catch(e) {
-		  console.log('Error:', e.stack);
-	  }
+  body.append('file', filedata);
+  fetch('http://cap142.cs.umass.edu:8001/', { //Send the newly created schedule to the capture server
+	  method: 'POST',
+	  headers: {
+			  'Content-Length': fileSizeInBytes,
+			  'Content-Type': undefined //To set data boundaries automatically... workaround
+			  //'Authorization': 'Basic' + base64.encode(username + ":" + password)
+		  },
+	  body: body
+  })
+  .then(function(res) {
+	  return res.text();
+  }).then(function(text) {
+	  console.log(text);
+  }).catch(function(error) {
+		console.log('Fetch operation error: ' + error.message);
+  });
+}
 
-	  body.append('file', filedata);
-	  fetch('http://cap142.cs.umass.edu:8001/', {
-		  method: 'POST',
-		  headers: {
-				  'Content-Length': fileSizeInBytes,
-				  'Content-Type': undefined //To set data boundaries automatically... workaround
-				  //'Authorization': 'Basic' + base64.encode(username + ":" + password)
-			  },
-		  body: body
-	  })
-	  .then(function(res) {
-		  return res.text();
-	  }).then(function(text) {
-		  console.log(text);
-	  }).catch(function(error) {
-			console.log('Fetch operation error: ' + error.message);
-	  });
+function jsDateToICSDate(datestring){
+	let yyyy = datestring.substring(0,4);
+	let mm = datestring.substring(5, 7);
+	let dd  = datestring.substring(8, 10);
+	let hh = datestring.substring(11, 13);
+	let min = datestring.substring(14, 16);
+	let ss = datestring.substring(17, 19);
+	return (yyyy + mm + dd + 'T' + hh + min + ss);
 }
 
 function isDuplicate(date, dates, excludes){
@@ -244,39 +237,14 @@ function formatRecurringDate(date){
 	return moment(year+month+day, "YYYYMMDD");
 }
 
-function incDates(dates, initial, excludes) {
+function includeDates(includes, initial, excludes) {
 	var newArr = initial;
-	for(var i = 0; i < dates.length; i++){
-		if(!isDuplicate(dates[i], initial, excludes)){
-			newArr = newArr.concat(dates[i]);
+	for(var i = 0; i < includes.length; i++){
+		if(!isDuplicate(includes[i], initial, excludes)){
+			newArr = newArr.concat(includes[i]);
 		}
 	}
 	return newArr;
-}
-
-function getCurrentSemester(){
-	var year = new Date().getFullYear().toString().substr(-2);
-	var curMonth = new Date().getMonth(); //Jan:0, May=4, Aug=7, Dec=11, 1-3, 5-6, 8-10
-	var curDay = new Date().getDate();
-	var semester = "";
-	switch(curMonth){
-		case 0:
-			(curDay < 21) ? semester = "WINTER" : semester = "SPRING";
-			break;
-		case 4:
-			(curDay < 17) ? semester = "SPRING" : semester = "SUMMER";
-			break;
-		case 7:
-			(curDay < 24) ? semester = "SUMMER" : semester = "FALL";
-			break;
-		case 11:
-			(curDay < 22) ? semester = "FALL" : semester = "WINTER";
-			break;
-		default:
-			(curMonth >= 1 && curMonth <= 3) ? semester = "SPRING" : (curMonth >= 5 && curMonth <= 6) ? semester = "SUMMER" : semester = "FALL";
-			break;
-	}
-	return semester + year;
 }
 
 function getICSDateNow() { //Gets the current timestamp in YYYYMMDDTHHMMSS format (for ics file generation)

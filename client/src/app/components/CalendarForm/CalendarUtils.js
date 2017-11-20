@@ -35,3 +35,17 @@ export function revertDate(date) { //20171014
 
   return mm + "/" + dd + "/" + yyyy;
 }
+
+export function isEqual(array1, array2){
+	if(array1.length !== array2.length){
+  	return false;
+  }
+  else{
+    for(let event of array1){
+      if(!array2.includes(event)){
+        return false;
+      }
+    }
+    return true;
+  }
+}
