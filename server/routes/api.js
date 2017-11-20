@@ -120,7 +120,6 @@ router.get('/video/:courseId/:lectureName', function (req, res) {
 });
 
 router.post("/lectureUpload", function(req, res){
-	
 	var date = req.body.lectureDate;
 	date = date.substring(5) + "-" + date.substring(0, 4);
 	var dir = "./lectures/" + req.body.courseId + "/" + date  + "--00-00-00/";
@@ -138,7 +137,7 @@ router.post("/lectureUpload", function(req, res){
 	var write = fs.createWriteStream(fileLoc);
 	read.pipe(write);
 	
-	res.redirect("http://localhost:3000/#/lectureUpload/");
+	res.redirect("http://localhost:3000/#/lectureUpload/success/");
 });
 
 router.post('/calendar', function (req, res) {

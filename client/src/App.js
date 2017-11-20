@@ -58,7 +58,10 @@ export default class App extends Component {
             <Route path="course/:courseId/lecture/:lectureId" component={Lecture} />
             <Route path="calendar" component={Calendar} />
             <Route path="course/:courseId/instructorSettings" component={InstructorSettings} />
-            <Route path="lectureUpload/" component={LectureUpload} />
+            <Route path="lectureUpload/" >
+              <IndexRoute component={LectureUpload} />
+              <Route path=":success/" component={LectureUpload} />
+            </Route>
           </Route>
         </Router>
       </Provider>
