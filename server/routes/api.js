@@ -162,13 +162,14 @@ function generateICS(events) {
 	var fileText = "";
 	var START_TAG = "BEGIN:VCALENDAR\nPRODID:Calendar\nVERSION:2.0\n", END_TAG = "END:VCALENDAR";
 	var dateNow = getICSDateNow();
-	var DTSTAMP = dateNow[0] + dateNow[1] + dateNow[2] + dateNow[3] + dateNow[4] + dateNow[5] + dateNow[6];
+	var DTSTAMP = dateNow[0] + dateNow[1] + dateNow[2] + dateNow[3] + dateNow[4] + dateNow[5] + dateNow[6] + "Z";
 	var lectureDir = dateNow[1] + "-" + dateNow[2] + "-" + dateNow[0] + "--" + dateNow[4] + "-" + dateNow[5] + "-" + dateNow[6];
 	fileText += START_TAG;
 	var courseId = events[0].courseId;
 	var index = 0;
 	for(let event of events){
 		fileText += "BEGIN:VEVENT\n";
+		fileText += "UID:" + DTSTAMP + "-LV-" + event.title + "\n";
 		fileText += (index + "@default\nCLASS:PUBLIC\n");
 		fileText += ("DESCRIPTION:" + event.description + "\n");
 		fileText += ("DTSTAMP;VALUE=DATE-TIME:" + DTSTAMP + "\n");
@@ -221,7 +222,7 @@ function jsDateToICSDate(datestring){
 	let hh = datestring.substring(11, 13);
 	let min = datestring.substring(14, 16);
 	let ss = datestring.substring(17, 19);
-	return (yyyy + mm + dd + 'T' + hh + min + ss);
+	return (yyyy + mm + dd + 'T' + hh + min + ss + "Z");
 }
 
 function isDuplicate(date, dates, excludes){
@@ -266,16 +267,21 @@ function icsToEventObjectArray(icsFileText) { //Converts the text of an ics file
 	var numEvents = parseInt(filetextsplit[filetextsplit.length-10].substring(0, 2)); //Contains the number of events in calendar
 	for(var i = 0; i < numEvents; i++){
 		var currentEvent = {};
-		for(var line = 0; line < 11; line++){
+		for(var line = 0; line < 12; line++){
 			var curline = filetextsplit[0];
 			switch(line){
-				case 3:
-					var description = curline.substring(12);
-					if(description === '') {continue;}
-					else {currentEvent.desc = curline.substring(12);}
+				case 1:
+					let title = curline.split("-LV-");
+					currentEvent.title = title[1];
 					filetextsplit.splice(0, 1);
 					break;
-				case 5:
+				case 4:
+					var description = curline.substring(12);
+					if(description === '') {continue;}
+					else {currentEvent.description = curline.substring(12);}
+					filetextsplit.splice(0, 1);
+					break;
+				case 6:
 					var year = curline.substring(24, 28);
 					var month = curline.substring(28, 30);
 					var day = curline.substring(30, 32);
@@ -287,7 +293,7 @@ function icsToEventObjectArray(icsFileText) { //Converts the text of an ics file
 					currentEvent.start = new Date(datestring);
 					filetextsplit.splice(0, 1);
 					break;
-				case 6:
+				case 7:
 					var year = curline.substring(22, 26);
 					var month = curline.substring(26, 28);
 					var day = curline.substring(28, 30);
@@ -301,9 +307,13 @@ function icsToEventObjectArray(icsFileText) { //Converts the text of an ics file
 					filetextsplit.splice(0, 1);
 					break;
 				case 8:
-					var title = curline.substring(23);
-					if(title === '')  {continue;}
-					else {currentEvent.title = title;}
+					currentEvent.location = curline.substring(9);
+					filetextsplit.splice(0, 1);
+					break;
+				case 9:
+					let sem_CID = curline.split(" ");
+					currentEvent.semester = sem_CID[0].substring(23);
+					currentEvent.courseId = sem_CID[1];
 					filetextsplit.splice(0, 1);
 					break;
 				default:

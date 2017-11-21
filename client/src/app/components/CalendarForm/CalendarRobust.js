@@ -19,6 +19,7 @@ class CalendarRobust extends React.Component {
     super(props);
     this.processEvents = this.processEvents.bind(this);
     this.addNewEvent = this.addNewEvent.bind(this);
+    this.deleteEvent = this.deleteEvent.bind(this);
     this.addRecurringEvent = this.addRecurringEvent.bind(this);
     this.launchMessage = this.launchMessage.bind(this);
     this.generateSelectedSlot = this.generateSelectedSlot.bind(this)
@@ -53,6 +54,45 @@ class CalendarRobust extends React.Component {
     return processedEvents;
   }
 
+  handleChange(name, e){
+    switch(name){
+      case 'sDate':
+        this.props.setCalSDate(e.toDate());
+        return;
+      case 'eDate':
+        this.props.setCalEDate(e.toDate());
+        return;
+      case 'description':
+        this.props.setCalDescription(e.target.value);
+        return;
+      case 'location':
+        this.props.setCalLoc(e.target.value);
+        return;
+      case 'showRecur':
+        if(this.props.calendarForm.showRecur){
+          this.props.setCalShowRecur(false);
+        }
+        else{
+          this.props.setCalShowRecur(true);
+        }
+        return;
+      default:
+        console.log("error", name);
+        return;
+    }
+  }
+
+  handleCheckboxChange(e){
+    const rDays = this.props.calendarForm.repeatDays;
+    let index
+    if(e.target.checked) {rDays.push(e.target.name);}
+    else {
+      index = rDays.indexOf(e.target.name);
+      rDays.splice(index, 1);
+    }
+    this.props.setCalRepeatDays(rDays);
+  }
+
   onOpenModal = () => {
     this.props.setCalModalState(true);
   };
@@ -75,6 +115,10 @@ class CalendarRobust extends React.Component {
   };
 
   onCloseMessage = () => {
+    this.props.setCalSDate('');
+    this.props.setCalEDate('');
+    this.props.setCalDescription('');
+    this.props.setCalLoc('');
     this.props.setCalMessageText('');
     this.props.setCalMessageState(false);
   };
@@ -111,78 +155,56 @@ class CalendarRobust extends React.Component {
   }
 
   generateSelectedEvent(event){
-    const selectedEventMessage = (
+    var selectedEventMessage = (
       <div>
         <div>
-          <p style={{display: 'inline'}}>Start: </p>
-          <p style={{display: 'inline'}}>{event.start.toLocaleString()}</p>
-        </div>
-        <div>
-          <p style={{display: 'inline'}}>End: </p>
-          <p style={{display: 'inline'}}>{event.end.toLocaleString()}</p>
-        </div>
-        <div>
-          <p style={{display: 'inline'}}>Description: </p>
-          <p style={{display: 'inline'}}>{event.description}</p>
-        </div>
-        <div>
-          <p style={{display: 'inline'}}>Location: </p>
-          <p style={{display: 'inline'}}>{event.location}</p>
-        </div>
-        <div>
-          <button type='button' style={buttonStyle}>Edit Event</button>
+          <div>
+            <p style={{display: 'inline'}}>Start: </p>
+            <p style={{display: 'inline'}}>{event.start.toLocaleString()}</p>
+          </div>
+          <div>
+            <p style={{display: 'inline'}}>End: </p>
+            <p style={{display: 'inline'}}>{event.end.toLocaleString()}</p>
+          </div>
+          <div>
+            <p style={{display: 'inline'}}>Description: </p>
+            <p style={{display: 'inline'}}>{event.description}</p>
+          </div>
+          <div>
+            <p style={{display: 'inline'}}>Location: </p>
+            <p style={{display: 'inline'}}>{event.location}</p>
+          </div>
+          <div>
+            <button type='button' style={buttonStyle} onClick={this.showEditPane.bind(this, event)}>Edit Event</button>
+            <button type='button' style={buttonStyle} onClick={this.deleteEventButton.bind(this, event)}>Delete Event</button>
+          </div>
         </div>
       </div>
     );
     this.launchMessage('Event Selected: ' + event.title, selectedEventMessage);
   }
 
-  handleChange(name, e){
-    switch(name){
-      case 'sDate':
-        this.props.setCalSDate(e.toDate());
-        return;
-
-      case 'eDate':
-        this.props.setCalEDate(e.toDate());
-        return;
-
-      case 'description':
-        this.props.setCalDescription(e.target.value);
-        return;
-
-      case 'location':
-        this.props.setCalLoc(e.target.value);
-        return;
-
-      case 'showRecur':
-        if(this.props.calendarForm.showRecur){
-          this.props.setCalShowRecur(false);
-        }
-        else{
-          this.props.setCalShowRecur(true);
-        }
-        return;
-
-      default:
-        console.log("error", name);
-        return;
-    }
-  }
-
-  handleCheckboxChange(e){
-    const rDays = this.props.calendarForm.repeatDays;
-    let index
-
-    if(e.target.checked) {
-      rDays.push(e.target.name);
-    }
-    else {
-      index = rDays.indexOf(e.target.name);
-      rDays.splice(index, 1);
-    }
-
-    this.props.setCalRepeatDays(rDays);
+  showEditPane(event, e){
+    e.preventDefault();
+    const editPane = (
+      <div>
+        <div>
+          <Datetime inputProps={{ placeholder: event.start.toLocaleString(), style: pickerStyle }} onChange={this.handleChange.bind(this, 'sDate')}/>
+        </div>
+        <div>
+          <Datetime inputProps={{ placeholder: event.end.toLocaleString(), style: pickerStyle }} onChange={this.handleChange.bind(this, 'eDate')}/>
+        </div>
+        <div id='description/location'>
+          <input type='text' style={inputStyle} placeholder={event.description} onChange={this.handleChange.bind(this, 'description')}></input>
+          <input type='text' style={inputStyle} placeholder={event.location} onChange={this.handleChange.bind(this, 'location')}></input>
+        </div>
+        <div>
+          <input type='submit' style={buttonStyle} value='Save Changes' onClick={this.handleEdit.bind(this, event)}/>
+        </div>
+      </div>
+    );
+    this.onCloseMessage()
+    this.launchMessage('Event Selected: ' + event.title, editPane);
   }
 
   handleAddDate(type, e){
@@ -229,7 +251,25 @@ class CalendarRobust extends React.Component {
     currentEvents.push(event);
     let newEvents = currentEvents;
     this.props.setCalEvents(newEvents);
-    this.onCloseModal();
+    if(this.props.calendarForm.modalState){
+      this.onCloseModal();
+    }
+  }
+
+  deleteEventButton(event, e){
+    e.preventDefault()
+    this.deleteEvent(event);
+  }
+
+  deleteEvent(event){
+    let events = this.props.calendarForm.events;
+    if(events.includes(event)){
+      events.splice(events.indexOf(event), 1);
+      this.props.setCalEvents(events);
+      if(this.props.calendarForm.messageState){
+        this.onCloseMessage();
+      }
+    }
   }
 
   addRecurringEvent(){
@@ -262,6 +302,20 @@ class CalendarRobust extends React.Component {
     this.props.setCalEvents(newEvents);
     this.onCloseModal();
     }).catch((err) => console.log(err));
+  }
+
+  handleEdit(event, e){
+    e.preventDefault();
+    let editedEvent = {}
+    editedEvent.title = event.title;
+    editedEvent.courseId = event.courseId;
+    editedEvent.start = this.props.calendarForm.sDate;
+    editedEvent.end = this.props.calendarForm.eDate;
+    editedEvent.description = this.props.calendarForm.description;
+    editedEvent.location = this.props.calendarForm.location;
+    this.deleteEvent(event);
+    this.addNewEvent(editedEvent);
+    this.onCloseMessage();
   }
 
   handleSubmit(e){
@@ -423,6 +477,7 @@ class CalendarRobust extends React.Component {
         <div>
           <BigCalendar
             selectable
+            popup
             events={this.props.calendarForm.events}
             defaultView='month'
             scrollToTime={new Date(1970, 1, 1, 6)}
