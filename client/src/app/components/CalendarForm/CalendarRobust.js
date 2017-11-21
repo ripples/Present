@@ -183,7 +183,7 @@ class CalendarRobust extends React.Component {
           </div>
           <div style={{textAlign: 'center'}}>
             <button type='button' style={modalBtnStyle} onClick={this.showEditPane.bind(this, event)}>Edit</button>
-            <button type='button' style={modalBtnStyle} onClick={this.deleteEvent.bind(this, event)}>Delete</button>
+            <button type='button' style={modalBtnStyle} onClick={this.deleteEventBtn.bind(this, event)}>Delete</button>
             <button type='button' style={modalBtnStyle} onClick={this.onCloseMessage}>Cancel</button>
           </div>
         </div>
@@ -268,8 +268,7 @@ class CalendarRobust extends React.Component {
     }
   }
 
-  deleteEvent(event, e){
-    e.preventDefault()
+  deleteEvent(event){
     let events = this.props.calendarForm.events;
     if(events.includes(event)){
       events.splice(events.indexOf(event), 1);
@@ -278,6 +277,11 @@ class CalendarRobust extends React.Component {
         this.onCloseMessage();
       }
     }
+  }
+
+  deleteEventBtn(event, e){
+    e.preventDefault();
+    this.deleteEvent(event);
   }
 
   addRecurringEvent(){
