@@ -6,24 +6,37 @@ import Modal from 'react-responsive-modal';
 import Datetime from 'react-datetime';
 import 'react-datetime/css/react-datetime.css';
 import {connect} from "react-redux";
-import {getCurrentSemester, formatDate, revertDate, isEqual} from './CalendarUtils.js';
-import {setCalModalState, setCalMessageState, setCalMessageText, setCalMessageTitle, setCalEvents,
+import TimeRange from './TimeRange.js';
+import {getCurrentSemester, formatDate, revertDate, isEqual, formatTime, getEventDT, deepCopy, processEvents} from './CalendarUtils.js';
+import {setCalModalState, setCalMessageState, setCalMessageText, setCalMessageTitle, setCalEvents, setCalSTime, setCalETime,
   setCalSDate, setCalEDate, setCalRepeatDays, setCalRecurrence, setCalExcludeDates, setCalShowRecur, setCalOriginalCal,
   setCalIncludeDates, setCalDescription, setCalLoc, setCalCourseId, clearForm} from '../../Actions/calFormActions.js';
 
 BigCalendar.momentLocalizer(moment);
 
+class Event {
+  constructor(courseId, title, start, end, description, location, summary){
+    this.courseId = courseId;
+    this.title = title;
+    this.start = start;
+    this.end = end;
+    this.description = description;
+    this.location = location;
+    this.summary = summary;
+  }
+}
+
 class CalendarRobust extends React.Component {
 
   constructor(props){
     super(props);
-    this.processEvents = this.processEvents.bind(this);
     this.addNewEvent = this.addNewEvent.bind(this);
     this.deleteEvent = this.deleteEvent.bind(this);
     this.addRecurringEvent = this.addRecurringEvent.bind(this);
-    this.launchMessage = this.launchMessage.bind(this);
-    this.generateSelectedSlot = this.generateSelectedSlot.bind(this)
     this.generateSelectedEvent = this.generateSelectedEvent.bind(this);
+    this.generateTitle = this.generateTitle.bind(this);
+    this.clear = this.clear.bind(this);
+    this.launchMessage = this.launchMessage.bind(this);
   }
 
   componentWillMount(){ //Read any existing calendar file from server, if none exists, blank calendar. (GET)
@@ -33,8 +46,9 @@ class CalendarRobust extends React.Component {
     }).then(
       res => (res.status === 200 || res.status === 204) ? res.json() : []
     ).then((json) => {
-      this.props.setCalOriginalCal(this.processEvents(json))
-      this.props.setCalEvents(this.processEvents(json))
+      const calendar = processEvents(json);
+      this.props.setCalOriginalCal(calendar);
+      this.props.setCalEvents(processEvents(deepCopy(calendar)));
     }).catch((err) => console.log(err));
   }
 
@@ -42,16 +56,18 @@ class CalendarRobust extends React.Component {
     this.props.clearForm();
   }
 
-  processEvents(events){ //Converts the JSON representation of the start/end times of each event from server into JS Date objects (required by calendar component for reading).
-    let processedEvents = []
-    for (let event of events){
-      let start = event.start;
-      let end = event.end;
-      event.start = new Date(start);
-      event.end = new Date(end);
-      processedEvents.push(event);
-    }
-    return processedEvents;
+  clear(){
+    this.props.setCalShowRecur(false);
+    this.props.setCalSDate('');
+    this.props.setCalEDate('');
+    this.props.setCalSTime('');
+    this.props.setCalETime('');
+    this.props.setCalRepeatDays([]);
+    this.props.setCalRecurrence([]);
+    this.props.setCalExcludeDates([]);
+    this.props.setCalIncludeDates([]);
+    this.props.setCalDescription('');
+    this.props.setCalLoc('');
   }
 
   handleChange(name, e){
@@ -61,6 +77,12 @@ class CalendarRobust extends React.Component {
         return;
       case 'eDate':
         this.props.setCalEDate(e.toDate());
+        return;
+      case 'sTime':
+        this.props.setCalSTime(formatTime(e.target.value));
+        return;
+      case 'eTime':
+        this.props.setCalETime(formatTime(e.target.value));
         return;
       case 'description':
         this.props.setCalDescription(e.target.value);
@@ -98,15 +120,7 @@ class CalendarRobust extends React.Component {
   };
 
   onCloseModal = () => {
-    this.props.setCalRecurrence([]);
-    this.props.setCalRepeatDays([]);
-    this.props.setCalSDate('');
-    this.props.setCalEDate('');
-    this.props.setCalDescription('');
-    this.props.setCalLoc('');
-    this.props.setCalExcludeDates([]);
-    this.props.setCalIncludeDates([]);
-    this.props.setCalShowRecur(false);
+    this.clear();
     this.props.setCalModalState(false);
   };
 
@@ -115,68 +129,62 @@ class CalendarRobust extends React.Component {
   };
 
   onCloseMessage = () => {
-    this.props.setCalSDate('');
-    this.props.setCalEDate('');
-    this.props.setCalDescription('');
-    this.props.setCalLoc('');
+    this.clear();
+    this.props.setCalMessageTitle('');
     this.props.setCalMessageText('');
     this.props.setCalMessageState(false);
   };
 
   launchMessage(title, text){
-    this.props.setCalMessageTitle(title);
+    this.props.setCalMessageTitle(this.generateTitle(title));
     this.props.setCalMessageText(text);
     this.onOpenMessage();
   }
 
-  launchMessageButton(title, text, e){
+  launchMessageBtn(title, text, e){
     e.preventDefault();
     this.launchMessage(title, text);
   }
 
-  generateSelectedSlot(slot){
-    const slotSelectMessage = (
-      <div>
-        <div>
-          <p style={{display: 'inline'}}>Start: </p>
-          <p style={{display: 'inline'}}>{slot.start.toLocaleString()}</p>
-        </div>
-        <div>
-          <p style={{display: 'inline'}}>End: </p>
-          <p style={{display: 'inline'}}>{slot.end.toLocaleString()}</p>
-        </div>
-        <div>
-          <p style={{display: 'inline'}}>Action: </p>
-          <p style={{display: 'inline'}}>{slot.action}</p>
-        </div>
-      </div>
+  generateTitle(text){
+    const title = (
+      <h1 style={legendStyle}>{text}</h1>
     );
-    this.launchMessage('You have selected a slot:', slotSelectMessage);
+    return title;
   }
 
   generateSelectedEvent(event){
     var selectedEventMessage = (
       <div>
         <div>
-          <div>
+          <div style={{textAlign: 'center'}}>
+            <p style={{display: 'inline'}}>CourseID: </p>
+            <p style={{display: 'inline'}}>{event.courseId}</p>
+          </div>
+          <div style={{textAlign: 'center'}}>
             <p style={{display: 'inline'}}>Start: </p>
             <p style={{display: 'inline'}}>{event.start.toLocaleString()}</p>
           </div>
-          <div>
+          <div style={{textAlign: 'center'}}>
             <p style={{display: 'inline'}}>End: </p>
             <p style={{display: 'inline'}}>{event.end.toLocaleString()}</p>
           </div>
-          <div>
+          <div style={{textAlign: 'center'}}>
             <p style={{display: 'inline'}}>Description: </p>
             <p style={{display: 'inline'}}>{event.description}</p>
           </div>
-          <div>
+          <div style={{textAlign: 'center'}}>
             <p style={{display: 'inline'}}>Location: </p>
             <p style={{display: 'inline'}}>{event.location}</p>
           </div>
-          <div>
-            <button type='button' style={buttonStyle} onClick={this.showEditPane.bind(this, event)}>Edit Event</button>
-            <button type='button' style={buttonStyle} onClick={this.deleteEventButton.bind(this, event)}>Delete Event</button>
+          <div style={{textAlign: 'center'}}>
+            <p style={{display: 'inline'}}>Summary: </p>
+            <p style={{display: 'inline'}}>{event.summary}</p>
+          </div>
+          <div style={{textAlign: 'center'}}>
+            <button type='button' style={modalBtnStyle} onClick={this.showEditPane.bind(this, event)}>Edit</button>
+            <button type='button' style={modalBtnStyle} onClick={this.deleteEvent.bind(this, event)}>Delete</button>
+            <button type='button' style={modalBtnStyle} onClick={this.onCloseMessage}>Cancel</button>
           </div>
         </div>
       </div>
@@ -189,17 +197,21 @@ class CalendarRobust extends React.Component {
     const editPane = (
       <div>
         <div>
-          <Datetime inputProps={{ placeholder: event.start.toLocaleString(), style: pickerStyle }} onChange={this.handleChange.bind(this, 'sDate')}/>
+          <Datetime inputProps={{ placeholder: event.start.toLocaleString(), style: pickerStyle }} onChange={this.handleChange.bind(this, 'sDate')} timeFormat={false} closeOnSelect={true}/>
         </div>
         <div>
-          <Datetime inputProps={{ placeholder: event.end.toLocaleString(), style: pickerStyle }} onChange={this.handleChange.bind(this, 'eDate')}/>
+          <Datetime inputProps={{ placeholder: event.end.toLocaleString(), style: pickerStyle }} onChange={this.handleChange.bind(this, 'eDate')} timeFormat={false} closeOnSelect={true}/>
+        </div>
+        <div>
+          <TimeRange handleChange={this.handleChange.bind(this)}/>
         </div>
         <div id='description/location'>
           <input type='text' style={inputStyle} placeholder={event.description} onChange={this.handleChange.bind(this, 'description')}></input>
           <input type='text' style={inputStyle} placeholder={event.location} onChange={this.handleChange.bind(this, 'location')}></input>
         </div>
-        <div>
-          <input type='submit' style={buttonStyle} value='Save Changes' onClick={this.handleEdit.bind(this, event)}/>
+        <div style={{textAlign: 'center'}}>
+          <input type='submit' style={modalBtnStyle} value='Save Changes' onClick={this.handleEdit.bind(this, event)}/>
+          <button type='button' style={modalBtnStyle} onClick={this.onCloseMessage}>Cancel</button>
         </div>
       </div>
     );
@@ -256,12 +268,8 @@ class CalendarRobust extends React.Component {
     }
   }
 
-  deleteEventButton(event, e){
+  deleteEvent(event, e){
     e.preventDefault()
-    this.deleteEvent(event);
-  }
-
-  deleteEvent(event){
     let events = this.props.calendarForm.events;
     if(events.includes(event)){
       events.splice(events.indexOf(event), 1);
@@ -288,14 +296,13 @@ class CalendarRobust extends React.Component {
     let recurrence = this.props.calendarForm.recurrence;
     let currentEvents = this.props.calendarForm.events;
     for (let date of recurrence){
-      let newEvent = {};
-      newEvent.title = this.props.courseTitle + ' ' + getCurrentSemester();
-      newEvent.description = this.props.calendarForm.description;
-      newEvent.location = this.props.calendarForm.location;
-      newEvent.start = new Date(parseInt(date.substring(0, 4), 10), parseInt(date.substring(4, 6), 10)-1, parseInt(date.substring(6,8), 10), this.props.calendarForm.sDate.getHours(), this.props.calendarForm.sDate.getMinutes());
-      newEvent.end = new Date(parseInt(date.substring(0, 4), 10), parseInt(date.substring(4, 6), 10)-1, parseInt(date.substring(6,8), 10), this.props.calendarForm.eDate.getHours(), this.props.calendarForm.eDate.getMinutes());
-      newEvent.summary = getCurrentSemester() + ' ' + this.props.courseId;
-      newEvent.courseId = this.props.courseId;
+      let sDate = new Date(parseInt(date.substring(0, 4), 10), parseInt(date.substring(4, 6), 10)-1,
+                           parseInt(date.substring(6,8), 10), this.props.calendarForm.sDate.getHours(), this.props.calendarForm.sDate.getMinutes());
+      let eDate = new Date(parseInt(date.substring(0, 4), 10), parseInt(date.substring(4, 6), 10)-1,
+                           parseInt(date.substring(6,8), 10), this.props.calendarForm.eDate.getHours(), this.props.calendarForm.eDate.getMinutes());
+      let newEvent = new Event(this.props.courseId, (this.props.courseTitle + ' ' + getCurrentSemester()), getEventDT(sDate, this.props.calendarForm.sTime),
+                              getEventDT(eDate, this.props.calendarForm.eTime), this.props.calendarForm.description, this.props.calendarForm.location,
+                              (getCurrentSemester() + ' ' + this.props.courseId));
       currentEvents.push(newEvent);
     }
     let newEvents = currentEvents;
@@ -306,13 +313,9 @@ class CalendarRobust extends React.Component {
 
   handleEdit(event, e){
     e.preventDefault();
-    let editedEvent = {}
-    editedEvent.title = event.title;
-    editedEvent.courseId = event.courseId;
-    editedEvent.start = this.props.calendarForm.sDate;
-    editedEvent.end = this.props.calendarForm.eDate;
-    editedEvent.description = this.props.calendarForm.description;
-    editedEvent.location = this.props.calendarForm.location;
+    let editedEvent = new Event(this.props.courseId, event.title, getEventDT(this.props.calendarForm.sDate, this.props.calendarForm.sTime),
+                                getEventDT(this.props.calendarForm.eDate, this.props.calendarForm.eTime), this.props.calendarForm.description,
+                                this.props.calendarForm.location, (getCurrentSemester() + ' ' + this.props.courseId));
     this.deleteEvent(event);
     this.addNewEvent(editedEvent);
     this.onCloseMessage();
@@ -322,26 +325,19 @@ class CalendarRobust extends React.Component {
     e.preventDefault();
     let start = this.props.calendarForm.sDate;
     let end = this.props.calendarForm.eDate;
-    start = new Date(parseInt(start.getFullYear(), 10), parseInt(start.getMonth(), 10), parseInt(start.getDate(), 10));
-    end = new Date(parseInt(end.getFullYear(), 10), parseInt(end.getMonth(), 10), parseInt(end.getDate(), 10));
     let repeatDays = this.props.calendarForm.repeatDays;
     if(+start > +end){
       this.launchMessage('ERROR: Start Date later than End Date', 'Your ending date must be later than or the same as your starting date.');
     }
     else if(repeatDays.length === 0){
-      let newEvent = {};
-      newEvent.title = this.props.courseTitle + ' ' + getCurrentSemester();
-      newEvent.description = this.props.calendarForm.description;
-      newEvent.location = this.props.calendarForm.location;
-      newEvent.start = this.props.calendarForm.sDate;
-      newEvent.end = this.props.calendarForm.eDate;
-      newEvent.summary = getCurrentSemester() + ' ' + this.props.courseId;
-      newEvent.courseId = this.props.courseId;
+      let newEvent = new Event(this.props.courseId, (this.props.courseTitle + ' ' + getCurrentSemester()), getEventDT(this.props.calendarForm.sDate, this.props.calendarForm.sTime),
+                               getEventDT(this.props.calendarForm.eDate, this.props.calendarForm.eTime), this.props.calendarForm.description, this.props.calendarForm.location,
+                               (getCurrentSemester() + ' ' + this.props.courseId));
       this.addNewEvent(newEvent); //Add a single event
     }
     else {
       if(+start === +end && repeatDays.length !== 0){ //If the user input a recurrence but set the same start and end date
-        this.launchMessage('ERROR: Trying to create repeat event in single day', 'If you want a recurring date, you must have the start and end dates be different.');
+        this.launchMessage('ERROR: Single Day Recurrence', 'If you want a recurring date, you must have the start and end dates be different.');
       }
       else {
         this.addRecurringEvent(); //Add a recurring event
@@ -360,8 +356,8 @@ class CalendarRobust extends React.Component {
       fetch('/api/calendar', options).then((response) => {
         return response.text()
       }).then((data) => {
-        console.log(data);
         this.props.setCalOriginalCal(this.props.calendarForm.events); //So user can't re-save the same calendar
+        this.launchMessage('Calendar saved successfully!', data);
       }).catch((err) => console.log(err));
     }
     else{
@@ -376,8 +372,8 @@ class CalendarRobust extends React.Component {
         <div>
           <p>To add a single event:</p>
           <ul>
-            <li>Select a starting date/time and ending date/time</li>
-            <li>Do NOT select any of the repeat checkboxes</li>
+            <li>Select a starting and ending date (You can have an event span multiple days)</li>
+            <li>Type in a start and end time for your event, and specify AM or PM</li>
             <li>Provide a description and location for your event</li>
             <li>Click "Add Event"</li>
           </ul>
@@ -386,8 +382,9 @@ class CalendarRobust extends React.Component {
           <p>To add a recurring event:</p>
           <ul>
             <li>Click the checkbox in the upper left corner that says "Create Recurring Event?" to bring up the recurrence options</li>
-            <li>Select the date you wish the recurring event to start on as well as the time that the event will start at in every repitition</li>
-            <li>Select the date you wish the recurrence to end on (inclusive of selected date) and the time the recurring event will end every repitition</li>
+            <li>Select the date you wish the recurring event to start on</li>
+            <li>Select the date you wish the recurrence to end on (inclusive of selected date)</li>
+            <li>Type in a start and end time, which will be applied to every event in the reccurence</li>
             <li>Click the checkboxes for the days of the week you wish the event to repeat on</li>
             <li>If you want, you may select individual dates to exclude and/or include from the repeating event range of dates, if you make a mistake you can press the undo button to remove your last added date</li>
             <li>Provide a description and location for the recurring event</li>
@@ -405,10 +402,13 @@ class CalendarRobust extends React.Component {
             <label style={labelStyle} htmlFor='showRecur'><input style={chkbxStyle} type='checkbox' name='showRecur' onChange={this.handleChange.bind(this, 'showRecur')}/>Create Recurring Event?</label>
           </div>
           <div>
-            <Datetime inputProps={{ placeholder: 'Start Date/Time: MM/DD/YYYY HH:MM AM/PM', style: pickerStyle }} onChange={this.handleChange.bind(this, 'sDate')}/>
+            <Datetime inputProps={{ placeholder: 'Start Date: MM/DD/YYYY', style: pickerStyle }} onChange={this.handleChange.bind(this, 'sDate')} timeFormat={false} closeOnSelect={true}/>
           </div>
           <div>
-            <Datetime inputProps={{ placeholder: 'End Date/Time: MM/DD/YYYY HH:MM AM/PM', style: pickerStyle }} onChange={this.handleChange.bind(this, 'eDate')}/>
+            <Datetime inputProps={{ placeholder: 'End Date: MM/DD/YYYY', style: pickerStyle }} onChange={this.handleChange.bind(this, 'eDate')} timeFormat={false} closeOnSelect={true}/>
+          </div>
+          <div>
+            <TimeRange handleChange={this.handleChange.bind(this)}/>
           </div>
           <div name='recurringEventDiv' hidden={!this.props.calendarForm.showRecur}>
             <div>
@@ -454,9 +454,10 @@ class CalendarRobust extends React.Component {
             <input type='text' style={inputStyle} placeholder='Description' onChange={this.handleChange.bind(this, 'description')}></input>
             <input type='text' style={inputStyle} placeholder='Location' onChange={this.handleChange.bind(this, 'location')}></input>
           </div>
-          <div>
-            <input type='submit' style={buttonStyle} value='Add Event'/>
-            <button type='button' style={buttonStyle} onClick={this.launchMessageButton.bind(this, 'How to add different types of events:', helpMessage)}>Need Help?</button>
+          <div style={{textAlign: 'center'}}>
+            <input type='submit' style={modalBtnStyle} value='Add Event'/>
+            <button type='button' style={modalBtnStyle} onClick={this.launchMessageBtn.bind(this, this.generateTitle('How to add different types of events:'), helpMessage)}>Help</button>
+            <button type='button' style={modalBtnStyle} onClick={this.onCloseModal}>Cancel</button>
           </div>
         </fieldset>
       </form>
@@ -470,7 +471,7 @@ class CalendarRobust extends React.Component {
             {addEventForm}
           </Modal>
           <Modal open={this.props.calendarForm.messageState} onClose={this.onCloseMessage} little>
-            <h2>{this.props.calendarForm.messageTitle}</h2>
+            {this.props.calendarForm.messageTitle}
             {this.props.calendarForm.messageText}
           </Modal>
         </div>
@@ -483,10 +484,10 @@ class CalendarRobust extends React.Component {
             scrollToTime={new Date(1970, 1, 1, 6)}
             defaultDate={new Date()}
             onSelectEvent={event => this.generateSelectedEvent(event)}
-            onSelectSlot={(slotInfo) => this.generateSelectedSlot(slotInfo)}
+            onSelectSlot={(slotInfo) => this.launchMessage('Empty Slot Selected', 'There are no events scheduled in this time slot')}
           />
         </div>
-        <button type='button' style={buttonStyle} onClick={this.handleSave.bind(this)}>Save Calendar</button>
+        <button type='button' style={modalBtnStyle} onClick={this.handleSave.bind(this)}>Save Calendar</button>
       </div>
     );
   }
@@ -516,6 +517,18 @@ var legendStyle = {
   fontWeight: "bold",
   color: "white",
   textAlign: 'center'
+}
+
+var modalBtnStyle = {
+  display: 'inline',
+  margin: '10px 5px 10px 5px',
+  paddingLeft: "10px",
+  paddingRight: "10px",
+  paddingTop: "4px",
+  paddingBottom: "4px",
+  backgroundColor: "white",
+  borderRadius: "4px",
+  color: "#000080"
 }
 
 var buttonStyle = {
@@ -588,7 +601,9 @@ const mapDispatchToProps = (dispatch, ownProps) => {
     setCalMessageText: (messageText) => dispatch(setCalMessageText(messageText)),
     setCalMessageTitle: (messageTitle) => dispatch(setCalMessageTitle(messageTitle)),
     setCalShowRecur: (showRecur) => dispatch(setCalShowRecur(showRecur)),
-    setCalOriginalCal: (originalCal) => dispatch(setCalOriginalCal(originalCal))
+    setCalOriginalCal: (originalCal) => dispatch(setCalOriginalCal(originalCal)),
+    setCalSTime: (sTime) => dispatch(setCalSTime(sTime)),
+    setCalETime: (eTime) => dispatch(setCalETime(eTime))
 	}
 };
 

@@ -63,6 +63,20 @@ export function setCalEDate(eDate){
     }
 }
 
+export function setCalSTime(sTime){
+  return {
+    type: calFormConstants.SET_CAL_S_TIME,
+    sTime
+  }
+}
+
+export function setCalETime(eTime){
+  return {
+    type: calFormConstants.SET_CAL_E_TIME,
+    eTime
+  }
+}
+
 export function setCalRepeatDays(repeatDays){
     return {
         type: calFormConstants.SET_CAL_REPEAT_DAYS,

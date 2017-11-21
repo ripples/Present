@@ -1,3 +1,5 @@
+import _ from 'underscore';
+
 export function getCurrentSemester(){
   var year = new Date().getFullYear().toString().substr(-2);
   var curMonth = new Date().getMonth(); //Jan:0, May=4, Aug=7, Dec=11, 1-3, 5-6, 8-10
@@ -23,6 +25,37 @@ export function getCurrentSemester(){
   return semester + year;
 }
 
+export function getEventDT(date, time){
+  let year = date.getFullYear();
+  let month = date.getMonth();
+  let day = date.getDate();
+  let hour = parseInt(time.substring(1, 3), 10);
+  let min = parseInt(time.substring(3, 5), 10);
+  let sec = parseInt(time.substring(5, 7), 10);
+  return new Date(year, month, day, hour, min, sec);
+}
+
+export function processEvents(events){ //Converts the JSON representation of the start/end times of each event from server into JS Date objects (required by calendar component for reading).
+  let processedEvents = [];
+  for (let event of events){
+    let start = event.start;
+    let end = event.end;
+    event.start = new Date(start);
+    event.end = new Date(end);
+    processedEvents.push(event);
+  }
+  return processedEvents;
+}
+
+export function deepCopy(obj){
+  return JSON.parse(JSON.stringify(obj));
+}
+
+export function formatTime(time){
+  var split = time.split(":");
+  return 'T' + split[0] + split[1] + '00Z'
+}
+
 export function formatDate(date) {
   var split = date.split("-");
   return split[0] + split[1] + split[2];
@@ -42,9 +75,14 @@ export function isEqual(array1, array2){
   }
   else{
     for(let event of array1){
-      if(!array2.includes(event)){
-        return false;
+      var found = false;
+      for(let e2 of array2){
+        if(found){break;}
+        if(_.isEqual(event, e2)){
+          found = true;
+        }
       }
+      if(!found){return false;}
     }
     return true;
   }

@@ -265,7 +265,7 @@ function icsToEventObjectArray(icsFileText) { //Converts the text of an ics file
 	filetextsplit.splice(0, 3); //Remove the first 3 unnecessary lines from file
 	filetextsplit.splice(-1, 1); //Remove last line from file, also don't need
 	var numEvents = parseInt(filetextsplit[filetextsplit.length-10].substring(0, 2)); //Contains the number of events in calendar
-	for(var i = 0; i < numEvents; i++){
+	for(var i = 0; i <= numEvents; i++){
 		var currentEvent = {};
 		for(var line = 0; line < 12; line++){
 			var curline = filetextsplit[0];
@@ -312,7 +312,7 @@ function icsToEventObjectArray(icsFileText) { //Converts the text of an ics file
 					break;
 				case 9:
 					let sem_CID = curline.split(" ");
-					currentEvent.semester = sem_CID[0].substring(23);
+					currentEvent.summary = sem_CID[0].substring(23) + ' ' + sem_CID[1];
 					currentEvent.courseId = sem_CID[1];
 					filetextsplit.splice(0, 1);
 					break;
