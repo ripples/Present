@@ -72,7 +72,7 @@ var noticeStyle = {
 }
 
 var inputStyle = {
-    marginLeft: "325px",
+    marginLeft: "170px",
     marginBottom: "25px",
     fontSize: "16px",
     outline: "none"
