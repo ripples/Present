@@ -13,6 +13,7 @@ import LecturesList from './app/Pages/LecturesList/LecturesList';
 import Lecture from './app/Pages/Lecture/Lecture.js';
 import Calendar from './app/Pages/Calendar/Calendar.js';
 import InstructorSettings from './app/Pages/InstructorSettings/InstructorSettings.js';
+import LectureUpload from './app/Pages/LectureUpload/LectureUpload.js';
 
 
 export default class App extends Component {
@@ -57,6 +58,10 @@ export default class App extends Component {
             <Route path="course/:courseId/lecture/:lectureId" component={Lecture} />
             <Route path="calendar" component={Calendar} />
             <Route path="course/:courseId/instructorSettings" component={InstructorSettings} />
+            <Route path="lectureUpload/" >
+              <IndexRoute component={LectureUpload} />
+              <Route path=":success/" component={LectureUpload} />
+            </Route>
           </Route>
         </Router>
       </Provider>
