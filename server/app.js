@@ -48,6 +48,7 @@ passport.use('lti-strategy', new CustomStrategy(
 			}		
 		}
 		catch(err){
+			console.log("Authenication error", err)
 			callback(err, null)
 		}
 	}

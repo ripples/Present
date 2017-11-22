@@ -21,7 +21,6 @@ router.get('/listOfCourseLectures/:courseId', function (req, res) {
 		if (err) {
 			throw err;
 		} else {
-			appGetLectures = false;
 			res.send(dirTree);
 		}
 	});
@@ -75,7 +74,6 @@ router.get('/image/:courseId/:lectureName/:sourceId/:time', function (req, res) 
 				return result
 			}, []).sort((left, right) => left.time - right.time).pop() //this should be the file
 			if (typeof fileName != 'undefined' && fileName != null) {
-				appGetLectureImages = false;
 				res.sendFile(path.resolve('lectures', req.params.courseId.toString(), req.params.lectureName.toString(), feedType.toLowerCase(), fileName.name))
 			}
 			else {
