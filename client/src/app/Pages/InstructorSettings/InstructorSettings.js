@@ -8,22 +8,26 @@ class InstructorSettings extends Component {
 
         return(
             <div className="container-fluid">
-                <div className="col-md-2">
-                </div>
-                <div className="col-md-8">
-                    <h1>Settings</h1>
-                    <div>
-                        <Link to="/calendar/">
-                        <button style={buttonStyle}>Calendar</button>
-                        </Link>
+                <div className="row" >
+                    <div className="col-md-12">
+                        <h1 style = {headerStyle} >Settings</h1>
+                        <div className="col-md-4">
+                            <div>
+                                <Link to="/calendar/">
+                                <button style={buttonStyle}><div style = {textStyle}>Calendar</div></button>
+                                </Link>
+                            </div>
+                        </div>
+                        <div className="col-md-4">
+                        </div>
+                        <div className="col-md-4">
+                            <div>
+                                <Link to="/lectureUpload/">
+                                    <button style={buttonStyle}><div style = {textStyle}>Lecture Upload</div></button>
+                                </Link>
+                            </div>
+                        </div>
                     </div>
-                    <div>
-                        <Link to="/lectureUpload/">
-                        <button style={buttonStyle}>Lecture Upload</button>
-                        </Link>
-                    </div>
-                </div>
-                <div className="col-md-2">
                 </div>
             </div>
         );
@@ -40,11 +44,22 @@ var buttonStyle= {
     backgroundColor: "white",
     borderRadius: "4px",
     marginTop: "20px",
-    color: "#000080",
+    color: "black",
     paddingLeft: "10px",
     paddingRight: "10px",
     paddingTop: "4px",
-    paddingBottom: "4px"
+    paddingBottom: "4px",
+    border: "solid black 1px",
+    outline: "none"
+}
+
+var headerStyle= {
+	fontWeight: "bold",
+	fontSize: "36px"
+}
+
+var textStyle = {
+    fontSize: "20px"
 }
 
 export default connect(mapStateToProps)(InstructorSettings);

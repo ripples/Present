@@ -66,7 +66,8 @@ const mapDispatchToProps = (dispatch, ownProps) => {
 
 
 var headerStyle = {
-	fontWeight: "bold"
+	fontWeight: "bold",
+	fontSize: "36px"
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(Lecture);

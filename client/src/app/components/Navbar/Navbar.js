@@ -9,14 +9,14 @@ class Navbar extends Component {
         return(
             <div className="navbar navbar-fixed-top navbar-default" style={barStyle}>
                 <div className="container-fluid">
-                    <div className="col-md-4">
+                    <div className="col-md-5">
                         <Link to="/">
-                            <button style={buttonStyle}>
+                            <button className="pull-left" style={buttonStyle}>
                                 <h1 style={headerStyle}>Lecture Viewer 2</h1>
                             </button>
                         </Link>
                     </div>
-                    <div className="col-md-5" >
+                    <div className="col-md-4" >
                     </div>
                     <div className="col-md-3">
                     {
@@ -49,9 +49,7 @@ var buttonStyle= {
     backgroundColor: "#0074D9",
     border: "none",
     outline: "none",
-    fontWeight: "bold",
-    marginBottom: "10px",
-    marginRight: "120px"
+    fontWeight: "bold"
 }
 
 var headerStyle= {
@@ -62,11 +60,11 @@ var headerStyle= {
 var instructorButtonStyle= {
     fontWeight: "bold",
     color: "white",
-    marginTop: "24px",
     fontSize: "25px",
     backgroundColor: "#0074D9",
     border: "none",
-    outline: "none"
+    outline: "none",
+    marginTop: "20px"
 }
 
 export default connect(mapStateToProps)(Navbar);
