@@ -22,6 +22,11 @@ class InstructorSettings extends Component {
                         <button style={buttonStyle}>Lecture Upload</button>
                         </Link>
                     </div>
+                    <div>
+                        <Link to="/lectureDelete/">
+                        <button style={buttonStyle}>Lecture Delete</button>
+                        </Link>
+                    </div>
                 </div>
                 <div className="col-md-2">
                 </div>

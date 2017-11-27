@@ -26,3 +26,9 @@ export const calFormConstants = {
     SET_CAL_COURSE_ID: 'SET_CAL_COURSE_ID',
     CLEAR_FORM: 'CLEAR_FORM'
 }
+
+//lecture delete actions
+export const deleteLectureConstants = {
+    SET_DELETE_LECTURE: "SET_DELETE_LECTURE",
+    CLEAR_DELETE_LECTURE: "CLEAR_DELETE_LECTURE"
+}
