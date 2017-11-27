@@ -1,6 +1,7 @@
 import React from "react";
 import {connect} from "react-redux";
 import {setDeleteLecture, clearDeleteLecture} from '../../Actions/lectureDeleteActions.js';
+import {setCourseFiles} from '../../Actions/courseFilesActions.js';
 
 class LectureDelete extends React.Component {
     
@@ -18,9 +19,16 @@ class LectureDelete extends React.Component {
                                 courseId: this.props.courseId
                                 })}
 
-        fetch('/api/deleteLecture', request).then((response) => {
-            return response.text()
-          }).then((data) => console.log(data)).catch((err) => console.log(err));
+        fetch('/api/deleteLecture', request).then(() => {
+            fetch(('/api/listofCourseLectures/' + this.props.courseId), {
+                credentials: 'same-origin'
+            }).then(res => res.json()).then(cour => {
+                this.props.setCourseFiles(cour);
+            }).then(() => {
+                this.props.router.push('/');
+                this.props.router.push('/lectureDelete/success/');
+            });
+        });
     }
 
     onChange(e){
@@ -28,7 +36,6 @@ class LectureDelete extends React.Component {
     }
 
     render(){
-        console.log(this.props.deleteLecture);
         return(
             <div className="container-fluid">
                 <div className="col-md-3">
@@ -57,7 +64,7 @@ class LectureDelete extends React.Component {
                                     
                                 }
                                 <br/>
-                                <input type="checkbox" required/> I have correctly selected the lecture I want to delete.
+                                <input type="checkbox" ref="approve" required/> I have correctly selected the lecture I want to delete.
                                 <br/>
                                 <br/>
                                 <input type="submit" value="Delete"/>
@@ -97,7 +104,8 @@ const mapDispatchToProps = (dispatch, ownProps) => {
 
     return {
         clearDeleteLecture: () => dispatch(clearDeleteLecture()),
-        setDeleteLecture: (lecture) => dispatch(setDeleteLecture(lecture))
+        setDeleteLecture: (lecture) => dispatch(setDeleteLecture(lecture)),
+        setCourseFiles: (files) => dispatch(setCourseFiles(files))
     }
 }
 

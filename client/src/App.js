@@ -63,7 +63,10 @@ export default class App extends Component {
               <IndexRoute component={LectureUpload} />
               <Route path=":success/" component={LectureUpload} />
             </Route>
-            <Route path="lectureDelete/" component={LectureDelete} />
+            <Route path="lectureDelete/" >
+              <IndexRoute component={LectureDelete} />
+              <Route path=":success/" component={LectureDelete} />
+            </Route>
           </Route>
         </Router>
       </Provider>
