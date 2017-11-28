@@ -28,6 +28,11 @@ class InstructorSettings extends Component {
                             </div>
                         </div>
                     </div>
+                    <div>
+                        <Link to="/lectureDelete/">
+                        <button style={buttonStyle}>Lecture Delete</button>
+                        </Link>
+                    </div>
                 </div>
             </div>
         );
