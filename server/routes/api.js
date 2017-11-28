@@ -143,6 +143,26 @@ router.post("/lectureUpload", function(req, res){
 	res.redirect("http://localhost:3000/#/lectureUpload/success/");
 });
 
+router.delete("/deleteLecture", function(req, res){
+	var path = "./lectures/" + req.body.courseId + "/" + req.body.lecture + "/";
+	deleteFolderRecursive(path);
+	res.send();
+});
+
+var deleteFolderRecursive = function(path) {
+	if( fs.existsSync(path) ) {
+		fs.readdirSync(path).forEach(function(file,index){
+			var curPath = path + "/" + file;
+			if(fs.lstatSync(curPath).isDirectory()) { // recurse
+				deleteFolderRecursive(curPath);
+			} else { // delete file
+				fs.unlinkSync(curPath);
+			}
+		});
+		fs.rmdirSync(path);
+	}
+};
+
 router.post('/calendar', function (req, res) {
 	var sDate = req.body.sDate;
 	var eDate = req.body.eDate;
