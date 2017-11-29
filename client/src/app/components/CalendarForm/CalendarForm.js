@@ -294,7 +294,7 @@ var chkbxStyle = {
 var labelStyle = {
   fontWeight: "bold",
   marginRight: "5px",
-  fontSize: "20px"
+  fontSize: "16px"
 }
 
 var fieldsetStyle = {
