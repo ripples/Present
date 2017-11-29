@@ -16,7 +16,7 @@ class LecturesList extends Component {
 							var patt = /^\d\d-\d\d-\d\d\d\d--\d\d-\d\d-\d\d$/;
 							if (patt.test(course.name)) { 
 								return (
-									<div className = "col-md-3" style={buttonStyles} key={i}>
+									<div className = "col-md-3" key={i}>
 										<div style = {courseStyle}>{convertMonth(course.name.substring(0,10)) + course.name.substring(3,5) + ", " + course.name.substring(6,10)}</div>
 										<Link to={"course/" + this.props.courseId + "/lecture/" + course.name}>
 											<button type="button" style={buttonStyle} />
@@ -72,10 +72,6 @@ var buttonStyle= {
 	position: "relative",
 	boxShadow: "10px 10px 5px #888888",
 	outline: "none"
-}
-
-var buttonStyles= {
-	overflow: "auto"
 }
 
 export default connect(mapStateToProps)(LecturesList);

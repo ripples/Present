@@ -3,11 +3,20 @@ import {connect} from "react-redux";
 import {setLectureTime} from '../../Actions/lectureTimeActions.js';
 import VideoView from "../../components/VideoView/VideoView";
 import LectureImage from '../LectureImage/LectureImage.js';
+import {setLectureImage, clearLectureImage, setImageType, setIndex} from '../../Actions/lectureImageActions.js';
 
 class LectureMedia extends React.Component {
 
+	componentWillMount(){
+		this.props.setImageType("1");
+		this.props.setIndex(0);
+		this.props.setLectureImage('/api/image/' + this.props.courseId + "/" + this.props.lectureId + '/' + this.props.imageType + '-' + this.props.index + '/' + this.props.time);
+	}
+	
+	
 	onVideoTimeUpdate = (newTime) => {
 		this.props.setTime(newTime);
+		this.props.setLectureImage('/api/image/' + this.props.courseId + "/" + this.props.lectureId + '/' + this.props.imageType + '-' + this.props.index + '/' + this.props.time);
 	}
 
 	range(l){
@@ -18,48 +27,45 @@ class LectureMedia extends React.Component {
 		return x
 	}
 
+	onClick(value, type, i, e){
+		this.props.setLectureImage(value);
+		this.props.setImageType(type);
+		this.props.setIndex(i);
+	}
+
 	componentWillUnmount(){
 		this.props.setTime(0);
+		this.props.clearLectureImage();
 	}
 
 	render() {
 		if(this.props.manifest){
 			var computerImages = this.range(this.props.manifest.computerCount).map( (e, i) => {
 				return (
-					<div key={i}>
+					<button key={i} style = {imageButtons} onClick = {this.onClick.bind(this, ('/api/image/' + this.props.courseId + "/" + this.props.lectureId + '/1-' + i + '/' + this.props.time), "1", i)}>
 						<LectureImage src={'/api/image/' + this.props.courseId + "/" + this.props.lectureId + '/1-' + i + '/' + this.props.time} fallbackImage = "no-comp-image-found.png"/>
-					</div>
+					</button>
 				);
 			})
 			var whiteBoardImages = this.range(this.props.manifest.whiteboardCount).map( (e, i) => {
 				return (
-					<div key={i}>
+					<button key={i} style = {imageButtons} onClick = {this.onClick.bind(this, ('/api/image/' + this.props.courseId + "/" + this.props.lectureId + '/2-' + i + '/' + this.props.time), "2", i)}>
 						<LectureImage src={'/api/image/' + this.props.courseId + "/" + this.props.lectureId + '/2-' + i + '/' + this.props.time} fallbackImage = "no-comp-image-found.png"/>
-					</div>
+					</button>
 				);
 			})
 		}
 		return (
 			<div className="lecture-media">
-				<div className="container">
-					<div>
-						<VideoView
-							videoSrc={'/api/video/' + this.props.courseId + "/" + this.props.lectureId } onVideoTimeUpdate={this.onVideoTimeUpdate} />
+				<div className="container-fluid" style ={lectureBody}>
+					<div style = {lectureVideo}>
+						<VideoView videoSrc={'/api/video/' + this.props.courseId + "/" + this.props.lectureId } style={lectureVideo} onVideoTimeUpdate={this.onVideoTimeUpdate} />
+					</div>
+					<div style = {selectedImage}>
+						<LectureImage src = {this.props.lectureImage} fallbackImage = "no-comp-image-found.png"/>
 					</div>
 				</div>
-				<div>
-					<style>{"\
-						img{\
-							max-width : 750px;\
-							max-height : 750px;\
-							border : solid black 1px;\
-							margin : 10px;\
-						}\
-						img:hover{\
-						max-width : 100%;\
-						max-height : 100%;\
-						}\
-					"}</style>
+				<div style = {imageContainer}>
 					{computerImages ? computerImages: null}
 					{whiteBoardImages ? whiteBoardImages: null}
 				</div>
@@ -71,15 +77,53 @@ class LectureMedia extends React.Component {
 const mapStateToProps = state => {
 	
 	return {
-		time: state.lectureTime
+		time: state.lectureTime,
+		lectureImage: state.lectureImage.image,
+		imageType: state.lectureImage.type,
+		index: state.lectureImage.index
 	};
 };
 
 const mapDispatchToProps = (dispatch, ownProps) => {
 	
 	return {
-		setTime: json => dispatch(setLectureTime(json))
+		setTime: (json) => dispatch(setLectureTime(json)),
+		setLectureImage: (image) => dispatch(setLectureImage(image)),
+		clearLectureImage: () => dispatch(clearLectureImage()),
+		setImageType: (type) => dispatch(setImageType(type)),
+		setIndex: (i) => dispatch(setIndex(i))
 	}
 };
+
+var imageButtons = {
+	maxWidth: "20%",
+	maxHeight: "20%",
+	margin: "0",
+	padding:"0",
+	border:"black 1px solid"
+}
+
+var lectureVideo = {
+	position: "absolute"
+}
+
+var selectedImage = {
+	position: "relative",
+	zIndex: "-1",
+	float: "right",
+	border: "black 1px solid",
+	bottom: "0"
+}
+
+var lectureBody = {
+	marginLeft: "0",
+	marginRight: "0",
+	height:"80%"
+}
+
+var imageContainer= {
+	positon: "absolute",
+	bottom:"0"
+}
 
 export default connect(mapStateToProps, mapDispatchToProps)(LectureMedia);

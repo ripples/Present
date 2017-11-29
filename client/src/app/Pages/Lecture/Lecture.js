@@ -25,25 +25,12 @@ class Lecture extends React.Component {
 	render() {
 		return (
 			<div className="container-fluid">
-				<div className="col-md-2">
-				</div>
-				
-				<div className="col-md-8">
-					<div>
-						<h2 style={headerStyle}>
-							{"Lecture: " + convertMonth(this.props.params.lectureId.substring(0,10)) + this.props.params.lectureId.substring(3,5) + ", " + this.props.params.lectureId.substring(6,10)}
-						</h2>
-					</div>
-					<div>
-						<LectureMedia
-							manifest = {this.props.manifest}
-							lectureId = {this.props.params.lectureId}
-							courseId = {this.props.params.courseId}
-						/>
-					</div>
-				</div>
-
-				<div className="col-md-2">
+				<div className="col-md-12">
+					<LectureMedia
+						manifest = {this.props.manifest}
+						lectureId = {this.props.params.lectureId}
+						courseId = {this.props.params.courseId}
+					/>
 				</div>
 			</div>
 		);
