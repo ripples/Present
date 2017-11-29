@@ -12,26 +12,26 @@ class InstructorSettings extends Component {
                     <div className="col-md-12">
                         <h1 style = {headerStyle} >Settings</h1>
                         <div className="col-md-4">
+                        </div>
+                        <div className="col-md-4">
                             <div>
                                 <Link to="/calendar/">
                                 <button style={buttonStyle}><div style = {textStyle}>Calendar</div></button>
                                 </Link>
                             </div>
-                        </div>
-                        <div className="col-md-4">
-                        </div>
-                        <div className="col-md-4">
                             <div>
                                 <Link to="/lectureUpload/">
                                     <button style={buttonStyle}><div style = {textStyle}>Lecture Upload</div></button>
                                 </Link>
                             </div>
+                            <div>
+                                <Link to="/lectureDelete/">
+                                    <button style={buttonStyle}><div style = {textStyle}>Lecture Delete</div></button>
+                                </Link>
+                            </div>
                         </div>
-                    </div>
-                    <div>
-                        <Link to="/lectureDelete/">
-                        <button style={buttonStyle}>Lecture Delete</button>
-                        </Link>
+                        <div className="col-md-4">
+                        </div>
                     </div>
                 </div>
             </div>
@@ -60,7 +60,8 @@ var buttonStyle= {
 
 var headerStyle= {
 	fontWeight: "bold",
-	fontSize: "36px"
+    fontSize: "36px",
+    marginBottom: "40px"
 }
 
 var textStyle = {

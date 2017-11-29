@@ -15,7 +15,7 @@ class LectureUpload extends React.Component {
                             <form method="post" action="http://localhost:3001/api/lectureUpload" encType="multipart/form-data">
                                 <h4 style = {titleStyle}>Please select a file to upload</h4>
                                 <p style = {noticeStyle}><b>NOTE:</b> Only .mp4 videos are supported</p>
-                                <input style = {inputStyle} type="file" accept="video/mp4" name="lectureVideo" required/>
+                                <input style={inputStyle} type="file" accept="video/mp4" name="lectureVideo" required/>
                                 <br/>
                                 <div style = {lectureDateStyle} >Lecture Date: <input type="date" name="lectureDate" required/></div>
                                 <br/>
@@ -72,10 +72,11 @@ var noticeStyle = {
 }
 
 var inputStyle = {
-    marginLeft: "170px",
     marginBottom: "25px",
+    marginLeft: "280px",
     fontSize: "16px",
-    outline: "none"
+    outline: "none",
+    position: "relative"
 }
 
 var lectureDateStyle = {
