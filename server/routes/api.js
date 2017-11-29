@@ -136,7 +136,8 @@ router.get('/calendar/:courseId', function (req, res) { //Gets the calendar for 
 			const eventArray = [];
 			res.status(200).send(eventArray);
 		}
-	});
+	})
+});
 
 router.post("/lectureUpload", function(req, res){
 	const data = JSON.parse(req.body.data);
