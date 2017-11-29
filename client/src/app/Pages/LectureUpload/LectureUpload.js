@@ -11,17 +11,17 @@ class LectureUpload extends React.Component {
                 <div className="col-md-6">
                     { ((typeof(this.props.roles) !== "undefined" && this.props.roles.toLowerCase().includes("instructor")) ?
                         <div>
-                            <h1>Lecture Upload</h1>
+                            <h1 style = {headerStyle}>Lecture Upload</h1>
                             <form method="post" action="http://localhost:3001/api/lectureUpload" encType="multipart/form-data">
-                                <h4>Please select a file to upload</h4>
-                                <p><b>NOTE:</b> Only .mp4 videos are supported</p>
-                                <input type="file" accept="video/mp4" name="lectureVideo" required/>
+                                <h4 style = {titleStyle}>Please select a file to upload</h4>
+                                <p style = {noticeStyle}><b>NOTE:</b> Only .mp4 videos are supported</p>
+                                <input style={inputStyle} type="file" accept="video/mp4" name="lectureVideo" required/>
                                 <br/>
-                                Lecture Date: <input type="date" name="lectureDate" required/>
+                                <div style = {lectureDateStyle} >Lecture Date: <input type="date" name="lectureDate" required/></div>
                                 <br/>
                                 <input type="text" name="courseId" value={this.props.courseId} readOnly required style={hideInput}/>
                                 <br/>
-                                <input type="submit" value="Submit" />
+                                <input style = {submitStyle} type="submit" value="Submit" />
                             </form>
                         </div>
                     :
@@ -53,6 +53,44 @@ const mapStateToProps = state => {
 
 var hideInput = {
     visibility: "hidden"
+}
+
+var headerStyle= {
+	fontWeight: "bold",
+    fontSize: "36px",
+    marginBottom: "40px"
+}
+
+var titleStyle = {
+    fontSize: "24px",
+    marginBottom: "20px"
+}
+
+var noticeStyle = {
+    fontSize: "20px",
+    marginBottom: "110px"
+}
+
+var inputStyle = {
+    marginBottom: "25px",
+    marginLeft: "280px",
+    fontSize: "16px",
+    outline: "none",
+    position: "relative"
+}
+
+var lectureDateStyle = {
+    fontSize: "16px"
+}
+
+var submitStyle = {
+    width: "50%",
+    backgroundColor: "#4CAF50",
+    color: "white",
+    padding: "14px 20px",
+    margin: "8px 0",
+    border: "none",
+    borderRadius: "4px"
 }
 
 export default connect(mapStateToProps)(LectureUpload);
