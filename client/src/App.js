@@ -13,6 +13,8 @@ import LecturesList from './app/Pages/LecturesList/LecturesList';
 import Lecture from './app/Pages/Lecture/Lecture.js';
 import Calendar from './app/Pages/Calendar/Calendar.js';
 import InstructorSettings from './app/Pages/InstructorSettings/InstructorSettings.js';
+import LectureUpload from './app/Pages/LectureUpload/LectureUpload.js';
+import LectureDelete from './app/Pages/LectureDelete/LectureDelete.js';
 
 
 export default class App extends Component {
@@ -34,7 +36,7 @@ export default class App extends Component {
     fetch(('/api/identify/'), {
       credentials: 'same-origin' // or 'include'
     }).then(
-      res => (res.status === 200) ? res.json() : ""
+      res => (res.status < 400) ? res.json() : Promise.reject('bad identify')
     ).then(
       dat =>
       {
@@ -45,7 +47,7 @@ export default class App extends Component {
         this.store.dispatch(setCourseFiles(cour));
         });
       }
-    );
+    ).catch( err => console.log(err));
   }
 
   render() {
@@ -57,6 +59,14 @@ export default class App extends Component {
             <Route path="course/:courseId/lecture/:lectureId" component={Lecture} />
             <Route path="calendar" component={Calendar} />
             <Route path="course/:courseId/instructorSettings" component={InstructorSettings} />
+            <Route path="lectureUpload/" >
+              <IndexRoute component={LectureUpload} />
+              <Route path=":success/" component={LectureUpload} />
+            </Route>
+            <Route path="lectureDelete/" >
+              <IndexRoute component={LectureDelete} />
+              <Route path=":success/" component={LectureDelete} />
+            </Route>
           </Route>
         </Router>
       </Provider>

@@ -8,7 +8,12 @@ var moment = require('moment');
 require('moment-recur');
 
 router.get('/identify/', function (req, res) {
-	res.send(req.session.lti_token);
+	if(req.session.lti_token){
+		res.send(req.session.lti_token);
+	}
+	else{
+		res.status(401).send()
+	}
 });
 
 router.get('/listOfCourseLectures/:courseId', function (req, res) {
@@ -16,7 +21,6 @@ router.get('/listOfCourseLectures/:courseId', function (req, res) {
 		if (err) {
 			throw err;
 		} else {
-			appGetLectures = false;
 			res.send(dirTree);
 		}
 	});
@@ -70,7 +74,6 @@ router.get('/image/:courseId/:lectureName/:sourceId/:time', function (req, res) 
 				return result
 			}, []).sort((left, right) => left.time - right.time).pop() //this should be the file
 			if (typeof fileName != 'undefined' && fileName != null) {
-				appGetLectureImages = false;
 				res.sendFile(path.resolve('lectures', req.params.courseId.toString(), req.params.lectureName.toString(), feedType.toLowerCase(), fileName.name))
 			}
 			else {
@@ -134,7 +137,48 @@ router.get('/calendar/:courseId', function (req, res) { //Gets the calendar for 
 			res.status(200).send(eventArray);
 		}
 	});
+
+router.post("/lectureUpload", function(req, res){
+	const data = JSON.parse(req.body.data);
+	var date = data.lectureDate;
+	date = date.substring(5) + "-" + date.substring(0, 4);
+	var dir = "./lectures/" + data.courseId + "/" + date  + "--00-00-00/";
+	var fileLoc = dir + "videoLarge.mp4";
+
+	if (!fs.existsSync(dir)){
+    fs.mkdirSync(dir);
+	}
+
+	if(!fs.existsSync(fileLoc)){
+		fs.closeSync(fs.openSync(fileLoc, 'w'));
+	}
+
+	var read = fs.createReadStream(req.files.attachment.file);
+	var write = fs.createWriteStream(fileLoc);
+	read.pipe(write);
+
+	res.send();
 });
+
+router.delete("/deleteLecture", function(req, res){
+	var path = "./lectures/" + req.body.courseId + "/" + req.body.lecture + "/";
+	deleteFolderRecursive(path);
+	res.send();
+});
+
+var deleteFolderRecursive = function(path) {
+	if( fs.existsSync(path) ) {
+		fs.readdirSync(path).forEach(function(file,index){
+			var curPath = path + "/" + file;
+			if(fs.lstatSync(curPath).isDirectory()) { // recurse
+				deleteFolderRecursive(curPath);
+			} else { // delete file
+				fs.unlinkSync(curPath);
+			}
+		});
+		fs.rmdirSync(path);
+	}
+};
 
 router.get('/calendar/:recurEvent/:start/:end/:includes/:excludes', function (req, res) {
 	let includes = req.params.includes;
