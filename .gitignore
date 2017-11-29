@@ -64,3 +64,6 @@ lectures/*
 uploads/*
 
 package-lock.json
+
+# vscode
+.vscode
