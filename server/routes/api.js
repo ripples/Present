@@ -123,9 +123,10 @@ router.get('/video/:courseId/:lectureName', function (req, res) {
 });
 
 router.post("/lectureUpload", function(req, res){
-	var date = req.body.lectureDate;
+	const data = JSON.parse(req.body.data);
+	var date = data.lectureDate;
 	date = date.substring(5) + "-" + date.substring(0, 4);
-	var dir = "./lectures/" + req.body.courseId + "/" + date  + "--00-00-00/";
+	var dir = "./lectures/" + data.courseId + "/" + date  + "--00-00-00/";
 	var fileLoc = dir + "videoLarge.mp4";
 	
 	if (!fs.existsSync(dir)){
@@ -136,11 +137,12 @@ router.post("/lectureUpload", function(req, res){
 		fs.closeSync(fs.openSync(fileLoc, 'w'));
 	}
 
-	var read = fs.createReadStream(req.files.lectureVideo.file);
+	var read = fs.createReadStream(req.files.attachment.file);
 	var write = fs.createWriteStream(fileLoc);
 	read.pipe(write);
 	
-	res.redirect("http://localhost:3000/#/lectureUpload/success/");
+	//res.redirect("http://localhost:3000/#/lectureUpload/success/");
+	res.send();
 });
 
 router.delete("/deleteLecture", function(req, res){
