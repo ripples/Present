@@ -141,7 +141,6 @@ router.post("/lectureUpload", function(req, res){
 	var write = fs.createWriteStream(fileLoc);
 	read.pipe(write);
 	
-	//res.redirect("http://localhost:3000/#/lectureUpload/success/");
 	res.send();
 });
 

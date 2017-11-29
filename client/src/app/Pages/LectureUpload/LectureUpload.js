@@ -13,8 +13,8 @@ class LectureUpload extends React.Component {
         this.props.setLectureDate(e.target.value);
     }
 
-    submit(){
-
+    submit(e){
+        e.preventDefault();
         var formData = new FormData();
         formData.append('attachment', this.props.lectureUpload.lectureFile);
         formData.append('data', JSON.stringify({
@@ -22,15 +22,16 @@ class LectureUpload extends React.Component {
             courseId: this.props.courseId
         }));
 
-        fetch('/api/lectureUpload', {method: "POST", body: formData, credentials: 'same-origin'}).then(
-            fetch(('/api/listofCourseLectures/' + this.props.courseId), {
-            credentials: 'same-origin'
-        }).then(res => res.json()).then(cour => {
-            this.props.setCourseFiles(cour);
-        }).then(() => {
-            this.props.router.push('/');
-            this.props.router.push('/lectureUpload/success/');
-        }));
+        fetch('/api/lectureUpload', {method: "POST", body: formData, credentials: 'same-origin'}).then(() => {
+                fetch(('/api/listofCourseLectures/' + this.props.courseId), {
+                credentials: 'same-origin'
+            }).then(res => res.json()).then(cour => {
+                this.props.setCourseFiles(cour);
+            }).then(() => {
+                this.props.router.push('/');
+                this.props.router.push('/lectureUpload/success/');
+            });
+        });
     }
 
     componentWillUnmount(){
