@@ -156,8 +156,12 @@ router.post("/lectureUpload", function(req, res){
 
 	var read = fs.createReadStream(req.files.attachment.file);
 	var write = fs.createWriteStream(fileLoc);
-	read.pipe(write);
-
+	read.pipe(write)
+	
+	read.on('end', () => {
+		deleteFolderRecursive("./uploads/" + req.files.attachment.uuid + "/");		
+	});
+	
 	res.send();
 });
 
