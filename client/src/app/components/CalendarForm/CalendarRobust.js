@@ -289,9 +289,9 @@ class CalendarRobust extends React.Component {
     let end = this.props.calendarForm.eDate;
     let repeatDays = this.props.calendarForm.repeatDays;
     let includes = this.props.calendarForm.includeDates;
-    if(includes.length === 0){includes = -1}
+    if(includes.length === 0){includes = -1} //Important for checking on server, do not change unless in both places.
     let excludes = this.props.calendarForm.excludeDates;
-    if(excludes.length === 0){excludes = -1}
+    if(excludes.length === 0){excludes = -1} //Important for checking on server, do not change unless in both places.
     fetch(('/api/calendar/' + repeatDays + '/' + start + '/' + end + '/' + includes + '/' + excludes), {
       credentials: 'same-origin' // or 'include'
     }).then(res => (res.status === 200 || res.status === 204 || res.status === 304) ? res.json() : []
@@ -367,6 +367,18 @@ class CalendarRobust extends React.Component {
     else{
       this.launchMessage('ERROR: No Changes Made', 'You haven\'t made any changes to the current calendar.');
     }
+  }
+
+  testBtn(e) {
+    e.preventDefault();
+
+    fetch(('/api/calendar/test/'), {
+      credentials: 'same-origin' // or 'include'
+    }).then(
+      res => (res.status === 200 || res.status === 204 || res.status === 304) ? res.text() : []
+    ).then((data) => {
+      console.log(data);
+    }).catch((err) => console.log(err));
   }
 
   render() {
@@ -470,6 +482,7 @@ class CalendarRobust extends React.Component {
     return (
       <div>
         <div>
+          <button type='button' style={buttonStyle} onClick={this.testBtn.bind(this)}>TEST</button>
           <button type='button' style={buttonStyle} onClick={this.onOpenModal}>Add Event(s)</button>
           <Modal open={this.props.calendarForm.modalState} onClose={this.onCloseModal} little>
             {addEventForm}

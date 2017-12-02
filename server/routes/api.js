@@ -197,6 +197,12 @@ router.get('/calendar/:recurEvent/:start/:end/:includes/:excludes', function (re
 	res.status(200).send(filteredDates);
 });
 
+router.get('/calendar/test', function (req, res) {
+	console.log('TEST PATH HIT')
+	testDirs();
+	res.status(200).send("TEST DIR SUCCESS");
+});
+
 router.post('/calendar', function (req, res) {
 	var events = req.body;
 	generateICS(events);
@@ -369,6 +375,13 @@ function icsToEventObjectArray(icsFileText) { //Converts the text of an ics file
 		eventArray.push(currentEvent);
 	}
 	return eventArray;
+}
+
+function testDirs() {
+	const isDirectory = srcPath => fs.lstatSync(srcPath).isDirectory();
+	const getDirectories = srcPath => fs.readdirSync(srcPath).map(name => path.join(srcPath, name)).filter(isDirectory);
+	let dirs = getDirectories('./lectures/');
+	console.log(dirs)
 }
 
 module.exports = router;
