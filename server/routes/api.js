@@ -168,11 +168,14 @@ router.get('/calendar/:courseId', function (req, res) { //Gets the calendar for 
 router.post("/lectureUpload", function(req, res){
 	const data = JSON.parse(req.body.data);
 	const fileName = req.files.attachment.filename;
-
-	if(fileName.toString().toLowerCase().substring(fileName.length - 4) === '.mp4'){
-		uploadVideo(req.files.attachment, data);
-	} else {
-		uploadZip(req.files.attachment, data);
+	try{
+		if(fileName.toString().toLowerCase().substring(fileName.length - 4) === '.mp4'){
+			uploadVideo(req.files.attachment, data);
+		} else {
+			uploadZip(req.files.attachment, data);
+		}
+	} catch(e){
+		res.status(500).send();
 	}
 	
 	res.send();
@@ -182,12 +185,10 @@ function uploadVideo(attachment, data){
 	var date = data.lectureDate;
 	date = date.substring(5) + "-" + date.substring(0, 4);
 	var dir = "./lectures/" + data.courseId + "/" + date  + "--00-00-00/";
+
+	dir = makeLecDir(dir);
+
 	var fileLoc = dir + "videoLarge.mp4";
-
-	if (!fs.existsSync(dir)){
-    fs.mkdirSync(dir);
-	}
-
 	if(!fs.existsSync(fileLoc)){
 		fs.closeSync(fs.openSync(fileLoc, 'w'));
 	}
@@ -205,14 +206,43 @@ function uploadZip(attachment, data){
 	var date = data.lectureDate;
 	date = date.substring(5) + "-" + date.substring(0, 4);
 	var dir = "./lectures/" + data.courseId + "/" + date  + "--00-00-00/";
-	
-	if (!fs.existsSync(dir)){
-		fs.mkdirSync(dir);
-	}
+
+	dir = makeLecDir(dir);
 
 	fs.createReadStream("./uploads/" + attachment.uuid + "/attachment/" + attachment.filename).pipe(unzip.Extract({ path: dir })).on('close', () => {
 		deleteFolderRecursive("./uploads/" + attachment.uuid + "/");
 	});
+}
+
+function makeLecDir(dir){
+	var sec = 0;
+	var strSec = "00";
+	var min = 0;
+	var minStr = "00";
+
+	while(min < 100 && fs.existsSync(dir)){
+		sec = 0;
+		while(sec < 100 && fs.existsSync(dir)){
+			strSec = sec.toString();
+			if(sec < 10){
+				strSec = "0" + strSec;
+			}
+			dir = dir.substring(0, dir.length - 6) + minStr + "-" + strSec + '/';
+			sec++;
+		}
+		min++;
+		minStr = min.toString();
+		if(min < 10){
+			minStr = "0" + minStr;
+		}
+	}
+
+	if(min === 100 && sec === 100 && fs.existsSync(dir)){
+		throw new Error('only 10,000 lectures allowed per day per course');
+	}
+
+	fs.mkdirSync(dir);
+	return dir;
 }
 
 router.delete("/deleteLecture", function(req, res){

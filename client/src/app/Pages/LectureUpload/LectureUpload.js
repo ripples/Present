@@ -22,7 +22,11 @@ class LectureUpload extends React.Component {
             courseId: this.props.courseId
         }));
 
-        fetch('/api/lectureUpload', {method: "POST", body: formData, credentials: 'same-origin'}).then(() => {
+        fetch('/api/lectureUpload', {method: "POST", body: formData, credentials: 'same-origin'}).then(response => {
+            if(!response.ok){
+                throw new Error(response.statusText);
+            }
+        }).then(() => {
                 fetch(('/api/listofCourseLectures/' + this.props.courseId + '/' + this.props.roles + '/'), {
                 credentials: 'same-origin'
             }).then(res => res.json()).then(cour => {
@@ -31,6 +35,9 @@ class LectureUpload extends React.Component {
                 this.props.router.push('/');
                 this.props.router.push('/lectureUpload/success/');
             });
+        }).catch(e => {
+            this.props.router.push('/');
+            this.props.router.push('/lectureUpload/error/');
         });
     }
 
@@ -67,8 +74,14 @@ class LectureUpload extends React.Component {
                     }
 
                     {
-                        (this.props.params.success === "success") ? 
-                            <h3>The video was successfully uploaded.</h3>
+                        (this.props.params.success === "success") ?
+                            <h3>The new lecture was successfully uploaded.</h3>
+                        : null
+                    }
+                    
+                    {
+                        (this.props.params.success === "error") ?
+                            <h3>There was an error uploading the new lecture.</h3>
                         : null 
                     }
                 </div>
