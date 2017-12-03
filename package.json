@@ -29,7 +29,8 @@
     "react-router": "3.0.4",
     "serve-favicon": "~2.4.5",
     "underscore": "^1.8.3",
-    "unzip": "^0.1.11"
+    "unzip": "^0.1.11",
+    "unzip-stream": "^0.2.1"
   },
   "devDependencies": {
     "concurrently": "^1.0.0"

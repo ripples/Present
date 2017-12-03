@@ -1,10 +1,11 @@
 var express = require('express');
 var router = express.Router();
-var dirToJson = require('dir-to-json');
+const dirToJson = require('dir-to-json');
 var path = require('path');
-var fs = require('fs');
+const fs = require('fs');
 var util = require('util');
 var moment = require('moment');
+const unzip = require('unzip-stream');
 require('moment-recur');
 
 router.get('/identify/', function (req, res) {
@@ -166,6 +167,18 @@ router.get('/calendar/:courseId', function (req, res) { //Gets the calendar for 
 
 router.post("/lectureUpload", function(req, res){
 	const data = JSON.parse(req.body.data);
+	const fileName = req.files.attachment.filename;
+
+	if(fileName.toString().toLowerCase().substring(fileName.length - 4) === '.mp4'){
+		uploadVideo(req.files.attachment, data);
+	} else {
+		uploadZip(req.files.attachment, data);
+	}
+	
+	res.send();
+});
+
+function uploadVideo(attachment, data){
 	var date = data.lectureDate;
 	date = date.substring(5) + "-" + date.substring(0, 4);
 	var dir = "./lectures/" + data.courseId + "/" + date  + "--00-00-00/";
@@ -179,16 +192,28 @@ router.post("/lectureUpload", function(req, res){
 		fs.closeSync(fs.openSync(fileLoc, 'w'));
 	}
 
-	var read = fs.createReadStream(req.files.attachment.file);
+	var read = fs.createReadStream(attachment.file);
 	var write = fs.createWriteStream(fileLoc);
-	read.pipe(write)
-	
+	read.pipe(write);
+
 	read.on('end', () => {
-		deleteFolderRecursive("./uploads/" + req.files.attachment.uuid + "/");		
+		deleteFolderRecursive("./uploads/" + attachment.uuid + "/");		
 	});
+}
+
+function uploadZip(attachment, data){
+	var date = data.lectureDate;
+	date = date.substring(5) + "-" + date.substring(0, 4);
+	var dir = "./lectures/" + data.courseId + "/" + date  + "--00-00-00/";
 	
-	res.send();
-});
+	if (!fs.existsSync(dir)){
+		fs.mkdirSync(dir);
+	}
+
+	fs.createReadStream("./uploads/" + attachment.uuid + "/attachment/" + attachment.filename).pipe(unzip.Extract({ path: dir })).on('close', () => {
+		deleteFolderRecursive("./uploads/" + attachment.uuid + "/");
+	});
+}
 
 router.delete("/deleteLecture", function(req, res){
 	var path = "./lectures/" + req.body.courseId + "/" + req.body.lecture + "/";

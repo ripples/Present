@@ -49,8 +49,8 @@ class LectureUpload extends React.Component {
                             <h1 style = {headerStyle}>Lecture Upload</h1>
                             <form onSubmit={this.submit.bind(this)}>
                                 <h4 style = {titleStyle}>Please select a file to upload</h4>
-                                <p style = {noticeStyle}><b>NOTE:</b> Only .mp4 videos are supported</p>
-                                <input style={inputStyle} type="file" accept="video/mp4" name="lectureVideo" onChange={this.setFile.bind(this)} required/>
+                                <p style = {noticeStyle}><b>NOTE:</b> Only .mp4 videos and .zip files are supported.</p>
+                                <input style={inputStyle} type="file" accept="video/mp4,application/zip,application/octet-stream,application/x-zip,application/x-zip-compressed" name="lectureVideo" onChange={this.setFile.bind(this)} required/>
                                 <br/>
                                 <div style = {lectureDateStyle} >Lecture Date: <input type="date" name="lectureDate" onChange={this.setDate.bind(this)} required/></div>
                                 <br/>
