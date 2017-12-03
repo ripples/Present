@@ -16,15 +16,40 @@ router.get('/identify/', function (req, res) {
 	}
 });
 
-router.get('/listOfCourseLectures/:courseId', function (req, res) {
+router.get('/listOfCourseLectures/:courseId/:roles/', function (req, res) {
 	dirToJson("./lectures/" + req.params.courseId.toString(), function (err, dirTree) {
 		if (err) {
 			throw err;
 		} else {
+			dirTree.children = dirTree.children.filter((lecture) => {
+				var patt = /^\d\d-\d\d-\d\d\d\d--\d\d-\d\d-\d\d$/;
+				if(patt.test(lecture.name)){
+					return true;
+				} else {
+					return false;
+				}
+			});
+
+			if(!req.params.roles.toString().toLowerCase().includes("instructor")){ //not instructor so filter future lectures out
+				var date = new Date();
+				dirTree.children = dirTree.children.filter((lecture) => {
+					var lecDate = getLectureDate(lecture.name);
+					
+					if(lecDate > date){
+						return false;
+					} else {
+						return true;
+					}
+				});
+			}
 			res.send(dirTree);
 		}
 	});
 });
+
+function getLectureDate(lecture){
+	return new Date(parseInt(lecture.substring(6, 11)), parseInt(lecture.substring(0, 2)) - 1, parseInt(lecture.substring(3, 5)));
+}
 
 router.get('/manifest/:courseId/:lectureName', function (req, res) {
 	const fpath = "./lectures/" + req.params.courseId.toString() + '/' + req.params.lectureName.toString() + '/INFO'

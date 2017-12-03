@@ -23,7 +23,7 @@ class LectureUpload extends React.Component {
         }));
 
         fetch('/api/lectureUpload', {method: "POST", body: formData, credentials: 'same-origin'}).then(() => {
-                fetch(('/api/listofCourseLectures/' + this.props.courseId), {
+                fetch(('/api/listofCourseLectures/' + this.props.courseId + '/' + this.props.roles + '/'), {
                 credentials: 'same-origin'
             }).then(res => res.json()).then(cour => {
                 this.props.setCourseFiles(cour);
