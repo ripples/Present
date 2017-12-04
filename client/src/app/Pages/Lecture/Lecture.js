@@ -1,7 +1,8 @@
 import React from "react";
 import {connect} from "react-redux";
-import {setLectureManifest} from '../../Actions/action.js';
+import {setLectureManifest} from '../../Actions/lectureManifestActions.js';
 import LectureMedia from "../../components/LectureMedia/LectureMedia";
+import {convertMonth} from '../../utils/utils.js';
 
 class Lecture extends React.Component {
 
@@ -30,7 +31,7 @@ class Lecture extends React.Component {
 				<div className="col-md-8">
 					<div>
 						<h2 style={headerStyle}>
-							{"Lecture: " + this.props.params.lectureId.substring(0,10)}
+							{"Lecture: " + convertMonth(this.props.params.lectureId.substring(0,10)) + this.props.params.lectureId.substring(3,5) + ", " + this.props.params.lectureId.substring(6,10)}
 						</h2>
 					</div>
 					<div>
@@ -65,7 +66,8 @@ const mapDispatchToProps = (dispatch, ownProps) => {
 
 
 var headerStyle = {
-	fontWeight: "bold"
+	fontWeight: "bold",
+	fontSize: "36px"
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(Lecture);

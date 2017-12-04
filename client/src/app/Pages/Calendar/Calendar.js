@@ -1,13 +1,20 @@
 import React, { Component } from 'react';
 import {connect} from "react-redux";
-import CalendarForm from '../../components/CalendarForm/CalendarForm';
+import CalendarRobust from '../../components/CalendarForm/CalendarRobust';
 
 class Calendar extends Component {
 
     render(){
         return(
             <div>
-                <CalendarForm courseId={this.props.courseId}/>
+                {
+                    (typeof(this.props.roles) !== "undefined" && this.props.roles.toLowerCase().includes("instructor")) ?
+                        <CalendarRobust />
+                    :
+                        <div>
+                            <h3>You are not an instructor for this course</h3>
+                        </div>
+                }
             </div>
         );
     }
@@ -15,7 +22,8 @@ class Calendar extends Component {
 
 const mapStateToProps = state => {
     return {
-        courseId: state.token.lis_course_section_sourcedid
+        courseId: state.token.lis_course_section_sourcedid,
+        roles: state.token.roles
     };
 };
 

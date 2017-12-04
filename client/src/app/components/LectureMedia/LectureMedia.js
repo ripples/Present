@@ -1,6 +1,6 @@
 import React from "react";
 import {connect} from "react-redux";
-import {setLectureTime} from '../../Actions/action.js';
+import {setLectureTime} from '../../Actions/lectureTimeActions.js';
 import VideoView from "../../components/VideoView/VideoView";
 import LectureImage from '../LectureImage/LectureImage.js';
 
@@ -27,14 +27,14 @@ class LectureMedia extends React.Component {
 			var computerImages = this.range(this.props.manifest.computerCount).map( (e, i) => {
 				return (
 					<div key={i}>
-						<LectureImage src={'/api/image/' + this.props.courseId + "/" + this.props.lectureId + '/1-' + i + '/' + this.props.time} alt="Computer Screen" />
+						<LectureImage src={'/api/image/' + this.props.courseId + "/" + this.props.lectureId + '/1-' + i + '/' + this.props.time} fallbackImage = "no-comp-image-found.png"/>
 					</div>
 				);
 			})
 			var whiteBoardImages = this.range(this.props.manifest.whiteboardCount).map( (e, i) => {
 				return (
 					<div key={i}>
-						<LectureImage src={'/api/image/' + this.props.courseId + "/" + this.props.lectureId + '/2-' + i + '/' + this.props.time} alt="Whiteboard"/>
+						<LectureImage src={'/api/image/' + this.props.courseId + "/" + this.props.lectureId + '/2-' + i + '/' + this.props.time} fallbackImage = "no-comp-image-found.png"/>
 					</div>
 				);
 			})
