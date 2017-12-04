@@ -1,4 +1,4 @@
-var proxy = require('redbird')({port: process.env.PROXY_PORT});
+var proxy = require('redbird')({port: parseInt(process.env.PROXY_PORT)});
 
 const serverPathAndPort = process.env.SERVER_PATH + ":" + process.env.SERVER_PORT
 
