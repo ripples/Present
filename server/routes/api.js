@@ -8,10 +8,10 @@ var moment = require('moment');
 require('moment-recur');
 
 router.get('/identify/', function (req, res) {
-	if(req.session.lti_token){
+	if (req.session.lti_token) {
 		res.send(req.session.lti_token);
 	}
-	else{
+	else {
 		res.status(401).send()
 	}
 });
@@ -124,9 +124,9 @@ router.get('/video/:courseId/:lectureName', function (req, res) {
 
 router.get('/calendar/:courseId', function (req, res) { //Gets the calendar for a given class
 	const fpath = "./lectures/" + req.params.courseId.toString() + "/Calendar.ics"
-	fs.exists(fpath, function(exists) {
-		if(exists) {
-			fs.readFile(fpath, function(err, data) {
+	fs.exists(fpath, function (exists) {
+		if (exists) {
+			fs.readFile(fpath, function (err, data) {
 				if (err) throw err;
 				const eventArray = icsToEventObjectArray(data.toString());
 				res.status(200).send(eventArray);
@@ -139,18 +139,18 @@ router.get('/calendar/:courseId', function (req, res) { //Gets the calendar for 
 	})
 });
 
-router.post("/lectureUpload", function(req, res){
+router.post("/lectureUpload", function (req, res) {
 	const data = JSON.parse(req.body.data);
 	var date = data.lectureDate;
 	date = date.substring(5) + "-" + date.substring(0, 4);
-	var dir = "./lectures/" + data.courseId + "/" + date  + "--00-00-00/";
+	var dir = "./lectures/" + data.courseId + "/" + date + "--00-00-00/";
 	var fileLoc = dir + "videoLarge.mp4";
 
-	if (!fs.existsSync(dir)){
-    fs.mkdirSync(dir);
+	if (!fs.existsSync(dir)) {
+		fs.mkdirSync(dir);
 	}
 
-	if(!fs.existsSync(fileLoc)){
+	if (!fs.existsSync(fileLoc)) {
 		fs.closeSync(fs.openSync(fileLoc, 'w'));
 	}
 
@@ -161,17 +161,17 @@ router.post("/lectureUpload", function(req, res){
 	res.send();
 });
 
-router.delete("/deleteLecture", function(req, res){
+router.delete("/deleteLecture", function (req, res) {
 	var path = "./lectures/" + req.body.courseId + "/" + req.body.lecture + "/";
 	deleteFolderRecursive(path);
 	res.send();
 });
 
-var deleteFolderRecursive = function(path) {
-	if( fs.existsSync(path) ) {
-		fs.readdirSync(path).forEach(function(file,index){
+var deleteFolderRecursive = function (path) {
+	if (fs.existsSync(path)) {
+		fs.readdirSync(path).forEach(function (file, index) {
 			var curPath = path + "/" + file;
-			if(fs.lstatSync(curPath).isDirectory()) { // recurse
+			if (fs.lstatSync(curPath).isDirectory()) { // recurse
 				deleteFolderRecursive(curPath);
 			} else { // delete file
 				fs.unlinkSync(curPath);
@@ -184,16 +184,16 @@ var deleteFolderRecursive = function(path) {
 router.get('/calendar/:recurEvent/:start/:end/:includes/:excludes', function (req, res) {
 	let includes = req.params.includes;
 	let excludes = req.params.excludes;
-	if(includes === '-1'){includes = [];}
-	else{includes = includes.split(',');}
-	if(excludes === '-1'){excludes = [];}
-	else{excludes = excludes.split(',');}
+	if (includes === '-1') { includes = []; }
+	else { includes = includes.split(','); }
+	if (excludes === '-1') { excludes = []; }
+	else { excludes = excludes.split(','); }
 	let sDate = formatRecurringDate(new Date(req.params.start));
 	let eDate = formatRecurringDate(new Date(req.params.end));
 	var recurrence = moment.recur(sDate, eDate).every(req.params.recurEvent.split(',')).daysOfWeek();
 	var dates = recurrence.all("YYYYMMDD");
 	var addedIncludes = includeDates(includes, dates, excludes);
-	var filteredDates = addedIncludes.filter(function(e){return excludes.indexOf(e)<0}); //Returns array with excluded dates removed, still in chronological order
+	var filteredDates = addedIncludes.filter(function (e) { return excludes.indexOf(e) < 0 }); //Returns array with excluded dates removed, still in chronological order
 	res.status(200).send(filteredDates);
 });
 
@@ -212,7 +212,7 @@ function generateICS(events) {
 	fileText += START_TAG;
 	var courseId = events[0].courseId;
 	var index = 0;
-	for(let event of events){
+	for (let event of events) {
 		fileText += "BEGIN:VEVENT\n";
 		fileText += "UID:" + DTSTAMP + "-LV-" + event.title + "\n";
 		fileText += (index + "@default\nCLASS:PUBLIC\n");
@@ -227,66 +227,66 @@ function generateICS(events) {
 	}
 	fileText += END_TAG;
 	fs.writeFileSync("./lectures/" + courseId + "/Calendar.ics", fileText, function (err) {
-	  if (err) return console.log(err);
+		if (err) return console.log(err);
 	});
-  let fetch = require('node-fetch');
-  let FormData = require('form-data');
-  const stats = fs.statSync("./lectures/" + courseId + "/Calendar.ics");
-  const fileSizeInBytes = stats.size;
-  var body = new FormData();
-  var filedata = 0
-  try {
-  filedata = fs.readFileSync("./lectures/" + courseId + "/Calendar.ics", 'utf8');
-  } catch(e) {
-	  console.log('Error:', e.stack);
-  }
+	let fetch = require('node-fetch');
+	let FormData = require('form-data');
+	const stats = fs.statSync("./lectures/" + courseId + "/Calendar.ics");
+	const fileSizeInBytes = stats.size;
+	var body = new FormData();
+	var filedata = 0
+	try {
+		filedata = fs.readFileSync("./lectures/" + courseId + "/Calendar.ics", 'utf8');
+	} catch (e) {
+		console.log('Error:', e.stack);
+	}
 
-  body.append('file', filedata);
-  fetch('http://cap142.cs.umass.edu:8001/', { //Send the newly created schedule to the capture server
-	  method: 'POST',
-	  headers: {
-			  'Content-Length': fileSizeInBytes,
-			  'Content-Type': undefined //To set data boundaries automatically... workaround
-			  //'Authorization': 'Basic' + base64.encode(username + ":" + password)
-		  },
-	  body: body
-  })
-  .then(function(res) {
-	  return res.text();
-  }).then(function(text) {
-	  console.log(text);
-  }).catch(function(error) {
-		console.log('Fetch operation error: ' + error.message);
-  });
+	body.append('file', filedata);
+	fetch('http://cap142.cs.umass.edu:8001/', { //Send the newly created schedule to the capture server
+		method: 'POST',
+		headers: {
+			'Content-Length': fileSizeInBytes,
+			'Content-Type': undefined //To set data boundaries automatically... workaround
+			//'Authorization': 'Basic' + base64.encode(username + ":" + password)
+		},
+		body: body
+	})
+		.then(function (res) {
+			return res.text();
+		}).then(function (text) {
+			console.log(text);
+		}).catch(function (error) {
+			console.log('Fetch operation error: ' + error.message);
+		});
 }
 
-function jsDateToICSDate(datestring){
-	let yyyy = datestring.substring(0,4);
+function jsDateToICSDate(datestring) {
+	let yyyy = datestring.substring(0, 4);
 	let mm = datestring.substring(5, 7);
-	let dd  = datestring.substring(8, 10);
+	let dd = datestring.substring(8, 10);
 	let hh = datestring.substring(11, 13);
 	let min = datestring.substring(14, 16);
 	let ss = datestring.substring(17, 19);
 	return (yyyy + mm + dd + 'T' + hh + min + ss + "Z");
 }
 
-function isDuplicate(date, dates, excludes){
+function isDuplicate(date, dates, excludes) {
 	return (dates.includes(date) && !excludes.includes(date));
 }
 
-function formatRecurringDate(date){
+function formatRecurringDate(date) {
 	let year = date.getFullYear().toString();
-	let month = (date.getMonth()+1).toString();
+	let month = (date.getMonth() + 1).toString();
 	let day = date.getDate().toString();
-	if(month.length === 1) {month = '0' + month;}
-	if(day.length === 1) {day = '0' + day;}
-	return moment(year+month+day, "YYYYMMDD");
+	if (month.length === 1) { month = '0' + month; }
+	if (day.length === 1) { day = '0' + day; }
+	return moment(year + month + day, "YYYYMMDD");
 }
 
 function includeDates(includes, initial, excludes) {
 	var newArr = initial;
-	for(var i = 0; i < includes.length; i++){
-		if(!isDuplicate(includes[i], initial, excludes)){
+	for (var i = 0; i < includes.length; i++) {
+		if (!isDuplicate(includes[i], initial, excludes)) {
 			newArr = newArr.concat(includes[i]);
 		}
 	}
@@ -309,12 +309,12 @@ function icsToEventObjectArray(icsFileText) { //Converts the text of an ics file
 	var filetextsplit = icsFileText.split('\n');
 	filetextsplit.splice(0, 3); //Remove the first 3 unnecessary lines from file
 	filetextsplit.splice(-1, 1); //Remove last line from file, also don't need
-	var numEvents = parseInt(filetextsplit[filetextsplit.length-10].substring(0, 2)); //Contains the number of events in calendar
-	for(var i = 0; i <= numEvents; i++){
+	var numEvents = parseInt(filetextsplit[filetextsplit.length - 10].substring(0, 2)); //Contains the number of events in calendar
+	for (var i = 0; i <= numEvents; i++) {
 		var currentEvent = {};
-		for(var line = 0; line < 12; line++){
+		for (var line = 0; line < 12; line++) {
 			var curline = filetextsplit[0];
-			switch(line){
+			switch (line) {
 				case 1:
 					let title = curline.split("-LV-");
 					currentEvent.title = title[1];
@@ -322,8 +322,8 @@ function icsToEventObjectArray(icsFileText) { //Converts the text of an ics file
 					break;
 				case 4:
 					var description = curline.substring(12);
-					if(description === '') {continue;}
-					else {currentEvent.description = curline.substring(12);}
+					if (description === '') { continue; }
+					else { currentEvent.description = curline.substring(12); }
 					filetextsplit.splice(0, 1);
 					break;
 				case 6:
@@ -332,8 +332,8 @@ function icsToEventObjectArray(icsFileText) { //Converts the text of an ics file
 					var day = curline.substring(30, 32);
 					var hour = curline.substring(33, 35);
 					var min = curline.substring(35, 37);
-					if(month.length === 1) {month = '0' + month;}
-					if(day.length === 1) {day = '0' + day;}
+					if (month.length === 1) { month = '0' + month; }
+					if (day.length === 1) { day = '0' + day; }
 					var datestring = year + '-' + month + '-' + day + 'T' + hour + ':' + min + ':00Z';
 					currentEvent.start = new Date(datestring);
 					filetextsplit.splice(0, 1);
@@ -344,8 +344,8 @@ function icsToEventObjectArray(icsFileText) { //Converts the text of an ics file
 					var day = curline.substring(28, 30);
 					var hour = curline.substring(31, 33);
 					var min = curline.substring(33, 35);
-					if(month.length === 1) {month = '0' + month;}
-					if(day.length === 1) {day = '0' + day;}
+					if (month.length === 1) { month = '0' + month; }
+					if (day.length === 1) { day = '0' + day; }
 					var datestring = year + '-' + month + '-' + day + 'T' + hour + ':' + min + ':00Z';
 					let end = new Date(datestring);
 					currentEvent.end = end;
