@@ -5,6 +5,9 @@ This is a stripped down version of lecture viewer that will be accessed through 
 How To Setup
 ---
 
+On Windows, please install [OpenSSL](https://slproweb.com/products/Win32OpenSSL.html)
+and [windows build tools](https://github.com/felixrieseberg/windows-build-tools)
+
 1. install node
 2. install a local version of moodle
 3. clone the repository
@@ -35,3 +38,34 @@ file tree should be:
 16. select the new configuration for your activities preconfigured tool
 17. finish creating the activity
 18. leave editing mode and click on the activiy. If it brings you to our web app, everything is working properly.
+
+Production
+---
+When running in production, one may wish to set env files, that may be done with the following:
+
+In the root directory, make a file with `.env` that contains the following keys, but different values (default values shown):
+```
+KEY="You'll Never Walk Alone"
+HOST=http://localhost/
+PORT=3001
+```
+
+In `/client` make another `.env ` with the following keys and some value
+
+```
+HOST=http://present.cs.umass.edu/
+PORT=80
+```
+
+## .env file
+
+```
+PRODUCTION=true
+PATH_TO_BUILD="C:/dev/lv-client2/client/build/"
+SERVER_PATH=localhost
+SERVER_PORT=3001
+PRESENT_PATH=localhost
+PRESENT_PORT=3000
+PROXY_PORT=80
+SECRET="Bye bye baby blue"
+```
