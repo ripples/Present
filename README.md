@@ -53,3 +53,16 @@ In `/client` make another `.env ` with the following keys and some value
 HOST=http://present.cs.umass.edu/
 PORT=80
 ```
+
+## .env file
+
+```
+PRODUCTION=true
+PATH_TO_BUILD="C:/dev/lv-client2/client/build/"
+SERVER_PATH=localhost
+SERVER_PORT=3001
+PRESENT_PATH=localhost
+PRESENT_PORT=3000
+PROXY_PORT=80
+SECRET="Bye bye baby blue"
+```
