@@ -5,6 +5,9 @@ This is a stripped down version of lecture viewer that will be accessed through 
 How To Setup
 ---
 
+On Windows, please install [OpenSSL](https://slproweb.com/products/Win32OpenSSL.html)
+and [windows build tools](https://github.com/felixrieseberg/windows-build-tools)
+
 1. install node
 2. install a local version of moodle
 3. clone the repository
