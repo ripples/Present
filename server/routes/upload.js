@@ -1,7 +1,7 @@
 var express = require('express');
 var router = express.Router();
-const fs = require('fs')
-const unzip = require('unzip')
+const fs = require('fs');
+const unzip = require('unzip');
 
 router.post('/upload/lecture-zip', function (req, res) {
 	const file = req.files.file
@@ -37,7 +37,7 @@ router.post('/upload/:courseId/lecture-zip', function (req, res) {
 	//now cleanup
 	fs.unlink(tmp_path, (err) => {
 		if (err) console.log("Error deleting file \"" + tmp_path + "\", consider removing files in tmp upload directory \nERR: " + err)
-	})
+	});
 });
 
 module.exports = router;

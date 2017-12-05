@@ -1,10 +1,11 @@
 var express = require('express');
 var router = express.Router();
-var dirToJson = require('dir-to-json');
+const dirToJson = require('dir-to-json');
 var path = require('path');
-var fs = require('fs');
+const fs = require('fs');
 var util = require('util');
 var moment = require('moment');
+const unzip = require('unzip-stream');
 require('moment-recur');
 
 router.get('/identify/', function (req, res) {
@@ -16,15 +17,40 @@ router.get('/identify/', function (req, res) {
 	}
 });
 
-router.get('/listOfCourseLectures/:courseId', function (req, res) {
+router.get('/listOfCourseLectures/:courseId/:roles/', function (req, res) {
 	dirToJson("./lectures/" + req.params.courseId.toString(), function (err, dirTree) {
 		if (err) {
 			throw err;
 		} else {
+			dirTree.children = dirTree.children.filter((lecture) => {
+				var patt = /^\d\d-\d\d-\d\d\d\d--\d\d-\d\d-\d\d$/;
+				if(patt.test(lecture.name)){
+					return true;
+				} else {
+					return false;
+				}
+			});
+
+			if(!req.params.roles.toString().toLowerCase().includes("instructor")){ //not instructor so filter future lectures out
+				var date = new Date();
+				dirTree.children = dirTree.children.filter((lecture) => {
+					var lecDate = getLectureDate(lecture.name);
+					
+					if(lecDate > date){
+						return false;
+					} else {
+						return true;
+					}
+				});
+			}
 			res.send(dirTree);
 		}
 	});
 });
+
+function getLectureDate(lecture){
+	return new Date(parseInt(lecture.substring(6, 11)), parseInt(lecture.substring(0, 2)) - 1, parseInt(lecture.substring(3, 5)));
+}
 
 router.get('/manifest/:courseId/:lectureName', function (req, res) {
 	const fpath = "./lectures/" + req.params.courseId.toString() + '/' + req.params.lectureName.toString() + '/INFO'
@@ -141,25 +167,83 @@ router.get('/calendar/:courseId', function (req, res) { //Gets the calendar for 
 
 router.post("/lectureUpload", function (req, res) {
 	const data = JSON.parse(req.body.data);
+	const fileName = req.files.attachment.filename;
+	try{
+		if(fileName.toString().toLowerCase().substring(fileName.length - 4) === '.mp4'){
+			uploadVideo(req.files.attachment, data);
+		} else {
+			uploadZip(req.files.attachment, data);
+		}
+	} catch(e){
+		res.status(500).send();
+	}
+	
+	res.send();
+});
+
+function uploadVideo(attachment, data){
 	var date = data.lectureDate;
 	date = date.substring(5) + "-" + date.substring(0, 4);
-	var dir = "./lectures/" + data.courseId + "/" + date + "--00-00-00/";
+	var dir = "./lectures/" + data.courseId + "/" + date  + "--00-00-00/";
+
+	dir = makeLecDir(dir);
+
 	var fileLoc = dir + "videoLarge.mp4";
-
-	if (!fs.existsSync(dir)) {
-		fs.mkdirSync(dir);
-	}
-
-	if (!fs.existsSync(fileLoc)) {
+	if(!fs.existsSync(fileLoc)){
 		fs.closeSync(fs.openSync(fileLoc, 'w'));
 	}
 
-	var read = fs.createReadStream(req.files.attachment.file);
+	var read = fs.createReadStream(attachment.file);
 	var write = fs.createWriteStream(fileLoc);
 	read.pipe(write);
 
-	res.send();
-});
+	read.on('end', () => {
+		deleteFolderRecursive("./uploads/" + attachment.uuid + "/");		
+	});
+}
+
+function uploadZip(attachment, data){
+	var date = data.lectureDate;
+	date = date.substring(5) + "-" + date.substring(0, 4);
+	var dir = "./lectures/" + data.courseId + "/" + date  + "--00-00-00/";
+
+	dir = makeLecDir(dir);
+
+	fs.createReadStream("./uploads/" + attachment.uuid + "/attachment/" + attachment.filename).pipe(unzip.Extract({ path: dir })).on('close', () => {
+		deleteFolderRecursive("./uploads/" + attachment.uuid + "/");
+	});
+}
+
+function makeLecDir(dir){
+	var sec = 0;
+	var strSec = "00";
+	var min = 0;
+	var minStr = "00";
+
+	while(min < 100 && fs.existsSync(dir)){
+		sec = 0;
+		while(sec < 100 && fs.existsSync(dir)){
+			strSec = sec.toString();
+			if(sec < 10){
+				strSec = "0" + strSec;
+			}
+			dir = dir.substring(0, dir.length - 6) + minStr + "-" + strSec + '/';
+			sec++;
+		}
+		min++;
+		minStr = min.toString();
+		if(min < 10){
+			minStr = "0" + minStr;
+		}
+	}
+
+	if(min === 100 && sec === 100 && fs.existsSync(dir)){
+		throw new Error('only 10,000 lectures allowed per day per course');
+	}
+
+	fs.mkdirSync(dir);
+	return dir;
+}
 
 router.delete("/deleteLecture", function (req, res) {
 	var path = "./lectures/" + req.body.courseId + "/" + req.body.lecture + "/";
