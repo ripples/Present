@@ -32,3 +32,8 @@ export const deleteLectureConstants = {
     SET_DELETE_LECTURE: "SET_DELETE_LECTURE",
     CLEAR_DELETE_LECTURE: "CLEAR_DELETE_LECTURE"
 }
+
+export const instructorSettingsConstants = {
+    SET_INSTRUCTOR_PAGE: 'SET_INSTRUCTOR_PAGE',
+    CLEAR_INSTRUCTOR_PAGE: 'CLEAR_INSTRUCTOR_PAGE'
+}
