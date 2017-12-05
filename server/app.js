@@ -73,7 +73,7 @@ app.use(passport.authenticate('lti-strategy', {failureFlash: true}));
 
 app.post('/data', function (req, res) {
 	req.session.lti_token = req.body;
-	const url = `http://${process.env.PRESENT_PATH}/`
+	const url = 'http://' + process.env.PRESENT_PATH + ':' + process.env.PROXY_PORT
 
 	res.redirect(url);
 })

@@ -2,11 +2,11 @@ var proxy = require('redbird')({port: parseInt(process.env.PROXY_PORT)});
 
 const serverPathAndPort = process.env.SERVER_PATH + ":" + process.env.SERVER_PORT
 
-if(process.env.PRODUCTION == "true"){
+if(process.env.PRODUCTION || process.env.PRODUCTION == "true"){
 	proxy.register(process.env.PRESENT_PATH, "http://" + serverPathAndPort+ "/");		
 }
 else{
-	proxy.register(process.env.PRESENT_PATH, "http://" + process.env.PRESENT_PATH + ":" + process.env.PRESENT_PORT + "/");
+	proxy.register(process.env.PRESENT_PATH + ':' + process.env.PROXY_PORT, "http://" + process.env.PRESENT_PATH + ":" + process.env.PRESENT_PORT + "/");
 }
 proxy.register(process.env.PRESENT_PATH + "/api", "http://" + serverPathAndPort + "/api");
 
