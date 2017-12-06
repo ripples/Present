@@ -60,7 +60,7 @@ class LectureUpload extends React.Component {
                             <p style = {noticeStyle}><b>NOTE:</b> Only .mp4 videos and .zip files are supported.</p>
                             <input style={inputStyle} type="file" accept="video/mp4,application/zip,application/octet-stream,application/x-zip,application/x-zip-compressed" name="lectureVideo" onChange={this.setFile.bind(this)} required/>
                             <br/>
-                            <div style = {lectureDateStyle} >Lecture Date: <input type="date" name="lectureDate" onChange={this.setDate.bind(this)} required/></div>
+                            <div style = {lectureDateStyle} >Lecture Date: <input type="date" name="lectureDate" onChange={this.setDate.bind(this)} required style={dateStyle}/></div>
                             <br/>
                             <input type="text" name="courseId" value={this.props.courseId} readOnly required style={hideInput}/>
                             <br/>
@@ -121,7 +121,7 @@ var noticeStyle = {
 
 var inputStyle = {
     marginBottom: "25px",
-    marginLeft: "280px",
+    marginLeft: "25%",
     fontSize: "16px",
     outline: "none",
     position: "relative",
