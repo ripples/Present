@@ -37,7 +37,7 @@ export default class App extends Component {
     ).then(
       token =>
       {
-        fetch(('/api/listofCourseLectures/' + token.lis_course_section_sourcedid + '/' + token.roles + '/'), {
+        fetch(('/api/listofCourseLectures/' + token.lis_course_section_sourcedid + '/'), {
           credentials: 'same-origin'
 		  }).then(res => res.json()).then(course => {
         this.store.dispatch(setToken(token));
