@@ -357,11 +357,12 @@ class CalendarRobust extends React.Component {
                     credentials: 'same-origin',
                     body: JSON.stringify(this.props.calendarForm.events)};
 
-      fetch('/api/calendar', options).then((response) => {
+      fetch('/api/calendar/' + this.props.courseId, options).then((response) => {
         return response.text()
       }).then((data) => {
-        this.props.setCalOriginalCal(this.props.calendarForm.events); //So user can't re-save the same calendar
+        this.props.setCalOriginalCal(deepCopy(this.props.calendarForm.events)); //So user can't re-save the same calendar
         this.launchMessage('Calendar saved successfully!', data);
+
       }).catch((err) => console.log(err));
     }
     else{
