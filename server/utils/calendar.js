@@ -46,7 +46,7 @@ module.exports = {
   	}
 
   	body.append('file', filedata);
-  	fetch('http://cap142.cs.umass.edu:3001/', { //Send the newly created schedule to the capture server
+  	fetch('http://cap142.cs.umass.edu:8001/', { //Send the newly created schedule to the capture server
   		method: 'POST',
   		headers: {
   			'Content-Length': fileSizeInBytes,
