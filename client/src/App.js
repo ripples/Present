@@ -38,13 +38,13 @@ export default class App extends Component {
     }).then(
       res => (res.status < 400) ? res.json() : Promise.reject('bad identify')
     ).then(
-      dat =>
+      token =>
       {
-        fetch(('/api/listofCourseLectures/' + dat.lis_course_section_sourcedid), {
-			credentials: 'same-origin' // or 'include'
-		  }).then(res => res.json()).then(cour => {
-        this.store.dispatch(setToken(dat));
-        this.store.dispatch(setCourseFiles(cour));
+        fetch(('/api/listofCourseLectures/' + token.lis_course_section_sourcedid + '/' + token.roles + '/'), {
+          credentials: 'same-origin'
+		  }).then(res => res.json()).then(course => {
+        this.store.dispatch(setToken(token));
+        this.store.dispatch(setCourseFiles(course));
         });
       }
     ).catch( err => console.log(err));

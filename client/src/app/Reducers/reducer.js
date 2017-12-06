@@ -7,6 +7,7 @@ import lectureTime from './lectureTime.js';
 import calendarForm from './calendarForm.js';
 import deleteLecture from './lectureDelete.js';
 import instructorPage from './instructorSettings.js';
+import lectureUpload from './lectureUpload.js';
 
 const appReducer = combineReducers({
     token,
@@ -15,7 +16,8 @@ const appReducer = combineReducers({
     lectureTime,
     calendarForm,
     deleteLecture,
-    instructorPage
+    instructorPage,
+    lectureUpload
 });
 
 export default appReducer;

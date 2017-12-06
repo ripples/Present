@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import {connect} from "react-redux";
-import CalendarForm from '../../components/CalendarForm/CalendarForm';
+import CalendarRobust from '../../components/CalendarForm/CalendarRobust';
 
 class Calendar extends Component {
 
@@ -9,7 +9,7 @@ class Calendar extends Component {
             <div>
                 {
                     (typeof(this.props.roles) !== "undefined" && this.props.roles.toLowerCase().includes("instructor")) ?
-                        <CalendarForm courseId={this.props.courseId}/>
+                        <CalendarRobust />
                     :
                         <div>
                             <h3>You are not an instructor for this course</h3>

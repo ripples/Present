@@ -1,5 +1,54 @@
 import {calFormConstants} from '../Constants/actions.js';
 
+export function setCalOriginalCal(originalCal){
+  return {
+    type: calFormConstants.SET_CAL_ORIGINAL_CAL,
+    originalCal
+  }
+}
+
+export function setCalShowRecur(showRecur){
+  return {
+    type: calFormConstants.SET_CAL_SHOW_RECUR,
+    showRecur
+  }
+}
+
+export function setCalModalState(modalState){
+  return {
+    type: calFormConstants.SET_CAL_MODAL_STATE,
+    modalState
+  }
+}
+
+export function setCalMessageState(messageState){
+  return {
+    type: calFormConstants.SET_CAL_MESSAGE_STATE,
+    messageState
+  }
+}
+
+export function setCalMessageText(messageText){
+  return {
+    type: calFormConstants.SET_CAL_MESSAGE_TEXT,
+    messageText
+  }
+}
+
+export function setCalMessageTitle(messageTitle){
+  return {
+    type: calFormConstants.SET_CAL_MESSAGE_TITLE,
+    messageTitle
+  }
+}
+
+export function setCalEvents(events){
+  return {
+    type: calFormConstants.SET_CAL_EVENTS,
+    events
+  }
+}
+
 export function setCalSDate(sDate){
     return {
         type: calFormConstants.SET_CAL_S_DATE,
@@ -15,24 +64,31 @@ export function setCalEDate(eDate){
 }
 
 export function setCalSTime(sTime){
-    return {
-        type: calFormConstants.SET_CAL_S_TIME,
-        sTime
-    }
+  return {
+    type: calFormConstants.SET_CAL_S_TIME,
+    sTime
+  }
 }
 
 export function setCalETime(eTime){
+  return {
+    type: calFormConstants.SET_CAL_E_TIME,
+    eTime
+  }
+}
+
+export function setCalRepeatDays(repeatDays){
     return {
-        type: calFormConstants.SET_CAL_E_TIME,
-        eTime
+        type: calFormConstants.SET_CAL_REPEAT_DAYS,
+        repeatDays
     }
 }
 
-export function setCalRecurDays(recurDays){
-    return {
-        type: calFormConstants.SET_CAL_RECUR_DAYS,
-        recurDays
-    }
+export function setCalRecurrence(recurrence){
+  return {
+    type: calFormConstants.SET_CAL_RECURRENCE,
+    recurrence
+  }
 }
 
 export function setCalExcludeDates(excludeDates){
