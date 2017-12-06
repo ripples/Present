@@ -2,7 +2,7 @@ var express = require('express');
 var router = express.Router();
 var path = require('path');
 
-if(process.env.PRODUCTION || process.env.PRODUCTION === "true"){
+if(process.env.PRODUCTION === "true"){
 	router.get('/', function(req, res){
 		res.sendFile(process.env.PATH_TO_BUILD + "index.html")
 	});
