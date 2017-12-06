@@ -73,8 +73,9 @@ class LectureDelete extends React.Component {
                                 <input style = {submitStyle} type="submit" value="Delete"/>
                             </form>
                         </div>
-
+                    <div style = {statusStyle}>
                     {this.props.status}
+                    </div>
                 </div>
                 <div className="col-md-3">
                 </div>
@@ -138,6 +139,11 @@ var submitStyle = {
     margin: "8px 0",
     border: "none",
     borderRadius: "4px"
+}
+
+var statusStyle = {
+    fontSize: "20px",
+    marginTop: "20px"
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(LectureDelete);

@@ -67,7 +67,9 @@ class LectureUpload extends React.Component {
                             <input style = {submitStyle} type="submit" value="Submit" />
                         </form>
                     </div>
+                    <div style = {statusStyle}>
                     {this.props.status}
+                    </div>
                 </div>
                 <div className="col-md-3">
                 </div>
@@ -144,6 +146,11 @@ var submitStyle = {
 
 var dateStyle = {
     boxShadow: "none"
+}
+
+var statusStyle = {
+    fontSize: "20px",
+    marginTop: "20px"
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(LectureUpload);
