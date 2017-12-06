@@ -5,14 +5,17 @@
   "dependencies": {
     "passport": "^0.4.0",
     "react": "16.1.1",
-    "react-datepicker": "^0.60.2",
+    "react-big-calendar": "^0.17.0",
+    "react-datetime": "^2.11.0",
     "react-dom": "16.1.1",
+    "react-responsive-modal": "^2.0.0",
     "react-image-fallback": "^7.0.1",
     "react-redux": "^5.0.6",
     "react-router": "3.0.4",
     "react-scripts": "1.0.17",
     "redux": "^3.7.2",
     "redux-thunk": "^2.2.0",
+    "underscore": "^1.8.3",
     "video.js": "^6.2.8"
   },
   "scripts": {
@@ -20,6 +23,5 @@
     "build": "react-scripts build",
     "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject"
-  },
-  "proxy": "http://localhost:3001"
+  }
 }

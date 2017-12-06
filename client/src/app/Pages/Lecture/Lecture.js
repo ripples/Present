@@ -7,7 +7,7 @@ import {convertMonth} from '../../utils/utils.js';
 class Lecture extends React.Component {
 
 	componentDidMount(){
-		fetch(('/api/manifest/' + this.props.params.courseId + '/' + this.props.params.lectureId), {
+		fetch(('/api/manifest/' + this.props.params.lectureId), {
 			credentials: 'same-origin' // or 'include'
 		  }).then(
 			res => (res.status === 200 ) ? res.json() : {}

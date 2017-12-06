@@ -20,7 +20,7 @@ class LectureDelete extends React.Component {
                                 })}
 
         fetch('/api/deleteLecture', request).then(() => {
-            fetch(('/api/listofCourseLectures/' + this.props.courseId), {
+            fetch(('/api/listofCourseLectures/'), {
                 credentials: 'same-origin'
             }).then(res => res.json()).then(cour => {
                 this.props.setCourseFiles(cour);
@@ -43,18 +43,18 @@ class LectureDelete extends React.Component {
                 <div className="col-md-6">
                     { ((typeof(this.props.roles) !== "undefined" && this.props.roles.toLowerCase().includes("instructor")) ?
                         <div>
-                            <h1>Lecture Delete</h1>
+                            <h1 style = {headerStyle}>Lecture Delete</h1>
                             <form onSubmit={this.onSubmit.bind(this)}>
-                                <h4>Please select a lecture to delete.</h4>
-                                <p><b>NOTE:</b> Deleting a lecture is a permanent process</p>
+                                <h4 style = {titleStyle}>Please select a lecture to delete.</h4>
+                                <p style = {noticeStyle}><b>NOTE:</b> Deleting a lecture is a permanent process</p>
                                 {
                                     (typeof(this.props.lectures) !== "undefined") ?
                                         this.props.lectures.map((lec, i) => {
                                             var patt = /^\d\d-\d\d-\d\d\d\d--\d\d-\d\d-\d\d$/;
                                             if (patt.test(lec.name)) {
                                                 return (
-                                                    <div key={i}>
-                                                        <input type="radio" name="lecture" value={lec.name} onChange={this.onChange.bind(this)} required /> {lec.name}
+                                                    <div key={i} style = {lectureStyle}>
+                                                        <input type="radio" name="lecture" value={lec.name} onChange={this.onChange.bind(this)} required/> {lec.name}
                                                     </div>
                                                 )
                                             } else {
@@ -64,10 +64,12 @@ class LectureDelete extends React.Component {
                                     
                                 }
                                 <br/>
-                                <input type="checkbox" ref="approve" required/> I have correctly selected the lecture I want to delete.
+                                <div style = {acknowledgeStyle}>
+                                    <input type="checkbox" ref="approve" required/> I have correctly selected the lecture I want to delete.
+                                </div>
                                 <br/>
                                 <br/>
-                                <input type="submit" value="Delete"/>
+                                <input style = {submitStyle} type="submit" value="Delete"/>
                             </form>
                         </div>
                     :
@@ -107,6 +109,41 @@ const mapDispatchToProps = (dispatch, ownProps) => {
         setDeleteLecture: (lecture) => dispatch(setDeleteLecture(lecture)),
         setCourseFiles: (files) => dispatch(setCourseFiles(files))
     }
+}
+
+var headerStyle = {
+    fontWeight: "bold",
+    fontSize: "36px",
+    marginBottom: "40px"
+}
+
+var titleStyle = {
+    fontSize: "24px",
+    marginBottom: "20px"
+}
+
+var noticeStyle = {
+    fontSize: "20px",
+    marginBottom: "50px"
+}
+
+var lectureStyle = {
+    fontSize: "16px",
+    marginBottom: "10px"
+}
+
+var acknowledgeStyle = {
+    fontSize: "14px"
+}
+
+var submitStyle = {
+    width: "50%",
+    backgroundColor: "#ff0000",
+    color: "white",
+    padding: "14px 20px",
+    margin: "8px 0",
+    border: "none",
+    borderRadius: "4px"
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(LectureDelete);
