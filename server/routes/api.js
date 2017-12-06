@@ -50,8 +50,9 @@ router.get('/listOfCourseLectures/', function (req, res) {
 	});
 });
 
-router.get('/manifest/:courseId/:lectureName', function (req, res) {
-	const fpath = "./lectures/" + req.params.courseId.toString() + '/' + req.params.lectureName.toString() + '/INFO'
+router.get('/manifest/:lectureName', function (req, res) {
+	console.log("hi");
+	const fpath = "./lectures/" + req.session.lti_token.lis_course_section_sourcedid.toString() + '/' + req.params.lectureName.toString() + '/INFO'
 	fs.readFile(fpath, 'utf8', function (err, contents) {
 		if (err) {
 			res.status(404).send('Not Found');
