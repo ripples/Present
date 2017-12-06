@@ -11,6 +11,7 @@ var CustomStrategy = require('passport-custom')
 var public = require('./routes/public');
 var api = require('./routes/api');
 var upload = require('./routes/upload')
+var entry = require('./routes/entry')
 
 var app = express();
 app.use(cookieParser())
@@ -71,13 +72,7 @@ app.use(passport.initialize())
 app.use(passport.session())
 app.use(passport.authenticate('lti-strategy', {failureFlash: true}));
 
-app.post('/data', function (req, res) {
-	req.session.lti_token = req.body;
-	const url = 'http://' + process.env.PRESENT_PATH + ':' + process.env.PROXY_PORT
-
-	res.redirect(url);
-})
-
+app.use('/data', entry)
 app.use('/api', api)
 
 // catch 404 and forward to error handler
