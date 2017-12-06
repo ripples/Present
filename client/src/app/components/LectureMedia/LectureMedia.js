@@ -4,6 +4,7 @@ import {setLectureTime} from '../../Actions/lectureTimeActions.js';
 import VideoView from "../../components/VideoView/VideoView";
 import LectureImage from '../LectureImage/LectureImage.js';
 import {setLectureImage, clearLectureImage, setImageType, setIndex} from '../../Actions/lectureImageActions.js';
+import {convertMonth} from '../../utils/utils.js';
 
 class LectureMedia extends React.Component {
 
@@ -42,14 +43,14 @@ class LectureMedia extends React.Component {
 		if(this.props.manifest){
 			var computerImages = this.range(this.props.manifest.computerCount).map( (e, i) => {
 				return (
-					<button key={i} style = {imageButtons} onClick = {this.onClick.bind(this, ('/api/image/' + this.props.courseId + "/" + this.props.lectureId + '/1-' + i + '/' + this.props.time), "1", i)}>
+					<button key={i} style = {compButtons} onClick = {this.onClick.bind(this, ('/api/image/' + this.props.courseId + "/" + this.props.lectureId + '/1-' + i + '/' + this.props.time), "1", i)}>
 						<LectureImage src={'/api/image/' + this.props.courseId + "/" + this.props.lectureId + '/1-' + i + '/' + this.props.time} fallbackImage = "no-comp-image-found.png"/>
 					</button>
 				);
 			})
 			var whiteBoardImages = this.range(this.props.manifest.whiteboardCount).map( (e, i) => {
 				return (
-					<button key={i} style = {imageButtons} onClick = {this.onClick.bind(this, ('/api/image/' + this.props.courseId + "/" + this.props.lectureId + '/2-' + i + '/' + this.props.time), "2", i)}>
+					<button key={i} style = {wbButtons} onClick = {this.onClick.bind(this, ('/api/image/' + this.props.courseId + "/" + this.props.lectureId + '/2-' + i + '/' + this.props.time), "2", i)}>
 						<LectureImage src={'/api/image/' + this.props.courseId + "/" + this.props.lectureId + '/2-' + i + '/' + this.props.time} fallbackImage = "no-comp-image-found.png"/>
 					</button>
 				);
@@ -64,6 +65,9 @@ class LectureMedia extends React.Component {
 					<div style = {selectedImage}>
 						<LectureImage src = {this.props.lectureImage} fallbackImage = "no-comp-image-found.png"/>
 					</div>
+				</div>
+				<div style = {date}>
+					{"Lecture: " + convertMonth(this.props.lectureId.substring(0,10)) + this.props.lectureId.substring(3,5) + ", " + this.props.lectureId.substring(6,10)}
 				</div>
 				<div style = {imageContainer}>
 					{computerImages ? computerImages: null}
@@ -95,11 +99,19 @@ const mapDispatchToProps = (dispatch, ownProps) => {
 	}
 };
 
-var imageButtons = {
-	maxWidth: "20%",
-	maxHeight: "20%",
-	margin: "0",
-	padding:"0",
+var compButtons = {
+	width: "11.35%",
+	display:"inline",
+	padding: "0",
+	margin:"10px",
+	border:"black 1px solid"
+}
+
+var wbButtons = {
+	width: "20%",
+	display:"inline",
+	padding: "0",
+	margin:"10px",
 	border:"black 1px solid"
 }
 
@@ -118,12 +130,26 @@ var selectedImage = {
 var lectureBody = {
 	marginLeft: "0",
 	marginRight: "0",
-	height:"80%"
+	height:"80%",
+	paddingBottom: "10px"
 }
 
 var imageContainer= {
 	positon: "absolute",
-	bottom:"0"
+	bottom:"0",
+	margin:"0",
+	padding:"10",
+	width:"100%",
+	height:"20%",
+	overflowY:"hidden",
+	overflowX:"auto",
+	whiteSpace:"nowrap",
+	backgroundColor:"gray"
 }
 
+var date = {
+	fontSize:"20px",
+	color:"white",
+	backgroundColor:"gray"
+}
 export default connect(mapStateToProps, mapDispatchToProps)(LectureMedia);
