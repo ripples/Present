@@ -370,6 +370,18 @@ class CalendarRobust extends React.Component {
     }
   }
 
+  testBtn(e) {
+    e.preventDefault();
+
+    fetch(('/api/calendar/test/'), {
+      credentials: 'same-origin' // or 'include'
+    }).then(
+      res => (res.status === 200 || res.status === 204 || res.status === 304) ? res.text() : []
+    ).then((data) => {
+      console.log(data);
+    }).catch((err) => console.log(err));
+  }
+
   render() {
 
     const helpMessage = (
@@ -471,6 +483,7 @@ class CalendarRobust extends React.Component {
     return (
       <div>
         <div>
+          <button type='button' style={buttonStyle} onClick={this.testBtn.bind(this)}>TEST</button>
           <button type='button' style={buttonStyle} onClick={this.onOpenModal}>Add Event(s)</button>
           <Modal open={this.props.calendarForm.modalState} onClose={this.onCloseModal} little>
             {addEventForm}
