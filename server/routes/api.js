@@ -31,6 +31,7 @@ router.get('/listOfCourseLectures/:courseId/:roles/', function (req, res) {
 				}
 			});
 
+			//TODO take from session
 			if(!req.params.roles.toString().toLowerCase().includes("instructor")){ //not instructor so filter future lectures out
 				var date = new Date();
 				dirTree.children = dirTree.children.filter((lecture) => {
