@@ -8,6 +8,9 @@ var moment = require('moment');
 const unzip = require('unzip-stream');
 require('moment-recur');
 
+const utils = require('../utils/utils');
+const lecUpUtils = require('../utils/lectureUpload');
+
 router.get('/identify/', function (req, res) {
 	if (req.session.lti_token) {
 		res.send(req.session.lti_token);
@@ -17,8 +20,8 @@ router.get('/identify/', function (req, res) {
 	}
 });
 
-router.get('/listOfCourseLectures/:courseId/', function (req, res) {
-	dirToJson("./lectures/" + req.params.courseId.toString(), function (err, dirTree) {
+router.get('/listOfCourseLectures/', function (req, res) {
+	dirToJson("./lectures/" + req.session.lti_token.lis_course_section_sourcedid.toString(), function (err, dirTree) {
 		if (err) {
 			throw err;
 		} else {
@@ -32,10 +35,10 @@ router.get('/listOfCourseLectures/:courseId/', function (req, res) {
 			});
 
 			if(!req.session.lti_token.roles.toString().toLowerCase().includes("instructor")){ //not instructor so filter future lectures out
+				
 				var date = new Date();
 				dirTree.children = dirTree.children.filter((lecture) => {
-					var lecDate = getLectureDate(lecture.name);
-					
+					var lecDate = new Date(parseInt(lecture.name.substring(6, 11)), parseInt(lecture.name.substring(0, 2)) - 1, parseInt(lecture.name.substring(3, 5)));
 					if(lecDate > date){
 						return false;
 					} else {
@@ -48,12 +51,9 @@ router.get('/listOfCourseLectures/:courseId/', function (req, res) {
 	});
 });
 
-function getLectureDate(lecture){
-	return new Date(parseInt(lecture.substring(6, 11)), parseInt(lecture.substring(0, 2)) - 1, parseInt(lecture.substring(3, 5)));
-}
-
-router.get('/manifest/:courseId/:lectureName', function (req, res) {
-	const fpath = "./lectures/" + req.params.courseId.toString() + '/' + req.params.lectureName.toString() + '/INFO'
+router.get('/manifest/:lectureName', function (req, res) {
+	console.log("hi");
+	const fpath = "./lectures/" + req.session.lti_token.lis_course_section_sourcedid.toString() + '/' + req.params.lectureName.toString() + '/INFO'
 	fs.readFile(fpath, 'utf8', function (err, contents) {
 		if (err) {
 			res.status(404).send('Not Found');
@@ -78,10 +78,10 @@ Scheme for sourceID
 2-x is for a whiteboard, x is for feed number
 Maybe some diffing...
 */
-router.get('/image/:courseId/:lectureName/:sourceId/:time', function (req, res) {
+router.get('/image/:lectureName/:sourceId/:time', function (req, res) {
 	const feedType = (req.params["sourceId"].split("-")[0] === "1") ? "computer" : "whiteBoard"
 	const feedId = req.params["sourceId"].split("-")[1]
-	const fpath = "./lectures/" + req.params.courseId.toString() + '/' + req.params.lectureName.toString()
+	const fpath = "./lectures/" + req.session.lti_token.lis_course_section_sourcedid.toString() + '/' + req.params.lectureName.toString()
 	util.promisify(fs.readFile)(fpath + '/INFO', 'utf8').then(contents => {
 		const re = /(?:timestamp: (\d*))/
 		const found = contents.match(re)[1];
@@ -100,7 +100,7 @@ router.get('/image/:courseId/:lectureName/:sourceId/:time', function (req, res) 
 				return result
 			}, []).sort((left, right) => left.time - right.time).pop() //this should be the file
 			if (typeof fileName != 'undefined' && fileName != null) {
-				res.sendFile(path.resolve('lectures', req.params.courseId.toString(), req.params.lectureName.toString(), feedType.toLowerCase(), fileName.name))
+				res.sendFile(path.resolve('lectures', req.session.lti_token.lis_course_section_sourcedid.toString(), req.params.lectureName.toString(), feedType.toLowerCase(), fileName.name))
 			}
 			else {
 				console.log("ERROR", fpath + '/' + feedType.toLowerCase())
@@ -116,8 +116,8 @@ router.get('/image/:courseId/:lectureName/:sourceId/:time', function (req, res) 
 	})
 });
 
-router.get('/video/:courseId/:lectureName', function (req, res) {
-	const fpath = "./lectures/" + req.params.courseId.toString() + '/' + req.params.lectureName.toString() + '/videoLarge.mp4'  // TODO tie this to absolute location
+router.get('/video/:lectureName', function (req, res) {
+	const fpath = "./lectures/" + req.session.lti_token.lis_course_section_sourcedid.toString() + '/' + req.params.lectureName.toString() + '/videoLarge.mp4'  // TODO tie this to absolute location
 	const stat = fs.statSync(fpath)
 	const fileSize = stat.size
 	const range = req.headers.range
@@ -148,8 +148,8 @@ router.get('/video/:courseId/:lectureName', function (req, res) {
 	}
 });
 
-router.get('/calendar/:courseId', function (req, res) { //Gets the calendar for a given class
-	const fpath = "./lectures/" + req.params.courseId.toString() + "/Calendar.ics"
+router.get('/calendar', function (req, res) { //Gets the calendar for a given class
+	const fpath = "./lectures/" + req.session.lti_token.lis_course_section_sourcedid.toString() + "/Calendar.ics"
 	fs.exists(fpath, function (exists) {
 		if (exists) {
 			fs.readFile(fpath, function (err, data) {
@@ -168,11 +168,37 @@ router.get('/calendar/:courseId', function (req, res) { //Gets the calendar for 
 router.post("/lectureUpload", function (req, res) {
 	const data = JSON.parse(req.body.data);
 	const fileName = req.files.attachment.filename;
+	const attachment = req.files.attachment;
 	try{
 		if(fileName.toString().toLowerCase().substring(fileName.length - 4) === '.mp4'){
-			uploadVideo(req.files.attachment, data);
+			var date = data.lectureDate;
+			date = date.substring(5) + "-" + date.substring(0, 4);
+			var dir = "./lectures/" + data.courseId + "/" + date  + "--00-00-00/";
+		
+			dir = lecUpUtils.makeLecDir(dir);
+		
+			var fileLoc = dir + "videoLarge.mp4";
+			if(!fs.existsSync(fileLoc)){
+				fs.closeSync(fs.openSync(fileLoc, 'w'));
+			}
+		
+			var read = fs.createReadStream(attachment.file);
+			var write = fs.createWriteStream(fileLoc);
+			read.pipe(write);
+		
+			read.on('end', () => {
+				utils.deleteFolderRecursive("./uploads/" + attachment.uuid + "/");		
+			});
 		} else {
-			uploadZip(req.files.attachment, data);
+			var date = data.lectureDate;
+			date = date.substring(5) + "-" + date.substring(0, 4);
+			var dir = "./lectures/" + data.courseId + "/" + date  + "--00-00-00/";
+		
+			dir = lecUpUtils.makeLecDir(dir);
+		
+			fs.createReadStream("./uploads/" + attachment.uuid + "/attachment/" + attachment.filename).pipe(unzip.Extract({ path: dir })).on('close', () => {
+				utils.deleteFolderRecursive("./uploads/" + attachment.uuid + "/");
+			});
 		}
 	} catch(e){
 		res.status(500).send();
@@ -181,89 +207,11 @@ router.post("/lectureUpload", function (req, res) {
 	res.send();
 });
 
-function uploadVideo(attachment, data){
-	var date = data.lectureDate;
-	date = date.substring(5) + "-" + date.substring(0, 4);
-	var dir = "./lectures/" + data.courseId + "/" + date  + "--00-00-00/";
-
-	dir = makeLecDir(dir);
-
-	var fileLoc = dir + "videoLarge.mp4";
-	if(!fs.existsSync(fileLoc)){
-		fs.closeSync(fs.openSync(fileLoc, 'w'));
-	}
-
-	var read = fs.createReadStream(attachment.file);
-	var write = fs.createWriteStream(fileLoc);
-	read.pipe(write);
-
-	read.on('end', () => {
-		deleteFolderRecursive("./uploads/" + attachment.uuid + "/");		
-	});
-}
-
-function uploadZip(attachment, data){
-	var date = data.lectureDate;
-	date = date.substring(5) + "-" + date.substring(0, 4);
-	var dir = "./lectures/" + data.courseId + "/" + date  + "--00-00-00/";
-
-	dir = makeLecDir(dir);
-
-	fs.createReadStream("./uploads/" + attachment.uuid + "/attachment/" + attachment.filename).pipe(unzip.Extract({ path: dir })).on('close', () => {
-		deleteFolderRecursive("./uploads/" + attachment.uuid + "/");
-	});
-}
-
-function makeLecDir(dir){
-	var sec = 0;
-	var strSec = "00";
-	var min = 0;
-	var minStr = "00";
-
-	while(min < 100 && fs.existsSync(dir)){
-		sec = 0;
-		while(sec < 100 && fs.existsSync(dir)){
-			strSec = sec.toString();
-			if(sec < 10){
-				strSec = "0" + strSec;
-			}
-			dir = dir.substring(0, dir.length - 6) + minStr + "-" + strSec + '/';
-			sec++;
-		}
-		min++;
-		minStr = min.toString();
-		if(min < 10){
-			minStr = "0" + minStr;
-		}
-	}
-
-	if(min === 100 && sec === 100 && fs.existsSync(dir)){
-		throw new Error('only 10,000 lectures allowed per day per course');
-	}
-
-	fs.mkdirSync(dir);
-	return dir;
-}
-
 router.delete("/deleteLecture", function (req, res) {
 	var path = "./lectures/" + req.body.courseId + "/" + req.body.lecture + "/";
-	deleteFolderRecursive(path);
+	utils.deleteFolderRecursive(path);
 	res.send();
 });
-
-var deleteFolderRecursive = function (path) {
-	if (fs.existsSync(path)) {
-		fs.readdirSync(path).forEach(function (file, index) {
-			var curPath = path + "/" + file;
-			if (fs.lstatSync(curPath).isDirectory()) { // recurse
-				deleteFolderRecursive(curPath);
-			} else { // delete file
-				fs.unlinkSync(curPath);
-			}
-		});
-		fs.rmdirSync(path);
-	}
-};
 
 router.get('/calendar/:recurEvent/:start/:end/:includes/:excludes', function (req, res) {
 	let includes = req.params.includes;
