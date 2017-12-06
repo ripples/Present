@@ -20,7 +20,7 @@ class LectureDelete extends React.Component {
                                 })}
 
         fetch('/api/deleteLecture', request).then(() => {
-            fetch(('/api/listofCourseLectures/' + this.props.courseId), {
+            fetch(('/api/listofCourseLectures/'), {
                 credentials: 'same-origin'
             }).then(res => res.json()).then(cour => {
                 this.props.setCourseFiles(cour);

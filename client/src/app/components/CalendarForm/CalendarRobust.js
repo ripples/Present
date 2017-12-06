@@ -41,7 +41,7 @@ class CalendarRobust extends React.Component {
 
   componentWillMount(){ //Read any existing calendar file from server, if none exists, blank calendar. (GET)
     this.props.setCourseId(this.props.courseId);
-    fetch(('/api/calendar/' + this.props.courseId), {
+    fetch(('/api/calendar/'), {
       credentials: 'same-origin' // or 'include'
     }).then(
       res => (res.status === 200 || res.status === 204) ? res.json() : []

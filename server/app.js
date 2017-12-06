@@ -14,6 +14,7 @@ var upload = require('./routes/upload')
 
 var app = express();
 app.use(cookieParser())
+//app.use(require('morgan')('combined')) //used for very verbose logging
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -27,12 +28,12 @@ bb.extend(app, {
     allowedPath: /./
 });
 
-app.use(session({secret: 'It never rains in Southern California'}))
+app.use(session({secret: process.env.SECRET}))
 
 //Passport
 passport.use('lti-strategy', new CustomStrategy(
 	function(req, callback) {
-		var val = (req.body.oauth_consumer_key) ? req.body.oauth_consumer_key : req.user		
+		var val = (req.body) ? req.body : req.user		
 		try{
 			var provider = new lti.Provider(val , "secret")	
 			if(req.user){
@@ -41,7 +42,7 @@ passport.use('lti-strategy', new CustomStrategy(
 			else{
 				provider.valid_request(req, function(err, isValid) {
 					if(err){
-						console.log(req, err, isValid)
+						console.log("LTI Error", err, isValid)
 					}
 					callback(err, val)
 				});
@@ -64,10 +65,18 @@ passport.serializeUser(function(user, done) {
 
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/upload', upload)
+app.use('/', public);
+
 app.use(passport.initialize())
 app.use(passport.session())
 app.use(passport.authenticate('lti-strategy', {failureFlash: true}));
-app.use('/', public);
+
+app.post('/data', function (req, res) {
+	req.session.lti_token = req.body;
+	const url = 'http://' + process.env.PRESENT_PATH + ':' + process.env.PROXY_PORT
+
+	res.redirect(url);
+})
 
 app.use('/api', api)
 

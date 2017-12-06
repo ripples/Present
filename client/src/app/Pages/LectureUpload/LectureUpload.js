@@ -22,8 +22,12 @@ class LectureUpload extends React.Component {
             courseId: this.props.courseId
         }));
 
-        fetch('/api/lectureUpload', {method: "POST", body: formData, credentials: 'same-origin'}).then(() => {
-                fetch(('/api/listofCourseLectures/' + this.props.courseId), {
+        fetch('/api/lectureUpload', {method: "POST", body: formData, credentials: 'same-origin'}).then(response => {
+            if(!response.ok){
+                throw new Error(response.statusText);
+            }
+        }).then(() => {
+                fetch(('/api/listofCourseLectures/'), {
                 credentials: 'same-origin'
             }).then(res => res.json()).then(cour => {
                 this.props.setCourseFiles(cour);
@@ -31,6 +35,9 @@ class LectureUpload extends React.Component {
                 this.props.router.push('/');
                 this.props.router.push('/lectureUpload/success/');
             });
+        }).catch(e => {
+            this.props.router.push('/');
+            this.props.router.push('/lectureUpload/error/');
         });
     }
 
@@ -49,8 +56,8 @@ class LectureUpload extends React.Component {
                             <h1 style = {headerStyle}>Lecture Upload</h1>
                             <form onSubmit={this.submit.bind(this)}>
                                 <h4 style = {titleStyle}>Please select a file to upload</h4>
-                                <p style = {noticeStyle}><b>NOTE:</b> Only .mp4 videos are supported</p>
-                                <input style={inputStyle} type="file" accept="video/mp4" name="lectureVideo" onChange={this.setFile.bind(this)} required/>
+                                <p style = {noticeStyle}><b>NOTE:</b> Only .mp4 videos and .zip files are supported.</p>
+                                <input style={inputStyle} type="file" accept="video/mp4,application/zip,application/octet-stream,application/x-zip,application/x-zip-compressed" name="lectureVideo" onChange={this.setFile.bind(this)} required/>
                                 <br/>
                                 <div style = {lectureDateStyle} >Lecture Date: <input type="date" name="lectureDate" onChange={this.setDate.bind(this)} required/></div>
                                 <br/>
@@ -67,8 +74,14 @@ class LectureUpload extends React.Component {
                     }
 
                     {
-                        (this.props.params.success === "success") ? 
-                            <h3>The video was successfully uploaded.</h3>
+                        (this.props.params.success === "success") ?
+                            <h3>The new lecture was successfully uploaded.</h3>
+                        : null
+                    }
+                    
+                    {
+                        (this.props.params.success === "error") ?
+                            <h3>There was an error uploading the new lecture.</h3>
                         : null 
                     }
                 </div>

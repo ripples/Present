@@ -6,12 +6,18 @@
     "start": "node ./bin/www",
     "start-server": "npm start",
     "start-client": "cd client && npm start",
-    "start-all": "concurrent \"npm run start\" \"npm run start-client\" "
+    "build-client": "cd client && npm run build",
+    "build-start": "npm run build-client && npm start",
+    "start-all": "concurrent \"npm run start\" \"npm run start-client\" ",
+    "start-pm2-all": "npx pm2 start npm -- run start-all",
+    "start-pm2-server": "npx pm2 start npm -- run start-server",
+    "start-pm2-prod": "npm run build-client && npm run start-pm2-server"
   },
   "dependencies": {
     "cookie-parser": "~1.4.3",
     "debug": "~2.6.9",
     "dir-to-json": "0.0.3",
+    "dotenv": "^4.0.0",
     "express": "~4.15.5",
     "express-busboy": "^6.0.1",
     "express-session": "^1.15.6",
@@ -20,18 +26,21 @@
     "jade": "~1.11.0",
     "moment": "^2.19.1",
     "moment-recur": "^1.0.7",
-    "morgan": "~1.9.0",
+    "morgan": "^1.9.0",
     "node-fetch": "^1.7.3",
     "passport": "^0.4.0",
     "passport-custom": "^1.0.5",
     "react": "^0.14.6",
     "react-dom": "^0.14.6",
     "react-router": "3.0.4",
+    "redbird": "^0.7.0",
     "serve-favicon": "~2.4.5",
     "underscore": "^1.8.3",
-    "unzip": "^0.1.11"
+    "unzip": "^0.1.11",
+    "unzip-stream": "^0.2.1"
   },
   "devDependencies": {
-    "concurrently": "^1.0.0"
+    "concurrently": "^1.0.0",
+    "pm2": "^2.8.0"
   }
 }
