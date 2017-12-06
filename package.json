@@ -4,9 +4,10 @@
   "private": true,
   "scripts": {
     "start": "node ./bin/www",
-    "start-server": "npm start",
+	"start-server": "npm start",
 	"start-client": "cd client && npm start",
 	"build-client": "cd client && npm run build",
+	"build-start": "npm run build-client && npm start",
     "start-all": "concurrent \"npm run start\" \"npm run start-client\" ",
 	"start-pm2-all": "npx pm2 start npm -- run start-all",
 	"start-pm2-server": "npx pm2 start npm -- run start-server",
