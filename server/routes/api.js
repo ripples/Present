@@ -236,17 +236,4 @@ router.post('/calendar/:courseId', function (req, res) {
 	res.status(201).send("Recording schedule successfully created: ./lectures/" + req.params.courseId + "/Calendar.ics");
 });
 
-router.get('/calendar/test', function (req, res) {
-	console.log('TEST PATH HIT')
-	testDirs();
-	res.status(200).send("TEST DIR SUCCESS");
-});
-
-function testDirs() {
-	const isDirectory = srcPath => fs.lstatSync(srcPath).isDirectory();
-	const getDirectories = srcPath => fs.readdirSync(srcPath).map(name => path.join(srcPath, name)).filter(isDirectory);
-	let dirs = getDirectories('./lectures/');
-	console.log(dirs)
-}
-
 module.exports = router;
