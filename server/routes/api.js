@@ -19,8 +19,8 @@ router.get('/identify/', function (req, res) {
 	}
 });
 
-router.get('/listOfCourseLectures/:courseId/', function (req, res) {
-	dirToJson("./lectures/" + req.params.courseId.toString(), function (err, dirTree) {
+router.get('/listOfCourseLectures/', function (req, res) {
+	dirToJson("./lectures/" + req.session.lti_token.lis_course_section_sourcedid.toString(), function (err, dirTree) {
 		if (err) {
 			throw err;
 		} else {
@@ -32,7 +32,7 @@ router.get('/listOfCourseLectures/:courseId/', function (req, res) {
 					return false;
 				}
 			});
-			
+
 			if(!req.session.lti_token.roles.toString().toLowerCase().includes("instructor")){ //not instructor so filter future lectures out
 				
 				var date = new Date();
