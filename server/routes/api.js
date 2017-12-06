@@ -17,7 +17,7 @@ router.get('/identify/', function (req, res) {
 	}
 });
 
-router.get('/listOfCourseLectures/:courseId/:roles/', function (req, res) {
+router.get('/listOfCourseLectures/:courseId/', function (req, res) {
 	dirToJson("./lectures/" + req.params.courseId.toString(), function (err, dirTree) {
 		if (err) {
 			throw err;
@@ -31,8 +31,7 @@ router.get('/listOfCourseLectures/:courseId/:roles/', function (req, res) {
 				}
 			});
 
-			//TODO take from session
-			if(!req.params.roles.toString().toLowerCase().includes("instructor")){ //not instructor so filter future lectures out
+			if(!req.session.lti_token.toString().toLowerCase().includes("instructor")){ //not instructor so filter future lectures out
 				var date = new Date();
 				dirTree.children = dirTree.children.filter((lecture) => {
 					var lecDate = getLectureDate(lecture.name);
