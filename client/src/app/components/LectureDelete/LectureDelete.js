@@ -20,7 +20,7 @@ class LectureDelete extends React.Component {
                                 })}
 
         fetch('/api/deleteLecture', request).then(() => {
-            fetch(('/api/listofCourseLectures/' + this.props.courseId), {
+            fetch(('/api/listofCourseLectures/' + this.props.courseId + '/' + this.props.roles + '/'), {
                 credentials: 'same-origin'
             }).then(res => res.json()).then(cour => {
                 this.props.setCourseFiles(cour);
@@ -41,7 +41,6 @@ class LectureDelete extends React.Component {
                 <div className="col-md-3">
                 </div>
                 <div className="col-md-6">
-                    { ((typeof(this.props.roles) !== "undefined" && this.props.roles.toLowerCase().includes("instructor")) ?
                         <div>
                             <h1 style = {headerStyle}>Lecture Delete</h1>
                             <form onSubmit={this.onSubmit.bind(this)}>
@@ -72,12 +71,6 @@ class LectureDelete extends React.Component {
                                 <input style = {submitStyle} type="submit" value="Delete"/>
                             </form>
                         </div>
-                    :
-                        <div>
-                            <h3>You are not an instructor for this course.</h3>
-                        </div>
-                    )
-                    }
 
                     {
                         (this.props.params.success === "success") ? 

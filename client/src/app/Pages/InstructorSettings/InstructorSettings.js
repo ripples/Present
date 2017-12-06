@@ -37,6 +37,7 @@ class InstructorSettings extends Component {
 
         return(
             <div className="container-fluid">
+                { ((typeof(this.props.roles) !== "undefined" && this.props.roles.toLowerCase().includes("instructor")) ?
                 <div className="row" >
                     <div className="col-md-12">
                         <h1 style = {headerStyle} >Settings</h1>
@@ -56,6 +57,12 @@ class InstructorSettings extends Component {
                         </div>
                     </div>
                 </div>
+                :
+                <div>
+                    <h3>You are not an instructor for this course.</h3>
+                </div>
+                )
+            }
             </div>
         );
     }
@@ -64,7 +71,8 @@ class InstructorSettings extends Component {
 const mapStateToProps = state => {
     return {
         courseId: state.token.lis_course_section_sourcedid,
-        instructorPage: state.instructorPage.page
+        instructorPage: state.instructorPage.page,
+        roles: state.token.roles
     };
 };
 
