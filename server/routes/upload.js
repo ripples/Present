@@ -3,7 +3,7 @@ var router = express.Router();
 const fs = require('fs');
 const unzip = require('unzip');
 
-router.post('/upload/lecture-zip', function (req, res) {
+router.post('/lecture-zip', function (req, res) {
 	const file = req.files.file
 	const tmp_path = file.file;
 	const target_path = './lectures';
@@ -21,7 +21,7 @@ router.post('/upload/lecture-zip', function (req, res) {
 	})
 });
 
-router.post('/upload/:courseId/lecture-zip', function (req, res) {
+router.post('/:courseId/lecture-zip', function (req, res) {
 	const file = req.files.file
 	const courseId = req.params.courseId
 	const tmp_path = file.file;
