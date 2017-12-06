@@ -55,15 +55,7 @@ export default class App extends Component {
             <IndexRoute component={LecturesList} />
             <Route path="course/:courseId/lecture/:lectureId" component={Lecture} />
               <Route path="course/:courseId/instructorSettings" >
-                <IndexRoute component={InstructorSettings} >
-                  <Route path="/calendar/" />
-                  <Route path="/lectureUpload/" >
-                    <Route path=":success/" />
-                  </Route>
-                  <Route path="/lectureDelete/" >
-                    <Route path=":success/" />
-                  </Route>
-                </IndexRoute>
+                <IndexRoute component={InstructorSettings} />
               </Route>
           </Route>
         </Router>

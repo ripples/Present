@@ -19,11 +19,11 @@ class InstructorSettings extends Component {
     renderComponent(page) {
         switch(page) {
             case "calendar":
-                return <Link to="/calendar/" ><CalendarRobust /></Link>
+                return <CalendarRobust />
             case "lectureUpload":
-                return <Link to="/lectureUpload/"><LectureUpload /></Link>
+                return <LectureUpload />
             case "lectureDelete":
-                return <Link to="/lectureDelete/"><LectureDelete /></Link>
+                return <LectureDelete />
             default:
                 return <div />
         }
@@ -72,7 +72,8 @@ const mapStateToProps = state => {
     return {
         courseId: state.token.lis_course_section_sourcedid,
         instructorPage: state.instructorPage.page,
-        roles: state.token.roles
+        roles: state.token.roles,
+        ipage: state.instructorPage
     };
 };
 

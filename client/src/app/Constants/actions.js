@@ -43,7 +43,9 @@ export const deleteLectureConstants = {
 
 export const instructorSettingsConstants = {
     SET_INSTRUCTOR_PAGE: 'SET_INSTRUCTOR_PAGE',
-    CLEAR_INSTRUCTOR_PAGE: 'CLEAR_INSTRUCTOR_PAGE'
+    CLEAR_INSTRUCTOR_PAGE: 'CLEAR_INSTRUCTOR_PAGE',
+    SET_STATUS_MESSAGE: 'SET_STATUS_MESSAGE',
+    CLEAR_STATUS_MESSAGE: 'CLEAR_STATUS_MESSAGE'
 }
 
 export const lectureUploadConstants = {

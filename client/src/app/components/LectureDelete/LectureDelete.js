@@ -2,12 +2,14 @@ import React from "react";
 import {connect} from "react-redux";
 import {setDeleteLecture, clearDeleteLecture} from '../../Actions/lectureDeleteActions.js';
 import {setCourseFiles} from '../../Actions/courseFilesActions.js';
+import { setStatusMessage, clearStatusMessage } from "../../Actions/instructorSettingsActions";
 
 class LectureDelete extends React.Component {
     
 
     componentWillUnmount(){
         this.props.clearDeleteLecture();
+        this.props.clearStatusMessage();
     }
 
     onSubmit(e){
@@ -20,15 +22,15 @@ class LectureDelete extends React.Component {
                                 })}
 
         fetch('/api/deleteLecture', request).then(() => {
-            fetch(('/api/listofCourseLectures/' + this.props.courseId + '/' + this.props.roles + '/'), {
+            fetch(('/api/listofCourseLectures/' + this.props.courseId + '/'), {
                 credentials: 'same-origin'
             }).then(res => res.json()).then(cour => {
                 this.props.setCourseFiles(cour);
             }).then(() => {
-                this.props.router.push('/');
-                this.props.router.push('/lectureDelete/success/');
+                this.props.setStatusMessage('The new lecture was successfully deleted.');
             });
         });
+        document.getElementById("form").reset();
     }
 
     onChange(e){
@@ -43,7 +45,7 @@ class LectureDelete extends React.Component {
                 <div className="col-md-6">
                         <div>
                             <h1 style = {headerStyle}>Lecture Delete</h1>
-                            <form onSubmit={this.onSubmit.bind(this)}>
+                            <form onSubmit={this.onSubmit.bind(this)} id="form">
                                 <h4 style = {titleStyle}>Please select a lecture to delete.</h4>
                                 <p style = {noticeStyle}><b>NOTE:</b> Deleting a lecture is a permanent process</p>
                                 {
@@ -72,11 +74,7 @@ class LectureDelete extends React.Component {
                             </form>
                         </div>
 
-                    {
-                        (this.props.params.success === "success") ? 
-                            <h3>The lecture was successfully deleted.</h3>
-                        : null 
-                    }
+                    {this.props.status}
                 </div>
                 <div className="col-md-3">
                 </div>
@@ -91,7 +89,8 @@ const mapStateToProps = state => {
         courseId: state.token.lis_course_section_sourcedid,
         roles: state.token.roles,
         lectures: state.courseFiles.children,
-        deleteLecture: state.deleteLecture
+        deleteLecture: state.deleteLecture,
+        status: state.instructorPage.status
     };
 };
 
@@ -100,7 +99,9 @@ const mapDispatchToProps = (dispatch, ownProps) => {
     return {
         clearDeleteLecture: () => dispatch(clearDeleteLecture()),
         setDeleteLecture: (lecture) => dispatch(setDeleteLecture(lecture)),
-        setCourseFiles: (files) => dispatch(setCourseFiles(files))
+        setCourseFiles: (files) => dispatch(setCourseFiles(files)),
+        setStatusMessage: (message) => dispatch(setStatusMessage(message)),
+        clearStatusMessage: () => dispatch(clearStatusMessage())
     }
 }
 

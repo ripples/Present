@@ -31,7 +31,7 @@ router.get('/listOfCourseLectures/:courseId/', function (req, res) {
 				}
 			});
 
-			if(!req.session.lti_token.toString().toLowerCase().includes("instructor")){ //not instructor so filter future lectures out
+			if(!req.session.lti_token.roles.toString().toLowerCase().includes("instructor")){ //not instructor so filter future lectures out
 				var date = new Date();
 				dirTree.children = dirTree.children.filter((lecture) => {
 					var lecDate = getLectureDate(lecture.name);
