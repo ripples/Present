@@ -77,10 +77,10 @@ Scheme for sourceID
 2-x is for a whiteboard, x is for feed number
 Maybe some diffing...
 */
-router.get('/image/:courseId/:lectureName/:sourceId/:time', function (req, res) {
+router.get('/image/:lectureName/:sourceId/:time', function (req, res) {
 	const feedType = (req.params["sourceId"].split("-")[0] === "1") ? "computer" : "whiteBoard"
 	const feedId = req.params["sourceId"].split("-")[1]
-	const fpath = "./lectures/" + req.params.courseId.toString() + '/' + req.params.lectureName.toString()
+	const fpath = "./lectures/" + req.session.lti_token.lis_course_section_sourcedid.toString() + '/' + req.params.lectureName.toString()
 	util.promisify(fs.readFile)(fpath + '/INFO', 'utf8').then(contents => {
 		const re = /(?:timestamp: (\d*))/
 		const found = contents.match(re)[1];
@@ -99,7 +99,7 @@ router.get('/image/:courseId/:lectureName/:sourceId/:time', function (req, res) 
 				return result
 			}, []).sort((left, right) => left.time - right.time).pop() //this should be the file
 			if (typeof fileName != 'undefined' && fileName != null) {
-				res.sendFile(path.resolve('lectures', req.params.courseId.toString(), req.params.lectureName.toString(), feedType.toLowerCase(), fileName.name))
+				res.sendFile(path.resolve('lectures', req.session.lti_token.lis_course_section_sourcedid.toString(), req.params.lectureName.toString(), feedType.toLowerCase(), fileName.name))
 			}
 			else {
 				console.log("ERROR", fpath + '/' + feedType.toLowerCase())
@@ -115,8 +115,8 @@ router.get('/image/:courseId/:lectureName/:sourceId/:time', function (req, res) 
 	})
 });
 
-router.get('/video/:courseId/:lectureName', function (req, res) {
-	const fpath = "./lectures/" + req.params.courseId.toString() + '/' + req.params.lectureName.toString() + '/videoLarge.mp4'  // TODO tie this to absolute location
+router.get('/video/:lectureName', function (req, res) {
+	const fpath = "./lectures/" + req.session.lti_token.lis_course_section_sourcedid.toString() + '/' + req.params.lectureName.toString() + '/videoLarge.mp4'  // TODO tie this to absolute location
 	const stat = fs.statSync(fpath)
 	const fileSize = stat.size
 	const range = req.headers.range
