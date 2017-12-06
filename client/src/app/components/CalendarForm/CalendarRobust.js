@@ -289,9 +289,9 @@ class CalendarRobust extends React.Component {
     let end = this.props.calendarForm.eDate;
     let repeatDays = this.props.calendarForm.repeatDays;
     let includes = this.props.calendarForm.includeDates;
-    if(includes.length === 0){includes = -1}
+    if(includes.length === 0){includes = -1} //Important for checking on server, do not change unless in both places.
     let excludes = this.props.calendarForm.excludeDates;
-    if(excludes.length === 0){excludes = -1}
+    if(excludes.length === 0){excludes = -1} //Important for checking on server, do not change unless in both places.
     fetch(('/api/calendar/' + repeatDays + '/' + start + '/' + end + '/' + includes + '/' + excludes), {
       credentials: 'same-origin' // or 'include'
     }).then(res => (res.status === 200 || res.status === 204 || res.status === 304) ? res.json() : []
@@ -357,11 +357,12 @@ class CalendarRobust extends React.Component {
                     credentials: 'same-origin',
                     body: JSON.stringify(this.props.calendarForm.events)};
 
-      fetch('/api/calendar', options).then((response) => {
+      fetch('/api/calendar/' + this.props.courseId, options).then((response) => {
         return response.text()
       }).then((data) => {
-        this.props.setCalOriginalCal(this.props.calendarForm.events); //So user can't re-save the same calendar
+        this.props.setCalOriginalCal(deepCopy(this.props.calendarForm.events)); //So user can't re-save the same calendar
         this.launchMessage('Calendar saved successfully!', data);
+
       }).catch((err) => console.log(err));
     }
     else{
