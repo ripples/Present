@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import {connect} from "react-redux";
 import { Link } from 'react-router';
-import CalendarForm from '../../components/CalendarForm/CalendarForm';
+import CalendarRobust from '../../components/CalendarForm/CalendarRobust';
 import LectureUpload from '../../components/LectureUpload/LectureUpload';
 import LectureDelete from '../../components/LectureDelete/LectureDelete';
 import {setInstructorPage, clearInstructorPage} from '../../Actions/instructorSettingsActions.js';
@@ -19,7 +19,7 @@ class InstructorSettings extends Component {
     renderComponent(page) {
         switch(page) {
             case "calendar":
-                return <Link to="/calendar/" ><CalendarForm /></Link>
+                return <Link to="/calendar/" ><CalendarRobust /></Link>
             case "lectureUpload":
                 return <Link to="/lectureUpload/"><LectureUpload /></Link>
             case "lectureDelete":
