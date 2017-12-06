@@ -36,7 +36,6 @@ router.get('/listOfCourseLectures/', function (req, res) {
 			});
 
 			if(!req.session.lti_token.roles.toString().toLowerCase().includes("instructor")){ //not instructor so filter future lectures out
-
 				var date = new Date();
 				dirTree.children = dirTree.children.filter((lecture) => {
 					var lecDate = new Date(parseInt(lecture.name.substring(6, 11)), parseInt(lecture.name.substring(0, 2)) - 1, parseInt(lecture.name.substring(3, 5)));

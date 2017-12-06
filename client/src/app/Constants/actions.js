@@ -41,6 +41,13 @@ export const deleteLectureConstants = {
     CLEAR_DELETE_LECTURE: "CLEAR_DELETE_LECTURE"
 }
 
+export const instructorSettingsConstants = {
+    SET_INSTRUCTOR_PAGE: 'SET_INSTRUCTOR_PAGE',
+    CLEAR_INSTRUCTOR_PAGE: 'CLEAR_INSTRUCTOR_PAGE',
+    SET_STATUS_MESSAGE: 'SET_STATUS_MESSAGE',
+    CLEAR_STATUS_MESSAGE: 'CLEAR_STATUS_MESSAGE'
+}
+
 export const lectureUploadConstants = {
     SET_LECTURE_FILE: 'SET_LECTURE_FILE',
     SET_LECTURE_DATE: 'SET_LECTURE_DATE',
