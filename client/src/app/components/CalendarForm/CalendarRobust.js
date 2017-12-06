@@ -73,11 +73,21 @@ class CalendarRobust extends React.Component {
   handleChange(name, e){
     switch(name){
       case 'sDate':
-        this.props.setCalSDate(e.toDate());
-        return;
+        if(moment.isMoment(e)){
+          this.props.setCalSDate(e.toDate());
+          return;
+        }
+        else{
+          return;
+        }
       case 'eDate':
-        this.props.setCalEDate(e.toDate());
-        return;
+        if(moment.isMoment(e)){
+          this.props.setCalEDate(e.toDate());
+          return;
+        }
+        else{
+          return;
+        }
       case 'sTime':
         this.props.setCalSTime(formatTime(e.target.value));
         return;
@@ -220,23 +230,28 @@ class CalendarRobust extends React.Component {
   }
 
   handleAddDate(type, e){
-    if(e.format("YYYYMMDD").toString() !== moment().format("YYYYMMDD").toString()){
-      if(type === 'exclude'){
-        const currentExcludes = this.props.calendarForm.excludeDates;
-        let newDate = formatDate(e.format("YYYY-MM-DD").toString());
-        if(!currentExcludes.includes(newDate)){
-          const newExcludes = currentExcludes.concat(newDate);
-          this.props.setCalExcludeDates(newExcludes);
+    if(moment.isMoment(e)){
+      if(e.format("YYYYMMDD").toString() !== moment().format("YYYYMMDD").toString()){
+        if(type === 'exclude'){
+          const currentExcludes = this.props.calendarForm.excludeDates;
+          let newDate = formatDate(e.format("YYYY-MM-DD").toString());
+          if(!currentExcludes.includes(newDate)){
+            const newExcludes = currentExcludes.concat(newDate);
+            this.props.setCalExcludeDates(newExcludes);
+          }
+        }
+        else if(type === 'include'){
+          const currentIncludes = this.props.calendarForm.includeDates;
+          let newDate = formatDate(e.format("YYYY-MM-DD").toString());
+          if(!currentIncludes.includes(newDate)){
+            const newIncludes = currentIncludes.concat(newDate);
+            this.props.setCalIncludeDates(newIncludes);
+          }
         }
       }
-      else if(type === 'include'){
-        const currentIncludes = this.props.calendarForm.includeDates;
-        let newDate = formatDate(e.format("YYYY-MM-DD").toString());
-        if(!currentIncludes.includes(newDate)){
-          const newIncludes = currentIncludes.concat(newDate);
-          this.props.setCalIncludeDates(newIncludes);
-        }
-      }
+    }
+    else{
+      return;
     }
   }
 
