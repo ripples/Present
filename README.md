@@ -25,9 +25,11 @@ The file tree should be as follows:
 			* computer-#-time.png
 		* whiteboard
 			* whiteBoard-#-time.png
+		* INFO
+
     * Lecture Date (mm-dd-yyyy--hh-mm-ss)
         * video.mp4
-	* INFO
+		* INFO
 * Course
 * Course
 
