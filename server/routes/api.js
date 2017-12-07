@@ -53,7 +53,6 @@ router.get('/listOfCourseLectures/', function (req, res) {
 });
 
 router.get('/manifest/:lectureName', function (req, res) {
-	console.log("hi");
 	const fpath = "./lectures/" + req.session.lti_token.lis_course_section_sourcedid.toString() + '/' + req.params.lectureName.toString() + '/INFO'
 	fs.readFile(fpath, 'utf8', function (err, contents) {
 		if (err) {
@@ -118,35 +117,46 @@ router.get('/image/:lectureName/:sourceId/:time', function (req, res) {
 });
 
 router.get('/video/:lectureName', function (req, res) {
-	const fpath = "./lectures/" + req.session.lti_token.lis_course_section_sourcedid.toString() + '/' + req.params.lectureName.toString() + '/videoLarge.mp4'  // TODO tie this to absolute location
-	const stat = fs.statSync(fpath)
-	const fileSize = stat.size
-	const range = req.headers.range
-	if (range) {
-		const parts = range.replace(/bytes=/, "").split("-")
-		const start = parseInt(parts[0], 10)
-		const end = parts[1]
-			? parseInt(parts[1], 10)
-			: fileSize - 1
-		const chunksize = (end - start) + 1
-		const file = fs.createReadStream(fpath, { start, end })
-		const head = {
-			'Content-Range': `bytes ${start}-${end}/${fileSize}`,
-			'Accept-Ranges': 'bytes',
-			'Content-Length': chunksize,
-			'Content-Type': 'video/mp4',
+	const fpath = "./lectures/" + req.session.lti_token.lis_course_section_sourcedid.toString() + '/' + req.params.lectureName.toString()
+	util.promisify(fs.readdir)(fpath).then((files, err) => {
+		if(err){
+			throw err
 		}
-		res.writeHead(206, head);
-		file.pipe(res);
-	}
-	else {
-		const head = {
-			'Content-Length': fileSize,
-			'Content-Type': 'video/mp4',
+		return files.find(e => e.endsWith('.mp4'))
+	}).then( videoName =>{
+		const vpath = fpath + '/' + videoName
+		const stat = fs.statSync(vpath)
+		const fileSize = stat.size
+		const range = req.headers.range
+		if (range) {
+			const parts = range.replace(/bytes=/, "").split("-")
+			const start = parseInt(parts[0], 10)
+			const end = parts[1]
+				? parseInt(parts[1], 10)
+				: fileSize - 1
+			const chunksize = (end - start) + 1
+			const file = fs.createReadStream(vpath, { start, end })
+			const head = {
+				'Content-Range': `bytes ${start}-${end}/${fileSize}`,
+				'Accept-Ranges': 'bytes',
+				'Content-Length': chunksize,
+				'Content-Type': 'video/mp4',
+			}
+			res.writeHead(206, head);
+			file.pipe(res);
 		}
-		res.writeHead(200, head)
-		fs.createReadStream(fpath).pipe(res)
-	}
+		else {
+			const head = {
+				'Content-Length': fileSize,
+				'Content-Type': 'video/mp4',
+			}
+			res.writeHead(200, head)
+			fs.createReadStream(fpath).pipe(res)
+		}
+	}).catch(err => {
+		console.log(err)
+		res.status(404).send()
+	})
 });
 
 router.post("/lectureUpload", function (req, res) {
