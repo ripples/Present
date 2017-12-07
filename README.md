@@ -1,71 +1,97 @@
-LV-client2
-===
-This is a stripped down version of lecture viewer that will be accessed through moodle using lti.
+# PAOL Present
+PAOL Present is a web client for PAOL lecture capture. It is simple, lightweight, requires little configuration, and open source. It uses technology from [IMS Global Learning Consortium's Learning Tools Interopability](http://www.imsglobal.org/activity/learning-tools-interoperability).
 
-How To Setup
----
+## Enviornment Setup
 
-On Windows, please install [OpenSSL](https://slproweb.com/products/Win32OpenSSL.html)
-and [windows build tools](https://github.com/felixrieseberg/windows-build-tools)
+Present's developer enviornment can be in Windows, OSX, and Linux.
 
-1. install node
-2. install a local version of moodle
-3. clone the repository
-4. cd into the client directory and run "npm install"
-5. cd lv-client2 and run "npm install"
-6. put your lecture files in the folder lv-client2/lectures -You may use a symlink for this if you so choose.
-file tree should be:
-* courseId
-    * lectureId
+1. Install the latest version of [NodeJS](https://nodejs.org/en/).
+1. If on Windows, install [OpenSSL 1.0.2m](https://slproweb.com/products/Win32OpenSSL.html) and have either a C++ compiler installed (I.E. Visual Studio) or use [Windows Build Tools](Windows-Build-Tools) .
+1. Run `npm install`
+1. Create a folder called `lectures` and place it in the root of the project.
+1. Create your `.env` file if you want to use custom ports in development.
+1. Either use a deployment script, or `npm run start-all`
+1. Visit from a valid LTI consumer such as Moodle, Sakai, or Canvus.
+
+## Lectures Folder
+
+### Folder Structure
+Create your lecture files in the folder `lv-client2/lectures`. You may use a symlink for this if you so choose.
+The file tree should be as follows:
+* Course
+    * Lecture Date (mm-dd-yyyy--hh-mm-ss)
         * videoLarge.mp4
-    * lectureId
-        * videoLarge.mp4
-    * lectureId
-        * videoLarge.mp4
-* courseId
-* courseId
+        * computer
+			* computer-#-time.png
+		* whiteboard
+			* whiteBoard-#-time.png
+    * Lecture Date (mm-dd-yyyy--hh-mm-ss)
+        * video.mp4
+	* INFO
+* Course
+* Course
 
+The video can be named whatever you want, but it has to be in an mp4 format.
 
-7. in lv-client2 run "node ./bin/www"
-8. cd into client (using a second terminal) and run "npm start"
-9. launch your local instance of moodle and create a course (dont set the course to start or end after the year 2037 if you have a 32-bit installation)
-10. go to the courses page, enable editing mode in the top right, and create a new activity
-11. select "external tool" as the activity
-12. in the settings for the tool add a preconfigured tool configuration
-13. set the tool URL to "localhost:3001/data"
-14. set the default launcher container to "new window"
-15. finish creating the configuration
-16. select the new configuration for your activities preconfigured tool
-17. finish creating the activity
-18. leave editing mode and click on the activiy. If it brings you to our web app, everything is working properly.
+### Info File
 
-Production
----
-When running in production, one may wish to set env files, that may be done with the following:
-
-In the root directory, make a file with `.env` that contains the following keys, but different values (default values shown):
-```
-KEY="You'll Never Walk Alone"
-HOST=http://localhost/
-PORT=3001
-```
-
-In `/client` make another `.env ` with the following keys and some value
+The following is an example of an INFO file.
 
 ```
-HOST=http://present.cs.umass.edu/
-PORT=80
+[course]
+id: PAOL100
+term: F17
+
+[pres]
+start: 2017,10,12,12,59,03
+duration: 3150
+source: paolCap303
+timestamp: 1476291543
+whiteboardCount: 3
+computerCount: 1
 ```
 
-## .env file
+## Deployment
+
+### The `.env` file
+
+ In order to make deployment easy, a `.env` file must be created in the root of `lv-client2` in order know what ports to use for the Proxy. The following is an example of one in use at [UMass Amherst](umass.edu).
 
 ```
 PRODUCTION=true
-PATH_TO_BUILD="C:/dev/lv-client2/client/build/"
-SERVER_PATH=localhost
+PATH_TO_BUILD="/home/user/lv-client2/client/build/"
+SERVER_PATH=present.cs.umass.edu
 SERVER_PORT=3001
-PRESENT_PATH=localhost
+PRESENT_PATH=present.cs.umass.edu
 PRESENT_PORT=3000
 PROXY_PORT=80
-SECRET="Bye bye baby blue"
+COOKIE_SECRET="You think I'd put the real one here?"
+LTI_SECRET="Guess Again!"
 ```
+
+If you do not create an env file, it will use default values as shown in `/lv-client2/bin/init.js`.
+
+**Don't forget that trailing slash in PATH_TO_BUILD**
+
+### Deployment Scripts
+
+Suggested production deployment of the project may be done in included `npm run` scripts using [PM2](https://github.com/Unitech/pm2). You may either install it globally using `npm i pm2 -g` or use the included dev dependency version with `npx pm2`.
+
+These included scripts may also be useful for development.
+
+
+| Command  | Description |
+| -------- | ------------- |
+| start | Starts the server with NPM |
+| start-server | Identical to *start* |
+| start-client | Starts a server for the client |
+| build-client | Builds an optimized verison of the client |
+| build-start | Builds the client then starts the server |
+| start-all | Starts the client and server at the same time |
+| start-pm2-all | Starts the client and server using PM2 |
+| start-pm2-server | Starts the server using PM2 |
+| start-pm2-prod | Builds the client and then starts the server with PM2 |
+
+Some quick ways to kill PM2 are `pm2 kill` which just kills the entire daemon, and `pm2 delete npm` which will delete the process (which is usually just called NPM). If you want to be more slick with PM2, or any other daemon, do it yourself.
+
+Note: PM2 does not work properly with NPM on Windows, but hopefully you are using Unix in production.

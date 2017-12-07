@@ -29,14 +29,14 @@ bb.extend(app, {
     allowedPath: /./
 });
 
-app.use(session({secret: process.env.SECRET}))
+app.use(session({secret: process.env.COOKIE_SECRET}))
 
 //Passport
 passport.use('lti-strategy', new CustomStrategy(
 	function(req, callback) {
 		var val = (req.body) ? req.body : req.user		
 		try{
-			var provider = new lti.Provider(val , "secret")	
+			var provider = new lti.Provider(val , process.env.LTI_SECRET)	
 			if(req.user){
 				callback(null, val)			
 			}
