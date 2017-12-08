@@ -7,18 +7,30 @@ if(process.env.PRODUCTION === "true"){
 		res.sendFile(process.env.PATH_TO_BUILD + "index.html")
 	});
 
-	router.get('/static/js/*', function(req, res){
+	router.get('/static/*', function(req, res){
 		const param = req.params[0]
-		res.sendFile(process.env.PATH_TO_BUILD + "/static/js/" + param)
+		res.sendFile(process.env.PATH_TO_BUILD + "/static/" + param)
 	});
 
-	router.get('/static/css/*', function(req, res){
+
+	router.get('/images/*', function(req, res){
 		const param = req.params[0]
-		res.sendFile(process.env.PATH_TO_BUILD + "/static/css/" + param)
+		res.sendFile(process.env.PATH_TO_BUILD + "/images/" + param)
 	});
 
-	router.get('/:param', function(req, res){
-		res.sendFile(process.env.PATH_TO_BUILD + "/" + req.params.param)
+	router.get('/manifest.json', function(req, res){
+		const param = req.params[0]
+		res.sendFile(process.env.PATH_TO_BUILD + "/manifest.json")
+	});
+
+	router.get('/asset-manifest.json', function(req, res){
+		const param = req.params[0]
+		res.sendFile(process.env.PATH_TO_BUILD + "/asset-manifest.json")
+	});
+
+	router.get('/service-worker.js', function(req, res){
+		const param = req.params[0]
+		res.sendFile(process.env.PATH_TO_BUILD + "/service-worker.js")
 	});
 }
 
