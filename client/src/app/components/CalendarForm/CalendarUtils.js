@@ -1,4 +1,5 @@
 import _ from 'underscore';
+import moment from 'moment';
 
 export function getCurrentSemester(){
   var year = new Date().getFullYear().toString().substr(-2);
@@ -59,6 +60,16 @@ export function formatTime(time){
 export function formatDate(date) {
   var split = date.split("-");
   return split[0] + split[1] + split[2];
+}
+
+export function isValidDate(str){
+  var regex = /[0-9]{1,2}\/[0-9]{1,2}\/[0-9]{4}/
+  if(regex.test(str) && moment(str, "MDY").isValid()){
+    return true;
+  }
+  else{
+    return false;
+  }
 }
 
 export function revertDate(date) { //20171014

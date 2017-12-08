@@ -11,6 +11,7 @@ var CustomStrategy = require('passport-custom')
 var public = require('./routes/public');
 var api = require('./routes/api');
 var upload = require('./routes/upload')
+var entry = require('./routes/entry')
 
 var app = express();
 app.use(cookieParser())
@@ -28,14 +29,14 @@ bb.extend(app, {
     allowedPath: /./
 });
 
-app.use(session({secret: process.env.SECRET}))
+app.use(session({secret: process.env.COOKIE_SECRET}))
 
 //Passport
 passport.use('lti-strategy', new CustomStrategy(
 	function(req, callback) {
 		var val = (req.body) ? req.body : req.user		
 		try{
-			var provider = new lti.Provider(val , "secret")	
+			var provider = new lti.Provider(val , process.env.LTI_SECRET)	
 			if(req.user){
 				callback(null, val)			
 			}
@@ -71,13 +72,7 @@ app.use(passport.initialize())
 app.use(passport.session())
 app.use(passport.authenticate('lti-strategy', {failureFlash: true}));
 
-app.post('/data', function (req, res) {
-	req.session.lti_token = req.body;
-	const url = 'http://' + process.env.PRESENT_PATH + ':' + process.env.PROXY_PORT
-
-	res.redirect(url);
-})
-
+app.use('/', entry)
 app.use('/api', api)
 
 // catch 404 and forward to error handler

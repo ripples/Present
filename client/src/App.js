@@ -11,10 +11,7 @@ import {setCourseFiles} from './app/Actions/courseFilesActions.js';
 import Application from './Application.js';
 import LecturesList from './app/Pages/LecturesList/LecturesList';
 import Lecture from './app/Pages/Lecture/Lecture.js';
-import Calendar from './app/Pages/Calendar/Calendar.js';
 import InstructorSettings from './app/Pages/InstructorSettings/InstructorSettings.js';
-import LectureUpload from './app/Pages/LectureUpload/LectureUpload.js';
-import LectureDelete from './app/Pages/LectureDelete/LectureDelete.js';
 
 
 export default class App extends Component {
@@ -57,16 +54,9 @@ export default class App extends Component {
           <Route path="/" component={Application}>
             <IndexRoute component={LecturesList} />
             <Route path="course/:courseId/lecture/:lectureId" component={Lecture} />
-            <Route path="calendar" component={Calendar} />
-            <Route path="course/:courseId/instructorSettings" component={InstructorSettings} />
-            <Route path="lectureUpload/" >
-              <IndexRoute component={LectureUpload} />
-              <Route path=":success/" component={LectureUpload} />
-            </Route>
-            <Route path="lectureDelete/" >
-              <IndexRoute component={LectureDelete} />
-              <Route path=":success/" component={LectureDelete} />
-            </Route>
+              <Route path="course/:courseId/instructorSettings" >
+                <IndexRoute component={InstructorSettings} />
+              </Route>
           </Route>
         </Router>
       </Provider>

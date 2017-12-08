@@ -59,7 +59,7 @@ var courseStyle = {
 var buttonStyle= {
 	height: "125px",
 	width: "250px",
-	backgroundImage: "url(item-bg.png)",
+	backgroundImage: "url(images/item-bg.png)",
 	backgroundSize: "contain",
 	marginTop: "10px",
 	marginBottom: "40px",

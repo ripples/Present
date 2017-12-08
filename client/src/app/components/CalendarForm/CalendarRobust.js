@@ -7,7 +7,7 @@ import Datetime from 'react-datetime';
 import 'react-datetime/css/react-datetime.css';
 import {connect} from "react-redux";
 import TimeRange from './TimeRange.js';
-import {getCurrentSemester, formatDate, revertDate, isEqual, formatTime, getEventDT, deepCopy, processEvents} from './CalendarUtils.js';
+import {getCurrentSemester, formatDate, revertDate, isEqual, formatTime, getEventDT, deepCopy, processEvents, isValidDate} from './CalendarUtils.js';
 import {setCalModalState, setCalMessageState, setCalMessageText, setCalMessageTitle, setCalEvents, setCalSTime, setCalETime,
   setCalSDate, setCalEDate, setCalRepeatDays, setCalRecurrence, setCalExcludeDates, setCalShowRecur, setCalOriginalCal,
   setCalIncludeDates, setCalDescription, setCalLoc, setCalCourseId, clearForm} from '../../Actions/calFormActions.js';
@@ -73,11 +73,31 @@ class CalendarRobust extends React.Component {
   handleChange(name, e){
     switch(name){
       case 'sDate':
-        this.props.setCalSDate(e.toDate());
-        return;
+        if(moment.isMoment(e)){
+          this.props.setCalSDate(e.toDate());
+          return;
+        }
+        else if(isValidDate(e)){
+          let m = moment(e, "MDY");
+          this.props.setCalSDate(m.toDate());
+          return;
+        }
+        else{
+          return;
+        }
       case 'eDate':
-        this.props.setCalEDate(e.toDate());
-        return;
+        if(moment.isMoment(e)){
+          this.props.setCalEDate(e.toDate());
+          return;
+        }
+        else if(isValidDate(e)){
+          let m = moment(e, "MDY");
+          this.props.setCalEDate(m.toDate());
+          return;
+        }
+        else{
+          return;
+        }
       case 'sTime':
         this.props.setCalSTime(formatTime(e.target.value));
         return;
@@ -220,21 +240,33 @@ class CalendarRobust extends React.Component {
   }
 
   handleAddDate(type, e){
-    if(e.format("YYYYMMDD").toString() !== moment().format("YYYYMMDD").toString()){
-      if(type === 'exclude'){
-        const currentExcludes = this.props.calendarForm.excludeDates;
-        let newDate = formatDate(e.format("YYYY-MM-DD").toString());
-        if(!currentExcludes.includes(newDate)){
-          const newExcludes = currentExcludes.concat(newDate);
-          this.props.setCalExcludeDates(newExcludes);
+    var m = false;
+    if(!moment.isMoment(e) && isValidDate(e)){
+      m = moment(e, "MDY")
+    }
+    else if(moment.isMoment(e)){
+      m = e;
+    }
+    if(!m){
+      return;
+    }
+    else{
+      if(m.format("YYYYMMDD").toString() !== moment().format("YYYYMMDD").toString()){
+        if(type === 'exclude'){
+          const currentExcludes = this.props.calendarForm.excludeDates;
+          let newDate = formatDate(m.format("YYYY-MM-DD").toString());
+          if(!currentExcludes.includes(newDate)){
+            const newExcludes = currentExcludes.concat(newDate);
+            this.props.setCalExcludeDates(newExcludes);
+          }
         }
-      }
-      else if(type === 'include'){
-        const currentIncludes = this.props.calendarForm.includeDates;
-        let newDate = formatDate(e.format("YYYY-MM-DD").toString());
-        if(!currentIncludes.includes(newDate)){
-          const newIncludes = currentIncludes.concat(newDate);
-          this.props.setCalIncludeDates(newIncludes);
+        else if(type === 'include'){
+          const currentIncludes = this.props.calendarForm.includeDates;
+          let newDate = formatDate(m.format("YYYY-MM-DD").toString());
+          if(!currentIncludes.includes(newDate)){
+            const newIncludes = currentIncludes.concat(newDate);
+            this.props.setCalIncludeDates(newIncludes);
+          }
         }
       }
     }
@@ -289,9 +321,9 @@ class CalendarRobust extends React.Component {
     let end = this.props.calendarForm.eDate;
     let repeatDays = this.props.calendarForm.repeatDays;
     let includes = this.props.calendarForm.includeDates;
-    if(includes.length === 0){includes = -1}
+    if(includes.length === 0){includes = -1} //Important for checking on server, do not change unless in both places.
     let excludes = this.props.calendarForm.excludeDates;
-    if(excludes.length === 0){excludes = -1}
+    if(excludes.length === 0){excludes = -1} //Important for checking on server, do not change unless in both places.
     fetch(('/api/calendar/' + repeatDays + '/' + start + '/' + end + '/' + includes + '/' + excludes), {
       credentials: 'same-origin' // or 'include'
     }).then(res => (res.status === 200 || res.status === 204 || res.status === 304) ? res.json() : []
@@ -357,11 +389,12 @@ class CalendarRobust extends React.Component {
                     credentials: 'same-origin',
                     body: JSON.stringify(this.props.calendarForm.events)};
 
-      fetch('/api/calendar', options).then((response) => {
+      fetch('/api/calendar/' + this.props.courseId, options).then((response) => {
         return response.text()
       }).then((data) => {
-        this.props.setCalOriginalCal(this.props.calendarForm.events); //So user can't re-save the same calendar
+        this.props.setCalOriginalCal(deepCopy(this.props.calendarForm.events)); //So user can't re-save the same calendar
         this.launchMessage('Calendar saved successfully!', data);
+
       }).catch((err) => console.log(err));
     }
     else{

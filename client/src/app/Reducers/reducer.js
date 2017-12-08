@@ -7,6 +7,7 @@ import lectureTime from './lectureTime.js';
 import calendarForm from './calendarForm.js';
 import deleteLecture from './lectureDelete.js';
 import lectureImage from './lectureImage.js';
+import instructorPage from './instructorSettings.js';
 import lectureUpload from './lectureUpload.js';
 
 const appReducer = combineReducers({
@@ -17,6 +18,7 @@ const appReducer = combineReducers({
     calendarForm,
     deleteLecture,
     lectureImage,
+    instructorPage,
     lectureUpload
 });
 
