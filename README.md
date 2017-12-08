@@ -8,14 +8,14 @@ Present's developer enviornment can be in Windows, OSX, and Linux.
 1. Install the latest version of [NodeJS](https://nodejs.org/en/).
 1. If on Windows, install [OpenSSL 1.0.2m](https://slproweb.com/products/Win32OpenSSL.html) and have either a C++ compiler installed (I.E. Visual Studio) or use [Windows Build Tools](https://github.com/felixrieseberg/windows-build-tools) .
 1. Run `npm install`
-1. Create a folder called `lectures` and place it in the root of the project.
 1. Create your `.env` file if you want to use custom ports in development.
 1. Either use a deployment script, or `npm run start-all`
 1. Visit from a valid LTI consumer such as Moodle, Sakai, or Canvus.
 
 ## Lectures Folder
 ### Folder Structure
-Create your lecture files in the folder `lv-client2/lectures`. You may use a symlink for this if you so choose.
+Place your lecture files in the folder `Present/lectures`. You may use a symlink for this if you so choose. Either create this folder yourself or it will be created the first time that the server is run
+
 The file tree should be as follows:
 
 * Course
@@ -54,10 +54,10 @@ computerCount: 1
 
 ### The `.env` file
 
- In order to make deployment easy, a `.env` file must be created in the root of `lv-client2` in order know what ports to use for the Proxy. The following is an example of one in use at [UMass Amherst](umass.edu).
+ In order to make deployment easy, a `.env` file must be created in the root of `Present` in order know what ports to use for the Proxy. The following is an example of one in use at [UMass Amherst](umass.edu).
 ```
 PRODUCTION=true
-PATH_TO_BUILD="/home/user/lv-client2/client/build/"
+PATH_TO_BUILD="/home/user/Present/client/build/"
 SERVER_PATH=present.cs.umass.edu
 SERVER_PORT=3001
 PRESENT_PATH=present.cs.umass.edu
@@ -66,7 +66,7 @@ PROXY_PORT=80
 COOKIE_SECRET="You think I'd put the real one here?"
 LTI_SECRET="Guess Again!"
 ```
-If you do not create an env file, it will use default values as shown in `/lv-client2/bin/init.js`.
+If you do not create an env file, it will use default values as shown in `/Present/bin/init.js`.
 
 **Don't forget that trailing slash in PATH_TO_BUILD**
 
