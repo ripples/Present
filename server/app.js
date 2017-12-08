@@ -72,7 +72,7 @@ app.use(passport.initialize())
 app.use(passport.session())
 app.use(passport.authenticate('lti-strategy', {failureFlash: true}));
 
-app.use('/data', entry)
+app.use('/', entry)
 app.use('/api', api)
 
 // catch 404 and forward to error handler

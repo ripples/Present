@@ -27,14 +27,14 @@ class LectureMedia extends React.Component {
 			var computerImages = this.range(this.props.manifest.computerCount).map( (e, i) => {
 				return (
 					<div key={i}>
-						<LectureImage src={'/api/image/' + this.props.lectureId + '/1-' + i + '/' + this.props.time} fallbackImage = "no-comp-image-found.png"/>
+						<LectureImage src={'/api/image/' + this.props.lectureId + '/1-' + i + '/' + this.props.time} fallbackImage = "images/no-comp-image-found.png"/>
 					</div>
 				);
 			})
 			var whiteBoardImages = this.range(this.props.manifest.whiteboardCount).map( (e, i) => {
 				return (
 					<div key={i}>
-						<LectureImage src={'/api/image/' + this.props.lectureId + '/2-' + i + '/' + this.props.time} fallbackImage = "no-comp-image-found.png"/>
+						<LectureImage src={'/api/image/' + this.props.lectureId + '/2-' + i + '/' + this.props.time} fallbackImage = "images/no-comp-image-found.png"/>
 					</div>
 				);
 			})
