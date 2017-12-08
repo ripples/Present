@@ -58,21 +58,33 @@ class LectureMedia extends React.Component {
 		}
 		return (
 			<div className="lecture-media">
-				<div className="container-fluid" style ={lectureBody}>
-					<div style = {lectureVideo}>
-						<VideoView videoSrc={'/api/video/' + this.props.lectureId } style={lectureVideo} onVideoTimeUpdate={this.onVideoTimeUpdate} />
+				{ (this.props.manifest && (this.props.manifest.whiteboardCount + this.props.manifest.computerCount) > 0) ?
+					<div>
+						<div className="container-fluid" style ={lectureBody}>
+							<div style = {lectureVideo}>
+								<VideoView videoSrc={'/api/video/' + this.props.lectureId } style={lectureVideo} onVideoTimeUpdate={this.onVideoTimeUpdate} manifest={this.props.manifest}/>
+							</div>
+							<div style = {selectedImage}>
+								<LectureImage src = {this.props.lectureImage} fallbackImage = "images/no-comp-image-found.png"/>
+							</div>
+						</div>
+						<div style = {date}>
+							{"Lecture: " + convertMonth(this.props.lectureId.substring(0,10)) + this.props.lectureId.substring(3,5) + ", " + this.props.lectureId.substring(6,10)}
+						</div>
+						<div style = {imageContainer}>
+							{computerImages ? computerImages: null}
+							{whiteBoardImages ? whiteBoardImages: null}
+						</div>
 					</div>
-					<div style = {selectedImage}>
-						<LectureImage src = {this.props.lectureImage} fallbackImage = "images/no-comp-image-found.png"/>
+					:
+					<div>
+						<div style = {dateNoBoards}>
+							{"Lecture: " + convertMonth(this.props.lectureId.substring(0,10)) + this.props.lectureId.substring(3,5) + ", " + this.props.lectureId.substring(6,10)}
+						</div>
+						<br></br>
+						<VideoView videoSrc={'/api/video/' + this.props.lectureId } onVideoTimeUpdate={this.onVideoTimeUpdate} manifest={this.props.manifest}/>
 					</div>
-				</div>
-				<div style = {date}>
-					{"Lecture: " + convertMonth(this.props.lectureId.substring(0,10)) + this.props.lectureId.substring(3,5) + ", " + this.props.lectureId.substring(6,10)}
-				</div>
-				<div style = {imageContainer}>
-					{computerImages ? computerImages: null}
-					{whiteBoardImages ? whiteBoardImages: null}
-				</div>
+				} 
 			</div>
 		);
 	}
@@ -151,5 +163,9 @@ var date = {
 	fontSize:"20px",
 	color:"white",
 	backgroundColor:"gray"
+}
+
+var dateNoBoards = {
+	fontSize: "20px"
 }
 export default connect(mapStateToProps, mapDispatchToProps)(LectureMedia);

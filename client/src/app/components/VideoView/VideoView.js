@@ -28,6 +28,15 @@ export default class VideoView extends React.Component {
   }
 
   render() {
+    var video = {
+      margin: "0 auto"
+    };
+    if(this.props.manifest && (this.props.manifest.whiteboardCount + this.props.manifest.computerCount) > 0){
+      video = {
+        float: "left"
+      }
+    }
+
     return (
       <div>
         <div className="video-view">
@@ -42,6 +51,3 @@ export default class VideoView extends React.Component {
   }
 }
 
-var video = {
-  float: "left"
-}
