@@ -259,4 +259,17 @@ router.post('/calendar/:courseId', function (req, res) {
 	}
 });
 
+router.get('/calendar/test', function (req, res) {
+	var mostRecentICSPath = calUtils.getMostRecentICS('./lectures/','.ics', new Date('1970-01-01T12:00:00Z'), '');
+	if(mostRecentICSPath === -1){
+		res.status(500).send("Error: Directory doesn't exist.");
+	}
+	else if(mostRecentICSPath === ""){ //If there is no calendar file at all
+
+	}
+	else{
+		
+	}
+});
+
 module.exports = router;
