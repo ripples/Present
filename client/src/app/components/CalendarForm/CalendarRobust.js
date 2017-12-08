@@ -9,7 +9,7 @@ import {connect} from "react-redux";
 import TimeRange from './TimeRange.js';
 import {getCurrentSemester, formatDate, revertDate, isEqual, formatTime, getEventDT, deepCopy, processEvents, isValidDate} from './CalendarUtils.js';
 import {setCalModalState, setCalMessageState, setCalMessageText, setCalMessageTitle, setCalEvents, setCalSTime, setCalETime,
-  setCalSDate, setCalEDate, setCalRepeatDays, setCalRecurrence, setCalExcludeDates, setCalShowRecur, setCalOriginalCal,
+  setCalSDate, setCalEDate, setCalRepeatDays, setCalRecurrence, setCalExcludeDates, setCalShowRecur, setCalMultidayEvent, setCalOriginalCal,
   setCalIncludeDates, setCalDescription, setCalLoc, setCalCourseId, clearForm} from '../../Actions/calFormActions.js';
 
 BigCalendar.momentLocalizer(moment);
@@ -115,7 +115,22 @@ class CalendarRobust extends React.Component {
           this.props.setCalShowRecur(false);
         }
         else{
+          if(this.props.calendarForm.multidayEvent){
+            this.props.setCalMultidayEvent(false);
+            this.refs['mdchkbx'].checked = !this.refs['mdchkbx'].checked;
+          }
           this.props.setCalShowRecur(true);
+        }
+        return;
+      case 'multidayEvent':
+        //console.log("BEFORE CHANGE: " + this.props.calendarForm.multidayEvent);
+        if(this.props.calendarForm.multidayEvent){
+          this.props.setCalMultidayEvent(false);
+          //console.log("AFTER CHANGE: " + this.props.calendarForm.multidayEvent);
+        }
+        else{
+          this.props.setCalMultidayEvent(true);
+          //console.log("AFTER CHANGE: " + this.props.calendarForm.multidayEvent);
         }
         return;
       default:
@@ -361,13 +376,16 @@ class CalendarRobust extends React.Component {
     e.preventDefault();
     let start = this.props.calendarForm.sDate;
     let end = this.props.calendarForm.eDate;
+    if(end === ""){
+      end = start;
+    }
     let repeatDays = this.props.calendarForm.repeatDays;
     if(+start > +end){
       this.launchMessage('ERROR: Start Date later than End Date', 'Your ending date must be later than or the same as your starting date.');
     }
     else if(repeatDays.length === 0){
-      let newEvent = new Event(this.props.courseId, (this.props.courseTitle + ' ' + getCurrentSemester()), getEventDT(this.props.calendarForm.sDate, this.props.calendarForm.sTime),
-                               getEventDT(this.props.calendarForm.eDate, this.props.calendarForm.eTime), this.props.calendarForm.description, this.props.calendarForm.location,
+      let newEvent = new Event(this.props.courseId, (this.props.courseTitle + ' ' + getCurrentSemester()), getEventDT(start, this.props.calendarForm.sTime),
+                               getEventDT(end, this.props.calendarForm.eTime), this.props.calendarForm.description, this.props.calendarForm.location,
                                (getCurrentSemester() + ' ' + this.props.courseId));
       this.addNewEvent(newEvent); //Add a single event
     }
@@ -404,6 +422,8 @@ class CalendarRobust extends React.Component {
 
   render() {
 
+    var showEndDate = !(this.props.calendarForm.multidayEvent || this.props.calendarForm.showRecur);
+
     const helpMessage = (
       <div>
         <div>
@@ -437,11 +457,12 @@ class CalendarRobust extends React.Component {
           <legend style={legendStyle}>Add New Event(s)</legend>
           <div>
             <label style={labelStyle} htmlFor='showRecur'><input style={chkbxStyle} type='checkbox' name='showRecur' onChange={this.handleChange.bind(this, 'showRecur')}/>Create Recurring Event?</label>
+            <label hidden={this.props.calendarForm.showRecur} style={labelStyle} htmlFor='multidayEvent'><input style={chkbxStyle} type='checkbox' name='multidayEvent' onChange={this.handleChange.bind(this, 'multidayEvent')} ref={'mdchkbx'}/>Multi-Day Event?</label>
           </div>
           <div>
             <Datetime inputProps={{ placeholder: 'Start Date: MM/DD/YYYY', style: pickerStyle }} onChange={this.handleChange.bind(this, 'sDate')} timeFormat={false} closeOnSelect={true}/>
           </div>
-          <div>
+          <div hidden={showEndDate}>
             <Datetime inputProps={{ placeholder: 'End Date: MM/DD/YYYY', style: pickerStyle }} onChange={this.handleChange.bind(this, 'eDate')} timeFormat={false} closeOnSelect={true}/>
           </div>
           <div>
@@ -640,7 +661,8 @@ const mapDispatchToProps = (dispatch, ownProps) => {
     setCalShowRecur: (showRecur) => dispatch(setCalShowRecur(showRecur)),
     setCalOriginalCal: (originalCal) => dispatch(setCalOriginalCal(originalCal)),
     setCalSTime: (sTime) => dispatch(setCalSTime(sTime)),
-    setCalETime: (eTime) => dispatch(setCalETime(eTime))
+    setCalETime: (eTime) => dispatch(setCalETime(eTime)),
+    setCalMultidayEvent: (multidayEvent) => dispatch(setCalMultidayEvent(multidayEvent))
 	}
 };
 

@@ -49,7 +49,7 @@ export function processEvents(events){ //Converts the JSON representation of the
 }
 
 export function deepCopy(obj){
-  return JSON.parse(JSON.stringify(obj));
+  return processEvents(JSON.parse(JSON.stringify(obj)));
 }
 
 export function formatTime(time){

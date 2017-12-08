@@ -14,6 +14,13 @@ export function setCalShowRecur(showRecur){
   }
 }
 
+export function setCalMultidayEvent(multidayEvent){
+  return {
+    type: calFormConstants.SET_CAL_MULTIDAY_EVENT,
+    multidayEvent
+  }
+}
+
 export function setCalModalState(modalState){
   return {
     type: calFormConstants.SET_CAL_MODAL_STATE,

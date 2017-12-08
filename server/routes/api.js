@@ -241,8 +241,22 @@ router.get('/calendar/:recurEvent/:start/:end/:includes/:excludes', function (re
 
 router.post('/calendar/:courseId', function (req, res) {
 	var events = req.body;
-	calUtils.generateICS(events, req.params.courseId);
-	res.status(201).send("Recording schedule successfully created: ./lectures/" + req.params.courseId + "/Calendar.ics");
+	if(events.length === 0){ //If they are saving an empty cal file
+		fpath = "./lectures/" + req.params.courseId + "/Calendar.ics";
+		fs.exists(fpath, function (exists) {
+			if (exists) {
+				fs.unlinkSync(fpath) //Delete the file synchronously
+				res.status(200).send("Overwrote old calendar with empty calendar, so it was deleted.");
+			}
+			else {
+				res.status(200).send("Saved empty calendar with no previously existing calendar... nothing was done.");
+			}
+		})
+	}
+	else{
+		calUtils.generateICS(events, req.params.courseId);
+		res.status(201).send("Recording schedule successfully created: ./lectures/" + req.params.courseId + "/Calendar.ics");
+	}
 });
 
 module.exports = router;

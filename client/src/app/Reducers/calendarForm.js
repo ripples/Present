@@ -6,6 +6,7 @@ export default function calendarForm(state = calInit, action){
           return {
             originalCal: action.originalCal,
             showRecur: state.showRecur,
+            multidayEvent: state.multidayEvent,
             modalState: state.modalState,
             messageState: state.messageState,
             messageText: state.messageText,
@@ -28,6 +29,30 @@ export default function calendarForm(state = calInit, action){
           return {
             originalCal: state.originalCal,
             showRecur: action.showRecur,
+            multidayEvent: state.multidayEvent,
+            modalState: state.modalState,
+            messageState: state.messageState,
+            messageText: state.messageText,
+            messageTitle: state.messageTitle,
+            events: state.events,
+            sDate: state.sDate,
+            eDate: state.eDate,
+            sTime: state.sTime,
+            eTime: state.eTime,
+            repeatDays: state.repeatDays,
+            recurrence: state.recurrence,
+            excludeDates: state.excludeDates,
+            includeDates: state.includeDates,
+            description: state.description,
+            location: state.location,
+            courseId: state.courseId
+          };
+
+        case calFormConstants.SET_CAL_MULTIDAY_EVENT:
+          return {
+            originalCal: state.originalCal,
+            showRecur: state.showRecur,
+            multidayEvent: action.multidayEvent,
             modalState: state.modalState,
             messageState: state.messageState,
             messageText: state.messageText,
@@ -50,6 +75,7 @@ export default function calendarForm(state = calInit, action){
           return {
             originalCal: state.originalCal,
             showRecur: state.showRecur,
+            multidayEvent: state.multidayEvent,
             modalState: action.modalState,
             messageState: state.messageState,
             messageText: state.messageText,
@@ -72,6 +98,7 @@ export default function calendarForm(state = calInit, action){
           return {
             originalCal: state.originalCal,
             showRecur: state.showRecur,
+            multidayEvent: state.multidayEvent,
             modalState: state.modalState,
             messageState: action.messageState,
             messageText: state.messageText,
@@ -94,6 +121,7 @@ export default function calendarForm(state = calInit, action){
           return {
             originalCal: state.originalCal,
             showRecur: state.showRecur,
+            multidayEvent: state.multidayEvent,
             modalState: state.modalState,
             messageState: state.messageState,
             messageText: action.messageText,
@@ -116,6 +144,7 @@ export default function calendarForm(state = calInit, action){
           return {
             originalCal: state.originalCal,
             showRecur: state.showRecur,
+            multidayEvent: state.multidayEvent,
             modalState: state.modalState,
             messageState: state.messageState,
             messageText: state.messageText,
@@ -138,6 +167,7 @@ export default function calendarForm(state = calInit, action){
           return {
             originalCal: state.originalCal,
             showRecur: state.showRecur,
+            multidayEvent: state.multidayEvent,
             modalState: state.modalState,
             messageState: state.messageState,
             messageText: state.messageText,
@@ -160,6 +190,7 @@ export default function calendarForm(state = calInit, action){
           return {
             originalCal: state.originalCal,
             showRecur: state.showRecur,
+            multidayEvent: state.multidayEvent,
             modalState: state.modalState,
             messageState: state.messageState,
             messageText: state.messageText,
@@ -182,6 +213,7 @@ export default function calendarForm(state = calInit, action){
           return {
             originalCal: state.originalCal,
             showRecur: state.showRecur,
+            multidayEvent: state.multidayEvent,
             modalState: state.modalState,
             messageState: state.messageState,
             messageText: state.messageText,
@@ -204,6 +236,7 @@ export default function calendarForm(state = calInit, action){
           return {
             originalCal: state.originalCal,
             showRecur: state.showRecur,
+            multidayEvent: state.multidayEvent,
             modalState: state.modalState,
             messageState: state.messageState,
             messageText: state.messageText,
@@ -226,6 +259,7 @@ export default function calendarForm(state = calInit, action){
           return {
             originalCal: state.originalCal,
             showRecur: state.showRecur,
+            multidayEvent: state.multidayEvent,
             modalState: state.modalState,
             messageState: state.messageState,
             messageText: state.messageText,
@@ -248,6 +282,7 @@ export default function calendarForm(state = calInit, action){
           return {
             originalCal: state.originalCal,
             showRecur: state.showRecur,
+            multidayEvent: state.multidayEvent,
             modalState: state.modalState,
             messageState: state.messageState,
             messageText: state.messageText,
@@ -270,6 +305,7 @@ export default function calendarForm(state = calInit, action){
           return {
             originalCal: state.originalCal,
             showRecur: state.showRecur,
+            multidayEvent: state.multidayEvent,
             modalState: state.modalState,
             messageState: state.messageState,
             messageText: state.messageText,
@@ -292,6 +328,7 @@ export default function calendarForm(state = calInit, action){
           return {
             originalCal: state.originalCal,
             showRecur: state.showRecur,
+            multidayEvent: state.multidayEvent,
             modalState: state.modalState,
             messageState: state.messageState,
             messageText: state.messageText,
@@ -314,6 +351,7 @@ export default function calendarForm(state = calInit, action){
           return {
             originalCal: state.originalCal,
             showRecur: state.showRecur,
+            multidayEvent: state.multidayEvent,
             modalState: state.modalState,
             messageState: state.messageState,
             messageText: state.messageText,
@@ -336,6 +374,7 @@ export default function calendarForm(state = calInit, action){
           return {
             originalCal: state.originalCal,
             showRecur: state.showRecur,
+            multidayEvent: state.multidayEvent,
             modalState: state.modalState,
             messageState: state.messageState,
             messageText: state.messageText,
@@ -358,6 +397,7 @@ export default function calendarForm(state = calInit, action){
           return {
             originalCal: state.originalCal,
             showRecur: state.showRecur,
+            multidayEvent: state.multidayEvent,
             modalState: state.modalState,
             messageState: state.messageState,
             messageText: state.messageText,
@@ -380,6 +420,7 @@ export default function calendarForm(state = calInit, action){
           return {
             originalCal: state.originalCal,
             showRecur: state.showRecur,
+            multidayEvent: state.multidayEvent,
             modalState: state.modalState,
             messageState: state.messageState,
             messageText: state.messageText,
@@ -409,6 +450,7 @@ export default function calendarForm(state = calInit, action){
 const calInit = {
     originalCal: [],
     showRecur: false,
+    multidayEvent: false,
     modalState: false,
     messageState: false,
     messageText: "",
