@@ -13,14 +13,19 @@ class LecturesList extends Component {
 					<h2 style={headerStyle}>{this.props.courseTitle} Lectures:</h2>
 					{( typeof this.props.course !== "undefined" && typeof this.props.course.children !== "undefined") ?
 						this.props.course.children.map((course, i) => {
-							return (
-								<div className = "col-md-3" style={buttonStyles} key={i}>
-									<div style = {courseStyle}>{convertMonth(course.name.substring(0,10)) + course.name.substring(3,5) + ", " + course.name.substring(6,10)}</div>
-									<Link to={"course/" + this.props.courseId + "/lecture/" + course.name}>
-										<button type="button" style={buttonStyle} />
-									</Link>
-								</div>
-							);
+							var patt = /^\d\d-\d\d-\d\d\d\d--\d\d-\d\d-\d\d$/;
+							if (patt.test(course.name)) { 
+								return (
+									<div className = "col-md-3" key={i}>
+										<div style = {courseStyle}>{convertMonth(course.name.substring(0,10)) + course.name.substring(3,5) + ", " + course.name.substring(6,10)}</div>
+										<Link to={"course/" + this.props.courseId + "/lecture/" + course.name}>
+											<button type="button" style={buttonStyle} />
+										</Link>
+									</div>
+								);
+							} else {
+								return (<div key={i}></div>)
+							}
 						}) : null
 					}
 				</div>
@@ -67,10 +72,6 @@ var buttonStyle= {
 	position: "relative",
 	boxShadow: "10px 10px 5px #888888",
 	outline: "none"
-}
-
-var buttonStyles= {
-	overflow: "auto"
 }
 
 export default connect(mapStateToProps)(LecturesList);

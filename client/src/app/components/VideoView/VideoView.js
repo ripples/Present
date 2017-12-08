@@ -4,8 +4,8 @@ import videojs from "video.js";
 export default class VideoView extends React.Component {
   componentDidMount() {
     const videoJsOptions = {
-      height: 358,
-      width: 638,
+      height: 240,
+      width: 320,
       autoPlay: true,
       controls: true,
       sources: [{
@@ -31,12 +31,17 @@ export default class VideoView extends React.Component {
     return (
       <div>
         <div className="video-view">
-          <video 
+          <video
             ref={node => this.videoNode = node}
-            className="video-js vjs-default-skin vjs-big-play-centered">
+            className="video-js vjs-default-skin vjs-big-play-centered"
+            style = {video}>
           </video>
         </div>
       </div>
     );
   }
+}
+
+var video = {
+  float: "left"
 }
