@@ -265,10 +265,18 @@ router.get('/calendar/test', function (req, res) {
 		res.status(500).send("Error: Directory doesn't exist.");
 	}
 	else if(mostRecentICSPath === ""){ //If there is no calendar file at all
-
+		res.status(200).send([]);
 	}
 	else{
-		
+		let csvdata = require('csvdata');
+		csvdata.load('./server/utils/CaptureRooms.csv').then(json => {
+			  for(let captureRoom of json){
+					if(mostRecentICSPath.includes(captureRoom.Room)){
+						//Found the correct room. Load the calendar from that filepath
+						//fpath should be ./lectures/ROOM/Calendar.ics
+					}
+				}
+		  }).catch(err => console.log('Error: ' + err));
 	}
 });
 

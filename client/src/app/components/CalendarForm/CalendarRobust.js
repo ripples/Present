@@ -534,8 +534,9 @@ class CalendarRobust extends React.Component {
     return (
       <div>
         <div>
-          <button type='button' style={buttonStyle} onClick={this.testBtn.bind(this)}>Find Cal Files</button>
-          <button type='button' style={buttonStyle} onClick={this.onOpenModal}>Add Event(s)</button>
+          <button type='button' style={modalBtnStyle} onClick={this.testBtn.bind(this)}>Find Cal Files</button>
+          <button type='button' style={modalBtnStyle} onClick={this.onOpenModal}>Add Event(s)</button>
+          <label name='numEvents'>Events Scheduled: {this.props.calendarForm.events.length}</label>
           <Modal open={this.props.calendarForm.modalState} onClose={this.onCloseModal} little>
             {addEventForm}
           </Modal>
@@ -544,7 +545,7 @@ class CalendarRobust extends React.Component {
             {this.props.calendarForm.messageText}
           </Modal>
         </div>
-        <div>
+        <div style={divStyle}>
           <BigCalendar
             selectable
             popup
@@ -561,6 +562,10 @@ class CalendarRobust extends React.Component {
     );
   }
 
+}
+
+var divStyle = {
+  height: "500px"
 }
 
 var labelStyle = {

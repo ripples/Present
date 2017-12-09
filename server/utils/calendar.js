@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 var moment = require('moment');
 require('moment-recur');
-const csv = require('fast-csv');
+
 
 module.exports = {
   generateICS: function(events, courseId) {
@@ -188,18 +188,19 @@ module.exports = {
     var files = fs.readdirSync(startPath);
     for(var i = 0; i < files.length; i++){
       var filename = path.join(startPath, files[i]);
-	  var stat = fs.lstatSync(filename);
+      var stat = fs.lstatSync(filename);
       if(stat.isDirectory()){
-        module.exports.getMostRecentICS(filename, filter, mostRecentDate, fpath); //recurse
+        fpath = module.exports.getMostRecentICS(filename, filter, mostRecentDate, fpath); //recurse
       }
       else if(filename.indexOf(filter) >= 0){
-    		if(stat.mtime > mostRecentDate){
-    			mostRecentDate = stat.mtime;
-    			fpath = filename;
-    		}
+        if(stat.mtime > mostRecentDate){
+          mostRecentDate = stat.mtime;
+          fpath = filename;
+          console.log('MOST RECENT: ' + fpath + ' ' + mostRecentDate);
+          return fpath; //Return the file path of the most recent calendar file.
+        }
       }
-	  }
-	  console.log('MOST RECENT: ' + fpath + ' ' + mostRecentDate);
-    return fpath; //Return the file path of the most recent calendar file.
+    }
+    return fpath;
   }
 }
