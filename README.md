@@ -55,7 +55,7 @@ computerCount: 1
 
 ### The `.env` file
 
- In order to make deployment easy, a `.env` file must be created in the root of `Present` in order know what ports to use for the Proxy. The following is an example of one in use at [UMass Amherst](umass.edu).
+ In order to make deployment easy, a `.env` file must be created in the root of `Present` in order know what ports to use for the Proxy. The following is an example of one in use at [UMass Amherst](http://umass.edu/).
 ```
 PRODUCTION=true
 PATH_TO_BUILD="/home/user/Present/client/build/"
@@ -101,7 +101,7 @@ These included scripts may also be useful for development.
 | start-pm2-server | Starts the server using PM2 |
 | start-pm2-prod | Builds the client and then starts the server with PM2 |
 
-Some quick ways to kill PM2 are `pm2 kill` which just kills the entire daemon, and `pm2 delete npm` which will delete the process (which is usually just called NPM). If you want to be more slick with PM2, or any other daemon, do it yourself.
+Some quick ways to kill PM2 are `pm2 kill` which just kills the entire daemon, and `pm2 delete npm` which will delete the process (which is usually just called NPM). If you want to be more slick with PM2, or any other daemon, may configure it on your own.
 
 Note: PM2 does not work properly with NPM on Windows, but hopefully you are using Unix in production.
 
