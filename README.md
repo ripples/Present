@@ -33,6 +33,7 @@ The file tree should be as follows:
 * Course
 
 The video can be named whatever you want, but it has to be in an mp4 format.
+
 ### Info File
 The following is an example of an INFO file.
 
@@ -121,3 +122,33 @@ The tool name is not releveant. The tool URL should match the URL and port of wh
 
 Once done, hit save changes. Then save and return to course, and finally you may test the tool.
 
+## Sakai
+
+With Sakai, you may need to have your system administrator allow for you to add the LTI External tool. First, under site info, go to `Mange Tools`
+
+![Step 1](https://i.imgur.com/kMqeOS2.png)
+
+On our installation, you then need to go to Plugin Tools and select PAOL LTI; however, on other installations, you may just select external tool under the general menu.
+
+![Step 2](https://i.imgur.com/HcMTdKE.png)
+
+You then need to configure the launch URL with where you have Present deployed, in adition to the launch key value as `key` and the secret as whatever is in the `.env` for `LTI_SECRET`. Custom parameters may be added ensure proper syncing of classnames with capture.
+
+![Step 3](https://i.imgur.com/bFUe11o.png)
+
+Hit continue, then finish, and the button should work.
+
+## FAQS
+
+- No Lectures are showing up!
+    - Make sure that the class IDs in Moodle and Sakai line up. With what is in the `/lectures/` folder. You may want to use the custom parameter for `class_name`.
+- I have multiple sections and one LMS page? How can this be FERPA compliant?
+    - As long as you keep the recordings consistently in different folders, I.E. classname-1 and classname-2, you may use the `section_number` custom parameter and make several different buttons that are only visible to certain groups through the LMS. This has been tested at Ithaca College and UMass Amherst.
+- Do I have to use your webserver; can I use something like Apache instead?
+    - Sure, just set Production to `false` and use the `PRESENT_PATH` and `PRESENT_PORT` variables to point to your server.
+- I am already running an NGINX reverse proxy? Do I have to use yours?
+    - As of now, yes. However you may just piggyback our Redbird proxy over NGINX.
+- I am getting invalid signature errors.
+    - This periodically happens if the Launch URL does not include `http://`. 
+- Do you support SSL?
+    - Some day. We aim to make it easy to add.
