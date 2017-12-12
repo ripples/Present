@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import {connect} from "react-redux";
-import { Link } from 'react-router';
 import CalendarRobust from '../../components/CalendarForm/CalendarRobust';
 import LectureUpload from '../../components/LectureUpload/LectureUpload';
 import LectureDelete from '../../components/LectureDelete/LectureDelete';
@@ -9,7 +8,7 @@ import {setInstructorPage, clearInstructorPage} from '../../Actions/instructorSe
 class InstructorSettings extends Component {
 
     componentWillMount() {
-        this.props.setInstructorPage(this.props.instructorPage);
+        this.props.setInstructorPage("lectureUpload");
     }
 
     onClick(page) {
@@ -43,13 +42,13 @@ class InstructorSettings extends Component {
                         <h1 style = {headerStyle} >Settings</h1>
                         <div className="col-md-4">
                             <div>
-                                    <button style={buttonStyle} onClick={this.onClick.bind(this, "calendar")}><div style = {textStyle}>Calendar</div></button>
+                                <button style={buttonStyle} onClick={this.onClick.bind(this, "lectureUpload")}><div style = {textStyle}>Lecture Upload</div></button>
                             </div>
                             <div>
-                                    <button style={buttonStyle} onClick={this.onClick.bind(this, "lectureUpload")}><div style = {textStyle}>Lecture Upload</div></button>
+                                <button style={buttonStyle} onClick={this.onClick.bind(this, "lectureDelete")}><div style = {textStyle}>Lecture Delete</div></button>
                             </div>
                             <div>
-                                    <button style={buttonStyle} onClick={this.onClick.bind(this, "lectureDelete")}><div style = {textStyle}>Lecture Delete</div></button>
+                                <button style={buttonStyle} onClick={this.onClick.bind(this, "calendar")}><div style = {textStyle}>Calendar</div></button>
                             </div>
                         </div>
                         <div className="col-md-8" >

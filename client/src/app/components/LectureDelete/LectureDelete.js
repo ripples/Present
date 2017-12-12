@@ -3,6 +3,7 @@ import {connect} from "react-redux";
 import {setDeleteLecture, clearDeleteLecture} from '../../Actions/lectureDeleteActions.js';
 import {setCourseFiles} from '../../Actions/courseFilesActions.js';
 import { setStatusMessage, clearStatusMessage } from "../../Actions/instructorSettingsActions";
+import {convertMonth} from '../../utils/utils.js';
 
 class LectureDelete extends React.Component {
     
@@ -55,7 +56,7 @@ class LectureDelete extends React.Component {
                                             if (patt.test(lec.name)) {
                                                 return (
                                                     <div key={i} style = {lectureStyle}>
-                                                        <input type="radio" name="lecture" value={lec.name} onChange={this.onChange.bind(this)} required/> {lec.name}
+                                                        <input type="radio" name="lecture" value={lec.name} onChange={this.onChange.bind(this)} required/> {convertMonth(lec.name.substring(0,10)) + lec.name.substring(3,5) + ", " + lec.name.substring(6,10)}
                                                     </div>
                                                 )
                                             } else {
