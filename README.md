@@ -68,6 +68,18 @@ LTI_SECRET="Guess Again!"
 ```
 If you do not create an env file, it will use default values as shown in `/Present/bin/init.js`.
 
+| Value | Description | Default Value |
+| ----- | ----------- | ------------- |
+| PRODUCTION | Set to true if production, will serve HTTP pages | `false` |
+| PATH_TO_BUILD | Where the build folder is in your filesystem, typically `/Present/client/build` | `undefined` |
+| SERVER_PATH | Where the server is | localhost |
+| SERVER_PORT | Port where the server is running | 3001 |
+| PRESENT_PATH | URL of client, only used if production is `false` | localhost |
+| PRESENT_PORT | Port of front end, only used if production is `false` | 3000 |
+| PROXY_PORT | Port that the proxy is running on | 3002 |
+| COOKIE_SECRET | Value for the cookie secret | Arbitrary String |
+| LTI_SECRET | Value for LTI shared secret | 'secret'
+
 **Don't forget that trailing slash in PATH_TO_BUILD**
 
 ### Deployment Scripts
@@ -91,3 +103,21 @@ These included scripts may also be useful for development.
 Some quick ways to kill PM2 are `pm2 kill` which just kills the entire daemon, and `pm2 delete npm` which will delete the process (which is usually just called NPM). If you want to be more slick with PM2, or any other daemon, do it yourself.
 
 Note: PM2 does not work properly with NPM on Windows, but hopefully you are using Unix in production.
+
+## LMS Intergration
+
+Present may be used with any LMS that supports  [IMS Global Learning Consortium's Learning Tools Interopability aka LTI](http://www.imsglobal.org/activity/learning-tools-interoperability). The system has been tested extensively with Moodle and Sakai.
+
+### Moodle
+
+To intergrate with Moodle, one needs to create an external tool from their class and add their Present server as an LTI tool. 
+
+![Step 1](https://i.imgur.com/UbavnOg.png)
+![Step 2](https://i.imgur.com/dCBNDIc.png)
+
+The tool name is not releveant. The tool URL should match the URL and port of where you deployed to. The consumer key must be `key` as listed. The shared secret should match the `LTI_SECRET` in your `.env` file. Custom Parameters may also be added to ensure proper syncing with folders created by the capture tool. They are not required however. The launch container should also be set to New Window.
+
+![Step 3](https://i.imgur.com/buWdhTd.png)
+
+Once done, hit save changes. Then save and return to course, and finally you may test the tool.
+
