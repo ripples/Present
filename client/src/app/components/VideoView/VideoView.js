@@ -3,9 +3,16 @@ import videojs from "video.js";
 
 export default class VideoView extends React.Component {
   componentDidMount() {
+    if(this.props.manifest && (this.props.manifest.whiteboardCount + this.props.manifest.computerCount) > 0){
+      var height = 240;
+      var width = 320;
+    } else {
+      var height = 480;
+      var width = 640;
+    }
     const videoJsOptions = {
-      height: 240,
-      width: 320,
+      height: height,
+      width: width,
       autoPlay: true,
       controls: true,
       sources: [{
