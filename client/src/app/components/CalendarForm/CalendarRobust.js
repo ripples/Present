@@ -41,8 +41,7 @@ class CalendarRobust extends React.Component {
 
   componentWillMount(){ //Read any existing calendar file from server, if none exists, blank calendar. (GET)
     this.props.setCourseId(this.props.courseId);
-    let urlParam = this.props.fpath.split("\\").join("~"); //Fetch doesn't allow URL query parameters nicely... need to hack it a little here.
-    fetch(('/api/calendar/populate/' + urlParam), {
+    fetch(('/api/calendar/populate/' + encodeURIComponent(this.props.fpath)), {
       credentials: 'same-origin' // or 'include'
     }).then(
       res => (res.status === 200 || res.status === 204) ? res.json() : []
@@ -60,7 +59,7 @@ class CalendarRobust extends React.Component {
   clear(){
     this.props.setCalShowRecur(false);
     this.props.setCalMultidayEvent(false);
-    this.refs['mdchkbx'].checked = false;
+    //this.refs['mdchkbx'].checked = false;
     this.props.setCalSDate('');
     this.props.setCalEDate('');
     this.props.setCalSTime('');
@@ -189,6 +188,11 @@ class CalendarRobust extends React.Component {
   }
 
   generateSelectedEvent(event){
+    const editDisabled = (this.props.courseId !== event.courseId);
+    let style = modalBtnStyle;
+    if(editDisabled){
+      style = disabledButtonStyle;
+    }
     var selectedEventMessage = (
       <div>
         <div>
@@ -217,8 +221,8 @@ class CalendarRobust extends React.Component {
             <p style={{display: 'inline'}}>{event.summary}</p>
           </div>
           <div style={{textAlign: 'center'}}>
-            <button type='button' style={modalBtnStyle} onClick={this.showEditPane.bind(this, event)}>Edit</button>
-            <button type='button' style={modalBtnStyle} onClick={this.deleteEventBtn.bind(this, event)}>Delete</button>
+            <button type='button' style={style} onClick={this.showEditPane.bind(this, event)} disabled={editDisabled}>Edit</button>
+            <button type='button' style={style} onClick={this.deleteEventBtn.bind(this, event)} disabled={editDisabled}>Delete</button>
             <button type='button' style={modalBtnStyle} onClick={this.onCloseMessage}>Cancel</button>
           </div>
         </div>
@@ -406,9 +410,8 @@ class CalendarRobust extends React.Component {
                     headers: {"Content-Type": "application/json"},
                     credentials: 'same-origin',
                     body: JSON.stringify(this.props.calendarForm.events)};
-      let urlParam = this.props.fpath.split("\\").join("~"); //Fetch doesn't allow URL query parameters nicely... need to hack it a little here.
 
-      fetch('/api/calendar/save/' + this.props.courseId + '/' + urlParam, options).then((response) => {
+      fetch('/api/calendar/save/' + this.props.courseId + '/' + encodeURIComponent(this.props.fpath), options).then((response) => {
         return response.text()
       }).then((data) => {
         this.props.setCalOriginalCal(deepCopy(this.props.calendarForm.events)); //So user can't re-save the same calendar
@@ -593,6 +596,18 @@ var modalBtnStyle = {
   backgroundColor: "white",
   borderRadius: "4px",
   color: "#000080"
+}
+
+var disabledButtonStyle = {
+  display: 'inline',
+  margin: '10px 5px 10px 5px',
+  paddingLeft: "10px",
+  paddingRight: "10px",
+  paddingTop: "4px",
+  paddingBottom: "4px",
+  backgroundColor: "grey",
+  borderRadius: "4px",
+  color: "#00008"
 }
 
 var buttonStyle = {

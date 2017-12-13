@@ -5,7 +5,7 @@ require('moment-recur');
 
 
 module.exports = {
-  generateICS: function(events, courseId) {
+  generateICS: function(events, courseId, fpath) {
 	var START_TAG = "BEGIN:VCALENDAR\nPRODID:Calendar\nVERSION:2.0\n", END_TAG = "END:VCALENDAR";
 	var fileText = "";
 	if(events.length === 0) {
@@ -32,23 +32,23 @@ module.exports = {
 		}
 		fileText += END_TAG;
 	}
-	fs.writeFileSync("./lectures/" + courseId + "/Calendar.ics", fileText, function (err) {
+	fs.writeFileSync(fpath, fileText, function (err) {
 		if (err) return console.log(err);
 	});
   	let fetch = require('node-fetch');
   	let FormData = require('form-data');
-  	const stats = fs.statSync("./lectures/" + courseId + "/Calendar.ics");
+  	const stats = fs.statSync(fpath);
   	const fileSizeInBytes = stats.size;
   	var body = new FormData();
   	var filedata = 0
   	try {
-  		filedata = fs.readFileSync("./lectures/" + courseId + "/Calendar.ics", 'utf8');
+  		filedata = fs.readFileSync(fpath, 'utf8');
   	} catch (e) {
   		console.log('Error:', e.stack);
   	}
 
   	body.append('file', filedata);
-  	fetch('http://cap142.cs.umass.edu:8001/', { //Send the newly created schedule to the capture server
+  	fetch('http://cap142.cs.umass.edu:8000/', { //Send the newly created schedule to the capture server
   		method: 'POST',
   		headers: {
   			'Content-Length': fileSizeInBytes,
@@ -113,7 +113,12 @@ module.exports = {
   icsToEventObjectArray: function(icsFileText) { //Converts the text of an ics file to an array of JSON objects readable by the calendar component
   	var eventArray = [];
   	var filetextsplit = icsFileText.split('\n');
-  	filetextsplit.splice(0, 3); //Remove the first 3 unnecessary lines from file
+	filetextsplit.splice(0, 3); //Remove the first 3 unnecessary lines from file
+	var index = filetextsplit.indexOf("");
+	while(index !== -1){ //Remove all blank strings that may have gotten into the file text
+		filetextsplit.splice(index, 1);
+		index = filetextsplit.indexOf("");
+	}
 	filetextsplit.splice(-1, 1); //Remove last line from file, also don't need
 	if(filetextsplit.length === 0){
 		return []

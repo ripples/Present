@@ -208,7 +208,8 @@ router.delete("/deleteLecture", function (req, res) {
 
 router.get('/calendar/populate/:fpath', function (req, res) { //Gets the calendar for a given class
 	//const fpath = "./lectures/" + req.session.lti_token.lis_course_section_sourcedid.toString() + "/Calendar.ics"
-	const fpath = "./" + req.params.fpath.split("~").join("/"); //Reversing the hack from the calendar fetch request. Fetch doesn't allow URL query params easily.
+	//const fpath = "./" + req.params.fpath.split("~").join("/"); //Reversing the hack from the calendar fetch request. Fetch doesn't allow URL query params easily.
+	const fpath = '.\\' + decodeURIComponent(req.params.fpath); 
 	fs.exists(fpath, function (exists) {
 		if (exists) {
 			fs.readFile(fpath, function (err, data) {
@@ -242,9 +243,8 @@ router.get('/calendar/recur/:recurEvent/:start/:end/:includes/:excludes', functi
 
 router.post('/calendar/save/:courseId/:fpath', function (req, res) {
 	var events = req.body;
+	const fpath = "./" + decodeURIComponent(req.params.fpath);
 	if(events.length === 0){ //If they are saving an empty cal file
-		//fpath = "./lectures/" + req.params.courseId + "/Calendar.ics";
-		const fpath = "./" + req.params.fpath.split("~").join("/"); //Reversing the hack from the calendar fetch request. Fetch doesn't allow URL query params easily.
 		fs.exists(fpath, function (exists) {
 			if (exists) {
 				fs.unlinkSync(fpath) //Delete the file synchronously
@@ -256,8 +256,8 @@ router.post('/calendar/save/:courseId/:fpath', function (req, res) {
 		})
 	}
 	else{
-		calUtils.generateICS(events, req.params.courseId);
-		res.status(201).send("Recording schedule successfully created: ./lectures/" + req.params.courseId + "/Calendar.ics");
+		calUtils.generateICS(events, req.params.courseId, fpath);
+		res.status(201).send("Recording schedule successfully created: " + fpath);
 	}
 });
 
@@ -273,8 +273,7 @@ router.get('/calendar/recent', function (req, res) {
 		let csvdata = require('csvdata');
 		csvdata.load('./server/utils/CaptureRooms.csv').then(json => {
 			  for(let captureRoom of json){
-					if(mostRecentICSPath.includes(captureRoom.Room)){
-						//Found the correct room. Load the calendar from that filepath
+					if(mostRecentICSPath.includes(captureRoom.Room)){ //Found the correct room. Load the calendar from that filepath
 						res.status(200).send(mostRecentICSPath);
 					}
 				}
