@@ -25,3 +25,10 @@ export function clearStatusMessage() {
         type: instructorSettingsConstants.CLEAR_STATUS_MESSAGE
     }
 }
+
+export function setCalFPath(fpath) {
+  return {
+    type: instructorSettingsConstants.SET_CAL_FPATH,
+    fpath
+  }
+}

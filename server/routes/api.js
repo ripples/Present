@@ -206,8 +206,9 @@ router.delete("/deleteLecture", function (req, res) {
 	res.send();
 });
 
-router.get('/calendar', function (req, res) { //Gets the calendar for a given class
-	const fpath = "./lectures/" + req.session.lti_token.lis_course_section_sourcedid.toString() + "/Calendar.ics"
+router.get('/calendar/populate/:fpath', function (req, res) { //Gets the calendar for a given class
+	//const fpath = "./lectures/" + req.session.lti_token.lis_course_section_sourcedid.toString() + "/Calendar.ics"
+	const fpath = "./" + req.params.fpath.split("~").join("/"); //Reversing the hack from the calendar fetch request. Fetch doesn't allow URL query params easily.
 	fs.exists(fpath, function (exists) {
 		if (exists) {
 			fs.readFile(fpath, function (err, data) {
@@ -223,7 +224,7 @@ router.get('/calendar', function (req, res) { //Gets the calendar for a given cl
 	})
 });
 
-router.get('/calendar/:recurEvent/:start/:end/:includes/:excludes', function (req, res) {
+router.get('/calendar/recur/:recurEvent/:start/:end/:includes/:excludes', function (req, res) {
 	let includes = req.params.includes;
 	let excludes = req.params.excludes;
 	if (includes === '-1') { includes = []; }
@@ -239,10 +240,11 @@ router.get('/calendar/:recurEvent/:start/:end/:includes/:excludes', function (re
 	res.status(200).send(filteredDates);
 });
 
-router.post('/calendar/:courseId', function (req, res) {
+router.post('/calendar/save/:courseId/:fpath', function (req, res) {
 	var events = req.body;
 	if(events.length === 0){ //If they are saving an empty cal file
-		fpath = "./lectures/" + req.params.courseId + "/Calendar.ics";
+		//fpath = "./lectures/" + req.params.courseId + "/Calendar.ics";
+		const fpath = "./" + req.params.fpath.split("~").join("/"); //Reversing the hack from the calendar fetch request. Fetch doesn't allow URL query params easily.
 		fs.exists(fpath, function (exists) {
 			if (exists) {
 				fs.unlinkSync(fpath) //Delete the file synchronously
@@ -259,13 +261,13 @@ router.post('/calendar/:courseId', function (req, res) {
 	}
 });
 
-router.get('/calendar/test', function (req, res) {
-	var mostRecentICSPath = calUtils.getMostRecentICS('./lectures/','.ics', new Date('1970-01-01T12:00:00Z'), '');
+router.get('/calendar/recent', function (req, res) {
+	var mostRecentICSPath = calUtils.getMostRecentICS('./lectures/Calendars/','.ics', new Date('1970-01-01T00:00:00Z'), '');
 	if(mostRecentICSPath === -1){
-		res.status(500).send("Error: Directory doesn't exist.");
+		res.status(500).send("SERVER ERROR");
 	}
 	else if(mostRecentICSPath === ""){ //If there is no calendar file at all
-		res.status(200).send([]);
+		res.status(200).send("NONE");
 	}
 	else{
 		let csvdata = require('csvdata');
@@ -273,7 +275,7 @@ router.get('/calendar/test', function (req, res) {
 			  for(let captureRoom of json){
 					if(mostRecentICSPath.includes(captureRoom.Room)){
 						//Found the correct room. Load the calendar from that filepath
-						//fpath should be ./lectures/ROOM/Calendar.ics
+						res.status(200).send(mostRecentICSPath);
 					}
 				}
 		  }).catch(err => console.log('Error: ' + err));

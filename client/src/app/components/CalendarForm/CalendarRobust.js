@@ -41,7 +41,8 @@ class CalendarRobust extends React.Component {
 
   componentWillMount(){ //Read any existing calendar file from server, if none exists, blank calendar. (GET)
     this.props.setCourseId(this.props.courseId);
-    fetch(('/api/calendar/'), {
+    let urlParam = this.props.fpath.split("\\").join("~"); //Fetch doesn't allow URL query parameters nicely... need to hack it a little here.
+    fetch(('/api/calendar/populate/' + urlParam), {
       credentials: 'same-origin' // or 'include'
     }).then(
       res => (res.status === 200 || res.status === 204) ? res.json() : []
@@ -58,6 +59,8 @@ class CalendarRobust extends React.Component {
 
   clear(){
     this.props.setCalShowRecur(false);
+    this.props.setCalMultidayEvent(false);
+    this.refs['mdchkbx'].checked = false;
     this.props.setCalSDate('');
     this.props.setCalEDate('');
     this.props.setCalSTime('');
@@ -123,14 +126,11 @@ class CalendarRobust extends React.Component {
         }
         return;
       case 'multidayEvent':
-        //console.log("BEFORE CHANGE: " + this.props.calendarForm.multidayEvent);
         if(this.props.calendarForm.multidayEvent){
           this.props.setCalMultidayEvent(false);
-          //console.log("AFTER CHANGE: " + this.props.calendarForm.multidayEvent);
         }
         else{
           this.props.setCalMultidayEvent(true);
-          //console.log("AFTER CHANGE: " + this.props.calendarForm.multidayEvent);
         }
         return;
       default:
@@ -339,7 +339,7 @@ class CalendarRobust extends React.Component {
     if(includes.length === 0){includes = -1} //Important for checking on server, do not change unless in both places.
     let excludes = this.props.calendarForm.excludeDates;
     if(excludes.length === 0){excludes = -1} //Important for checking on server, do not change unless in both places.
-    fetch(('/api/calendar/' + repeatDays + '/' + start + '/' + end + '/' + includes + '/' + excludes), {
+    fetch(('/api/calendar/recur/' + repeatDays + '/' + start + '/' + end + '/' + includes + '/' + excludes), {
       credentials: 'same-origin' // or 'include'
     }).then(res => (res.status === 200 || res.status === 204 || res.status === 304) ? res.json() : []
     ).then((json) => {
@@ -406,8 +406,9 @@ class CalendarRobust extends React.Component {
                     headers: {"Content-Type": "application/json"},
                     credentials: 'same-origin',
                     body: JSON.stringify(this.props.calendarForm.events)};
+      let urlParam = this.props.fpath.split("\\").join("~"); //Fetch doesn't allow URL query parameters nicely... need to hack it a little here.
 
-      fetch('/api/calendar/' + this.props.courseId, options).then((response) => {
+      fetch('/api/calendar/save/' + this.props.courseId + '/' + urlParam, options).then((response) => {
         return response.text()
       }).then((data) => {
         this.props.setCalOriginalCal(deepCopy(this.props.calendarForm.events)); //So user can't re-save the same calendar
@@ -418,16 +419,6 @@ class CalendarRobust extends React.Component {
     else{
       this.launchMessage('ERROR: No Changes Made', 'You haven\'t made any changes to the current calendar.');
     }
-  }
-
-  testBtn(e){
-    e.preventDefault();
-    fetch(('/api/calendar/test'), {
-      credentials: 'same-origin' // or 'include'
-    }).then(res => (res.status === 200 || res.status === 204 || res.status === 304) ? res.text() : ''
-  ).then((text) => {
-      console.log(text);
-    }).catch((err) => console.log(err));
   }
 
   render() {
@@ -534,7 +525,6 @@ class CalendarRobust extends React.Component {
     return (
       <div>
         <div>
-          <button type='button' style={modalBtnStyle} onClick={this.testBtn.bind(this)}>Find Cal Files</button>
           <button type='button' style={modalBtnStyle} onClick={this.onOpenModal}>Add Event(s)</button>
           <label name='numEvents'>Events Scheduled: {this.props.calendarForm.events.length}</label>
           <Modal open={this.props.calendarForm.modalState} onClose={this.onCloseModal} little>

@@ -4,12 +4,24 @@ import { Link } from 'react-router';
 import CalendarRobust from '../../components/CalendarForm/CalendarRobust';
 import LectureUpload from '../../components/LectureUpload/LectureUpload';
 import LectureDelete from '../../components/LectureDelete/LectureDelete';
-import {setInstructorPage, clearInstructorPage} from '../../Actions/instructorSettingsActions.js';
+import {setInstructorPage, clearInstructorPage, setCalFPath} from '../../Actions/instructorSettingsActions.js';
 
 class InstructorSettings extends Component {
 
     componentWillMount() {
         this.props.setInstructorPage(this.props.instructorPage);
+        fetch(('/api/calendar/recent'), {
+          credentials: 'same-origin' // or 'include'
+        }).then(res => (res.status === 200 || res.status === 204 || res.status === 304) ? res.text() : "BLANK"
+        ).then((text) => {
+        console.log(text);
+        if(text === "BLANK"){
+          this.props.setCalFPath("MODAL");
+        }
+        else{
+          this.props.setCalFPath(text);
+        }
+      }).catch((err) => console.log(err));
     }
 
     onClick(page) {
@@ -19,7 +31,7 @@ class InstructorSettings extends Component {
     renderComponent(page) {
         switch(page) {
             case "calendar":
-                return <CalendarRobust />
+                return <CalendarRobust fpath={this.props.calFPath} />
             case "lectureUpload":
                 return <LectureUpload />
             case "lectureDelete":
@@ -73,14 +85,16 @@ const mapStateToProps = state => {
         courseId: state.token.lis_course_section_sourcedid,
         instructorPage: state.instructorPage.page,
         roles: state.token.roles,
-        ipage: state.instructorPage
+        ipage: state.instructorPage,
+        calFPath: state.instructorPage.fpath
     };
 };
 
 const mapDispatchToProps = (dispatch, ownProps) => {
     return {
         setInstructorPage: (page) => dispatch(setInstructorPage(page)),
-        clearInstructorPage: () => dispatch(clearInstructorPage())
+        clearInstructorPage: () => dispatch(clearInstructorPage()),
+        setCalFPath: (fpath) => dispatch(setCalFPath(fpath))
     }
 };
 
