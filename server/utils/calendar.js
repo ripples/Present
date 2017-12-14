@@ -5,7 +5,7 @@ require('moment-recur');
 
 
 module.exports = {
-  generateICS: function(events, courseId, fpath) {
+  generateICS: function(events, courseId, fpath, capture_url) {
 	var START_TAG = "BEGIN:VCALENDAR\nPRODID:Calendar\nVERSION:2.0\n", END_TAG = "END:VCALENDAR";
 	var fileText = "";
 	if(events.length === 0) {
@@ -19,7 +19,8 @@ module.exports = {
 		var index = 0;
 		for (let event of events) {
 			fileText += "BEGIN:VEVENT\n";
-			fileText += "UID:" + DTSTAMP + "-LV-" + event.title + "\n";
+			//fileText += "UID:" + DTSTAMP + "-LV-" + event.title + "\n";
+      fileText += "UID:" + DTSTAMP + "-LV-" + event.title + "-LV-" + event.hexColor + "\n";
 			fileText += (index + "@default\nCLASS:PUBLIC\n");
 			fileText += ("DESCRIPTION:" + event.description + "\n");
 			fileText += ("DTSTAMP;VALUE=DATE-TIME:" + DTSTAMP + "\n");
@@ -48,7 +49,7 @@ module.exports = {
   	}
 
   	body.append('file', filedata);
-  	fetch('http://cap142.cs.umass.edu:8000/', { //Send the newly created schedule to the capture server
+  	fetch(capture_url, { //Send the newly created schedule to the capture server
   		method: 'POST',
   		headers: {
   			'Content-Length': fileSizeInBytes,
@@ -132,6 +133,7 @@ module.exports = {
   				case 1:
   					let title = curline.split("-LV-");
   					currentEvent.title = title[1];
+            currentEvent.hexColor = title[2];
   					filetextsplit.splice(0, 1);
   					break;
   				case 4:

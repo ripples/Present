@@ -7,15 +7,15 @@ import Datetime from 'react-datetime';
 import 'react-datetime/css/react-datetime.css';
 import {connect} from "react-redux";
 import TimeRange from './TimeRange.js';
-import {getCurrentSemester, formatDate, revertDate, isEqual, formatTime, getEventDT, deepCopy, processEvents, isValidDate} from './CalendarUtils.js';
-import {setCalModalState, setCalMessageState, setCalMessageText, setCalMessageTitle, setCalEvents, setCalSTime, setCalETime,
+import {getCurrentSemester, formatDate, revertDate, isEqual, formatTime, getEventDT, deepCopy, processEvents, isValidDate, generateRandomHexColor} from './CalendarUtils.js';
+import {setCalModalState, setCalMessageState, setCalMessageText, setCalMessageTitle, setCalEvents, setCalSTime, setCalETime, setCalHexColor,
   setCalSDate, setCalEDate, setCalRepeatDays, setCalRecurrence, setCalExcludeDates, setCalShowRecur, setCalMultidayEvent, setCalOriginalCal,
-  setCalIncludeDates, setCalDescription, setCalLoc, setCalCourseId, clearForm} from '../../Actions/calFormActions.js';
+  setCalIncludeDates, setCalDescription, setCalRoom, setCalURL, setCalCourseId, clearForm} from '../../Actions/calFormActions.js';
 
 BigCalendar.momentLocalizer(moment);
 
 class Event {
-  constructor(courseId, title, start, end, description, location, summary){
+  constructor(courseId, title, start, end, description, location, summary, hexColor){
     this.courseId = courseId;
     this.title = title;
     this.start = start;
@@ -23,6 +23,7 @@ class Event {
     this.description = description;
     this.location = location;
     this.summary = summary;
+    this.hexColor = hexColor;
   }
 }
 
@@ -37,20 +38,33 @@ class CalendarRobust extends React.Component {
     this.generateTitle = this.generateTitle.bind(this);
     this.clear = this.clear.bind(this);
     this.launchMessage = this.launchMessage.bind(this);
+    this.eventStyleGetter = this.eventStyleGetter.bind(this);
   }
 
   componentWillMount(){ //Read any existing calendar file from server, if none exists, blank calendar. (GET)
+      this.loadCalendarData();
+  }
+
+  loadCalendarData = () => {
     this.props.setCourseId(this.props.courseId);
-    fetch(('/api/calendar/populate/' + encodeURIComponent(this.props.fpath)), {
+    fetch(('/api/calendar/populate/' + encodeURIComponent("./lectures/Calendars/" + this.props.calendarForm.room + "/Calendar.ics")), {
       credentials: 'same-origin' // or 'include'
     }).then(
-      res => (res.status === 200 || res.status === 204) ? res.json() : []
+      res => (res.status === 200 || res.status === 204 || res.status === 304) ? res.json() : []
     ).then((json) => {
-      const calendar = processEvents(json);
-      this.props.setCalOriginalCal(calendar);
-      this.props.setCalEvents(processEvents(deepCopy(calendar)));
+      if(json.length !== 0){ //If there was no valid calendar file
+        const calendar = processEvents(json);
+        this.props.setCalOriginalCal(calendar);
+        this.props.setCalEvents(deepCopy(calendar));
+        this.props.setCalHexColor(calendar[0].hexColor);
+      }
+      else{
+        this.props.setCalOriginalCal([]);
+        this.props.setCalEvents([]);
+        this.props.setCalHexColor(generateRandomHexColor());
+      }
     }).catch((err) => console.log(err));
-  }
+  };
 
   componentWillUnmount(){
     this.props.clearForm();
@@ -59,7 +73,6 @@ class CalendarRobust extends React.Component {
   clear(){
     this.props.setCalShowRecur(false);
     this.props.setCalMultidayEvent(false);
-    //this.refs['mdchkbx'].checked = false;
     this.props.setCalSDate('');
     this.props.setCalEDate('');
     this.props.setCalSTime('');
@@ -69,7 +82,6 @@ class CalendarRobust extends React.Component {
     this.props.setCalExcludeDates([]);
     this.props.setCalIncludeDates([]);
     this.props.setCalDescription('');
-    this.props.setCalLoc('');
   }
 
   handleChange(name, e){
@@ -108,9 +120,6 @@ class CalendarRobust extends React.Component {
         return;
       case 'description':
         this.props.setCalDescription(e.target.value);
-        return;
-      case 'location':
-        this.props.setCalLoc(e.target.value);
         return;
       case 'showRecur':
         if(this.props.calendarForm.showRecur){
@@ -163,7 +172,9 @@ class CalendarRobust extends React.Component {
   };
 
   onCloseMessage = () => {
-    this.clear();
+    if(!this.props.calendarForm.modalState){
+      this.clear();
+    }
     this.props.setCalMessageTitle('');
     this.props.setCalMessageText('');
     this.props.setCalMessageState(false);
@@ -244,9 +255,8 @@ class CalendarRobust extends React.Component {
         <div>
           <TimeRange handleChange={this.handleChange.bind(this)}/>
         </div>
-        <div id='description/location'>
+        <div id='description'>
           <input type='text' style={inputStyle} placeholder={event.description} onChange={this.handleChange.bind(this, 'description')}></input>
-          <input type='text' style={inputStyle} placeholder={event.location} onChange={this.handleChange.bind(this, 'location')}></input>
         </div>
         <div style={{textAlign: 'center'}}>
           <input type='submit' style={modalBtnStyle} value='Save Changes' onClick={this.handleEdit.bind(this, event)}/>
@@ -356,8 +366,8 @@ class CalendarRobust extends React.Component {
       let eDate = new Date(parseInt(date.substring(0, 4), 10), parseInt(date.substring(4, 6), 10)-1,
                            parseInt(date.substring(6,8), 10), this.props.calendarForm.eDate.getHours(), this.props.calendarForm.eDate.getMinutes());
       let newEvent = new Event(this.props.courseId, (this.props.courseTitle + ' ' + getCurrentSemester()), getEventDT(sDate, this.props.calendarForm.sTime),
-                              getEventDT(eDate, this.props.calendarForm.eTime), this.props.calendarForm.description, this.props.calendarForm.location,
-                              (getCurrentSemester() + ' ' + this.props.courseId));
+                              getEventDT(eDate, this.props.calendarForm.eTime), this.props.calendarForm.description, this.props.calendarForm.room,
+                              (getCurrentSemester() + ' ' + this.props.courseId), this.props.calendarForm.hexColor);
       currentEvents.push(newEvent);
     }
     let newEvents = currentEvents;
@@ -370,7 +380,7 @@ class CalendarRobust extends React.Component {
     e.preventDefault();
     let editedEvent = new Event(this.props.courseId, event.title, getEventDT(this.props.calendarForm.sDate, this.props.calendarForm.sTime),
                                 getEventDT(this.props.calendarForm.eDate, this.props.calendarForm.eTime), this.props.calendarForm.description,
-                                this.props.calendarForm.location, (getCurrentSemester() + ' ' + this.props.courseId));
+                                this.props.calendarForm.room, (getCurrentSemester() + ' ' + this.props.courseId), event.hexColor);
     this.deleteEvent(event);
     this.addNewEvent(editedEvent);
     this.onCloseMessage();
@@ -389,8 +399,8 @@ class CalendarRobust extends React.Component {
     }
     else if(repeatDays.length === 0){
       let newEvent = new Event(this.props.courseId, (this.props.courseTitle + ' ' + getCurrentSemester()), getEventDT(start, this.props.calendarForm.sTime),
-                               getEventDT(end, this.props.calendarForm.eTime), this.props.calendarForm.description, this.props.calendarForm.location,
-                               (getCurrentSemester() + ' ' + this.props.courseId));
+                               getEventDT(end, this.props.calendarForm.eTime), this.props.calendarForm.description, this.props.calendarForm.room,
+                               (getCurrentSemester() + ' ' + this.props.courseId), this.props.calendarForm.hexColor);
       this.addNewEvent(newEvent); //Add a single event
     }
     else {
@@ -411,7 +421,7 @@ class CalendarRobust extends React.Component {
                     credentials: 'same-origin',
                     body: JSON.stringify(this.props.calendarForm.events)};
 
-      fetch('/api/calendar/save/' + this.props.courseId + '/' + encodeURIComponent(this.props.fpath), options).then((response) => {
+      fetch('/api/calendar/save/' + this.props.courseId + '/' + encodeURIComponent("./lectures/Calendars/" + this.props.calendarForm.room + "/Calendar.ics") + '/' + encodeURIComponent(this.props.calendarForm.url), options).then((response) => {
         return response.text()
       }).then((data) => {
         this.props.setCalOriginalCal(deepCopy(this.props.calendarForm.events)); //So user can't re-save the same calendar
@@ -422,6 +432,20 @@ class CalendarRobust extends React.Component {
     else{
       this.launchMessage('ERROR: No Changes Made', 'You haven\'t made any changes to the current calendar.');
     }
+  }
+
+  eventStyleGetter(event){
+    var backgroundColor = event.hexColor;
+    var style = {
+      backgroundColor: backgroundColor,
+      opacity: 0.8,
+      fontWeight: 600, //Slightly less than bold.
+      color: 'white',
+      textShadow: '-1px 0 black, 0 1px black, 1px 0 black, 0 -1px black' //Bc webkit-text-stroke is not supported on major browsers yet
+    };
+    return {
+      style: style
+    };
   }
 
   render() {
@@ -512,9 +536,8 @@ class CalendarRobust extends React.Component {
               </div>
             </div>
           </div>
-          <div id='description/location'>
+          <div id='description'>
             <input type='text' style={inputStyle} placeholder='Description' onChange={this.handleChange.bind(this, 'description')}></input>
-            <input type='text' style={inputStyle} placeholder='Location' onChange={this.handleChange.bind(this, 'location')}></input>
           </div>
           <div style={{textAlign: 'center'}}>
             <input type='submit' style={modalBtnStyle} value='Add Event'/>
@@ -526,19 +549,19 @@ class CalendarRobust extends React.Component {
     );
 
     return (
-      <div>
-        <div>
-          <button type='button' style={modalBtnStyle} onClick={this.onOpenModal}>Add Event(s)</button>
-          <label name='numEvents'>Events Scheduled: {this.props.calendarForm.events.length}</label>
-          <Modal open={this.props.calendarForm.modalState} onClose={this.onCloseModal} little>
+      <div className="col-md-12">
+        <div className="row">
+          <label name="currentRoom" style={roomLblStyle}>Currently Selected Room: {this.props.calendarForm.room}</label>
+          <label name='numEvents' style={eventsScheduledStyle}>Events Scheduled: {this.props.calendarForm.events.length}</label>
+          <Modal open={this.props.calendarForm.modalState} onClose={this.onCloseModal} showCloseIcon={false} little>
             {addEventForm}
           </Modal>
-          <Modal open={this.props.calendarForm.messageState} onClose={this.onCloseMessage} little>
+          <Modal open={this.props.calendarForm.messageState} onClose={this.onCloseMessage} showCloseIcon={false} little>
             {this.props.calendarForm.messageTitle}
             {this.props.calendarForm.messageText}
           </Modal>
         </div>
-        <div style={divStyle}>
+        <div className="row" style={divStyle}>
           <BigCalendar
             selectable
             popup
@@ -548,17 +571,37 @@ class CalendarRobust extends React.Component {
             defaultDate={new Date()}
             onSelectEvent={event => this.generateSelectedEvent(event)}
             onSelectSlot={(slotInfo) => this.launchMessage('Empty Slot Selected', 'There are no events scheduled in this time slot')}
+            eventPropGetter={(event => this.eventStyleGetter(event))}
           />
         </div>
-        <button type='button' style={modalBtnStyle} onClick={this.handleSave.bind(this)}>Save Calendar</button>
+        <div className="row">
+          <button type='button' style={modalBtnStyle} onClick={this.onOpenModal}>Add Event(s)</button>
+          <button type='button' style={modalBtnStyle} onClick={this.handleSave.bind(this)}>Save Calendar</button>
+        </div>
       </div>
     );
   }
 
 }
 
+var roomLblStyle = {
+  textAlign: 'left',
+  float: 'left',
+  display: 'inline',
+  margin: '0px 0px 0px 15px'
+}
+
+var eventsScheduledStyle = {
+  textAlign: 'right',
+  float: 'right',
+  display: 'inline',
+  margin: '0px 15px 0px 0px'
+}
+
 var divStyle = {
-  height: "500px"
+  height: "500px",
+  width: 'auto',
+  margin: 'auto'
 }
 
 var labelStyle = {
@@ -610,20 +653,6 @@ var disabledButtonStyle = {
   color: "#00008"
 }
 
-var buttonStyle = {
-    display: 'flex',
-    margin: 'auto',
-    marginTop: '10px',
-    marginBottom: '10px',
-    paddingLeft: "10px",
-    paddingRight: "10px",
-    paddingTop: "4px",
-    paddingBottom: "4px",
-    backgroundColor: "white",
-    borderRadius: "4px",
-    color: "#000080"
-}
-
 var undoStyle = {
   display: 'inline-block',
   margin: '10px 10px 10px 0px',
@@ -673,7 +702,6 @@ const mapDispatchToProps = (dispatch, ownProps) => {
     setCalSDate: (date) => dispatch(setCalSDate(date)),
     setCalEDate: (date) => dispatch(setCalEDate(date)),
     setCalDescription: (desc) => dispatch(setCalDescription(desc)),
-    setCalLoc: (loc) => dispatch(setCalLoc(loc)),
     setCalEvents: (events) => dispatch(setCalEvents(events)),
     setCalModalState: (modalState) => dispatch(setCalModalState(modalState)),
     setCalMessageState: (messageState) => dispatch(setCalMessageState(messageState)),
@@ -683,7 +711,10 @@ const mapDispatchToProps = (dispatch, ownProps) => {
     setCalOriginalCal: (originalCal) => dispatch(setCalOriginalCal(originalCal)),
     setCalSTime: (sTime) => dispatch(setCalSTime(sTime)),
     setCalETime: (eTime) => dispatch(setCalETime(eTime)),
-    setCalMultidayEvent: (multidayEvent) => dispatch(setCalMultidayEvent(multidayEvent))
+    setCalMultidayEvent: (multidayEvent) => dispatch(setCalMultidayEvent(multidayEvent)),
+    setCalHexColor: (hexColor) => dispatch(setCalHexColor(hexColor)),
+    setCalRoom: (room) => dispatch(setCalRoom(room)),
+    setCalURL: (url) => dispatch(setCalURL(url))
 	}
 };
 

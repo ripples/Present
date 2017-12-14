@@ -26,9 +26,16 @@ export function clearStatusMessage() {
     }
 }
 
-export function setCalFPath(fpath) {
+export function setRoomModalState(modalState){
   return {
-    type: instructorSettingsConstants.SET_CAL_FPATH,
-    fpath
+    type: instructorSettingsConstants.SET_ROOM_MODAL_STATE,
+    modalState
+  }
+}
+
+export function setRoomOptions(roomOptions){
+  return {
+    type: instructorSettingsConstants.SET_ROOM_OPTIONS,
+    roomOptions
   }
 }

@@ -1,5 +1,17 @@
-import _ from 'underscore';
 import moment from 'moment';
+
+class Event {
+  constructor(courseId, title, start, end, description, location, summary, hexColor){
+    this.courseId = courseId;
+    this.title = title;
+    this.start = start;
+    this.end = end;
+    this.description = description;
+    this.location = location;
+    this.summary = summary;
+    this.hexColor = hexColor;
+  }
+}
 
 export function getCurrentSemester(){
   var year = new Date().getFullYear().toString().substr(-2);
@@ -39,11 +51,8 @@ export function getEventDT(date, time){
 export function processEvents(events){ //Converts the JSON representation of the start/end times of each event from server into JS Date objects (required by calendar component for reading).
   let processedEvents = [];
   for (let event of events){
-    let start = event.start;
-    let end = event.end;
-    event.start = new Date(start);
-    event.end = new Date(end);
-    processedEvents.push(event);
+    let newEvent = new Event(event.courseId, event.title, new Date(event.start), new Date(event.end), event.description, event.location, event.summary, event.hexColor);
+    processedEvents.push(newEvent);
   }
   return processedEvents;
 }
@@ -72,6 +81,22 @@ export function isValidDate(str){
   }
 }
 
+export function generateRandomHexColor(){
+  return '#'+('00000'+(Math.random()*(1<<24)|0).toString(16)).slice(-6);
+}
+
+function isEqualEvent(event1, event2){
+  let courseId = (event1.courseId === event2.courseId);
+  let title = (event1.title === event2.title);
+  let start = (event1.start.getTime() === event2.start.getTime());
+  let end = (event1.end.getTime() === event2.end.getTime());
+  let description = (event1.description === event2.description);
+  let location = (event1.location === event2.location);
+  let summary = (event1.summary === event2.summary);
+  let hexColor = (event1.hexColor === event2.hexColor);
+  return (courseId && title && start && end && description && location && summary && hexColor);
+}
+
 export function revertDate(date) { //20171014
   var yyyy = date.substring(0, 4);
   var mm = date.substring(4, 6);
@@ -85,15 +110,15 @@ export function isEqual(array1, array2){
   	return false;
   }
   else{
-    for(let event of array1){
-      var found = false;
-      for(let e2 of array2){
-        if(found){break;}
-        if(_.isEqual(event, e2)){
-          found = true;
+    for(let event1 of array1){
+      var isSame = false;
+      for(let event2 of array2){
+        if(isSame){break;}
+        if(isEqualEvent(event1, event2)){
+          isSame = true;
         }
       }
-      if(!found){return false;}
+      if(!isSame){return false;}
     }
     return true;
   }

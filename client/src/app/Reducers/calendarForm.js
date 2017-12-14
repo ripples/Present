@@ -6,6 +6,9 @@ export default function calendarForm(state = calInit, action){
           return {
             originalCal: action.originalCal,
             showRecur: state.showRecur,
+            room: state.room,
+            url: state.url,
+            hexColor: state.hexColor,
             multidayEvent: state.multidayEvent,
             modalState: state.modalState,
             messageState: state.messageState,
@@ -21,7 +24,6 @@ export default function calendarForm(state = calInit, action){
             excludeDates: state.excludeDates,
             includeDates: state.includeDates,
             description: state.description,
-            location: state.location,
             courseId: state.courseId
           };
 
@@ -29,6 +31,9 @@ export default function calendarForm(state = calInit, action){
           return {
             originalCal: state.originalCal,
             showRecur: action.showRecur,
+            room: state.room,
+            url: state.url,
+            hexColor: state.hexColor,
             multidayEvent: state.multidayEvent,
             modalState: state.modalState,
             messageState: state.messageState,
@@ -44,7 +49,81 @@ export default function calendarForm(state = calInit, action){
             excludeDates: state.excludeDates,
             includeDates: state.includeDates,
             description: state.description,
-            location: state.location,
+            courseId: state.courseId
+          };
+
+        case calFormConstants.SET_CAL_ROOM:
+          return {
+            originalCal: state.originalCal,
+            showRecur: state.showRecur,
+            room: action.room,
+            url: state.url,
+            hexColor: state.hexColor,
+            multidayEvent: state.multidayEvent,
+            modalState: state.modalState,
+            messageState: state.messageState,
+            messageText: state.messageText,
+            messageTitle: state.messageTitle,
+            events: state.events,
+            sDate: state.sDate,
+            eDate: state.eDate,
+            sTime: state.sTime,
+            eTime: state.eTime,
+            repeatDays: state.repeatDays,
+            recurrence: state.recurrence,
+            excludeDates: state.excludeDates,
+            includeDates: state.includeDates,
+            description: state.description,
+            courseId: state.courseId
+          };
+
+        case calFormConstants.SET_CAL_URL:
+          return {
+            originalCal: state.originalCal,
+            showRecur: state.showRecur,
+            room: state.room,
+            url: action.url,
+            hexColor: state.hexColor,
+            multidayEvent: state.multidayEvent,
+            modalState: state.modalState,
+            messageState: state.messageState,
+            messageText: state.messageText,
+            messageTitle: state.messageTitle,
+            events: state.events,
+            sDate: state.sDate,
+            eDate: state.eDate,
+            sTime: state.sTime,
+            eTime: state.eTime,
+            repeatDays: state.repeatDays,
+            recurrence: state.recurrence,
+            excludeDates: state.excludeDates,
+            includeDates: state.includeDates,
+            description: state.description,
+            courseId: state.courseId
+          };
+
+        case calFormConstants.SET_CAL_HEX_COLOR:
+          return {
+            originalCal: state.originalCal,
+            showRecur: state.showRecur,
+            room: state.room,
+            url: state.url,
+            hexColor: action.hexColor,
+            multidayEvent: state.multidayEvent,
+            modalState: state.modalState,
+            messageState: state.messageState,
+            messageText: state.messageText,
+            messageTitle: state.messageTitle,
+            events: state.events,
+            sDate: state.sDate,
+            eDate: state.eDate,
+            sTime: state.sTime,
+            eTime: state.eTime,
+            repeatDays: state.repeatDays,
+            recurrence: state.recurrence,
+            excludeDates: state.excludeDates,
+            includeDates: state.includeDates,
+            description: state.description,
             courseId: state.courseId
           };
 
@@ -52,6 +131,9 @@ export default function calendarForm(state = calInit, action){
           return {
             originalCal: state.originalCal,
             showRecur: state.showRecur,
+            room: state.room,
+            url: state.url,
+            hexColor: state.hexColor,
             multidayEvent: action.multidayEvent,
             modalState: state.modalState,
             messageState: state.messageState,
@@ -67,7 +149,6 @@ export default function calendarForm(state = calInit, action){
             excludeDates: state.excludeDates,
             includeDates: state.includeDates,
             description: state.description,
-            location: state.location,
             courseId: state.courseId
           };
 
@@ -75,6 +156,9 @@ export default function calendarForm(state = calInit, action){
           return {
             originalCal: state.originalCal,
             showRecur: state.showRecur,
+            room: state.room,
+            url: state.url,
+            hexColor: state.hexColor,
             multidayEvent: state.multidayEvent,
             modalState: action.modalState,
             messageState: state.messageState,
@@ -90,7 +174,6 @@ export default function calendarForm(state = calInit, action){
             excludeDates: state.excludeDates,
             includeDates: state.includeDates,
             description: state.description,
-            location: state.location,
             courseId: state.courseId
           };
 
@@ -98,6 +181,9 @@ export default function calendarForm(state = calInit, action){
           return {
             originalCal: state.originalCal,
             showRecur: state.showRecur,
+            room: state.room,
+            url: state.url,
+            hexColor: state.hexColor,
             multidayEvent: state.multidayEvent,
             modalState: state.modalState,
             messageState: action.messageState,
@@ -113,7 +199,6 @@ export default function calendarForm(state = calInit, action){
             excludeDates: state.excludeDates,
             includeDates: state.includeDates,
             description: state.description,
-            location: state.location,
             courseId: state.courseId
           };
 
@@ -121,6 +206,9 @@ export default function calendarForm(state = calInit, action){
           return {
             originalCal: state.originalCal,
             showRecur: state.showRecur,
+            room: state.room,
+            url: state.url,
+            hexColor: state.hexColor,
             multidayEvent: state.multidayEvent,
             modalState: state.modalState,
             messageState: state.messageState,
@@ -136,7 +224,6 @@ export default function calendarForm(state = calInit, action){
             excludeDates: state.excludeDates,
             includeDates: state.includeDates,
             description: state.description,
-            location: state.location,
             courseId: state.courseId
           };
 
@@ -144,6 +231,9 @@ export default function calendarForm(state = calInit, action){
           return {
             originalCal: state.originalCal,
             showRecur: state.showRecur,
+            room: state.room,
+            url: state.url,
+            hexColor: state.hexColor,
             multidayEvent: state.multidayEvent,
             modalState: state.modalState,
             messageState: state.messageState,
@@ -159,7 +249,6 @@ export default function calendarForm(state = calInit, action){
             excludeDates: state.excludeDates,
             includeDates: state.includeDates,
             description: state.description,
-            location: state.location,
             courseId: state.courseId
           };
 
@@ -167,6 +256,9 @@ export default function calendarForm(state = calInit, action){
           return {
             originalCal: state.originalCal,
             showRecur: state.showRecur,
+            room: state.room,
+            url: state.url,
+            hexColor: state.hexColor,
             multidayEvent: state.multidayEvent,
             modalState: state.modalState,
             messageState: state.messageState,
@@ -182,7 +274,6 @@ export default function calendarForm(state = calInit, action){
             excludeDates: state.excludeDates,
             includeDates: state.includeDates,
             description: state.description,
-            location: state.location,
             courseId: state.courseId
           };
 
@@ -190,6 +281,9 @@ export default function calendarForm(state = calInit, action){
           return {
             originalCal: state.originalCal,
             showRecur: state.showRecur,
+            room: state.room,
+            url: state.url,
+            hexColor: state.hexColor,
             multidayEvent: state.multidayEvent,
             modalState: state.modalState,
             messageState: state.messageState,
@@ -205,7 +299,6 @@ export default function calendarForm(state = calInit, action){
             excludeDates: state.excludeDates,
             includeDates: state.includeDates,
             description: state.description,
-            location: state.location,
             courseId: state.courseId
           };
 
@@ -213,6 +306,9 @@ export default function calendarForm(state = calInit, action){
           return {
             originalCal: state.originalCal,
             showRecur: state.showRecur,
+            room: state.room,
+            url: state.url,
+            hexColor: state.hexColor,
             multidayEvent: state.multidayEvent,
             modalState: state.modalState,
             messageState: state.messageState,
@@ -228,7 +324,6 @@ export default function calendarForm(state = calInit, action){
             excludeDates: state.excludeDates,
             includeDates: state.includeDates,
             description: state.description,
-            location: state.location,
             courseId: state.courseId
           };
 
@@ -236,6 +331,9 @@ export default function calendarForm(state = calInit, action){
           return {
             originalCal: state.originalCal,
             showRecur: state.showRecur,
+            room: state.room,
+            url: state.url,
+            hexColor: state.hexColor,
             multidayEvent: state.multidayEvent,
             modalState: state.modalState,
             messageState: state.messageState,
@@ -251,7 +349,6 @@ export default function calendarForm(state = calInit, action){
             excludeDates: state.excludeDates,
             includeDates: state.includeDates,
             description: state.description,
-            location: state.location,
             courseId: state.courseId
           };
 
@@ -259,6 +356,9 @@ export default function calendarForm(state = calInit, action){
           return {
             originalCal: state.originalCal,
             showRecur: state.showRecur,
+            room: state.room,
+            url: state.url,
+            hexColor: state.hexColor,
             multidayEvent: state.multidayEvent,
             modalState: state.modalState,
             messageState: state.messageState,
@@ -274,7 +374,6 @@ export default function calendarForm(state = calInit, action){
             excludeDates: state.excludeDates,
             includeDates: state.includeDates,
             description: state.description,
-            location: state.location,
             courseId: state.courseId
           };
 
@@ -282,6 +381,9 @@ export default function calendarForm(state = calInit, action){
           return {
             originalCal: state.originalCal,
             showRecur: state.showRecur,
+            room: state.room,
+            url: state.url,
+            hexColor: state.hexColor,
             multidayEvent: state.multidayEvent,
             modalState: state.modalState,
             messageState: state.messageState,
@@ -297,7 +399,6 @@ export default function calendarForm(state = calInit, action){
             excludeDates: state.excludeDates,
             includeDates: state.includeDates,
             description: state.description,
-            location: state.location,
             courseId: state.courseId
           };
 
@@ -305,6 +406,9 @@ export default function calendarForm(state = calInit, action){
           return {
             originalCal: state.originalCal,
             showRecur: state.showRecur,
+            room: state.room,
+            url: state.url,
+            hexColor: state.hexColor,
             multidayEvent: state.multidayEvent,
             modalState: state.modalState,
             messageState: state.messageState,
@@ -320,7 +424,6 @@ export default function calendarForm(state = calInit, action){
             excludeDates: state.excludeDates,
             includeDates: state.includeDates,
             description: state.description,
-            location: state.location,
             courseId: state.courseId
           };
 
@@ -328,6 +431,9 @@ export default function calendarForm(state = calInit, action){
           return {
             originalCal: state.originalCal,
             showRecur: state.showRecur,
+            room: state.room,
+            url: state.url,
+            hexColor: state.hexColor,
             multidayEvent: state.multidayEvent,
             modalState: state.modalState,
             messageState: state.messageState,
@@ -343,7 +449,6 @@ export default function calendarForm(state = calInit, action){
             excludeDates: action.excludeDates,
             includeDates: state.includeDates,
             description: state.description,
-            location: state.location,
             courseId: state.courseId
           };
 
@@ -351,6 +456,9 @@ export default function calendarForm(state = calInit, action){
           return {
             originalCal: state.originalCal,
             showRecur: state.showRecur,
+            room: state.room,
+            url: state.url,
+            hexColor: state.hexColor,
             multidayEvent: state.multidayEvent,
             modalState: state.modalState,
             messageState: state.messageState,
@@ -366,7 +474,6 @@ export default function calendarForm(state = calInit, action){
             excludeDates: state.excludeDates,
             includeDates: action.includeDates,
             description: state.description,
-            location: state.location,
             courseId: state.courseId
           };
 
@@ -374,6 +481,9 @@ export default function calendarForm(state = calInit, action){
           return {
             originalCal: state.originalCal,
             showRecur: state.showRecur,
+            room: state.room,
+            url: state.url,
+            hexColor: state.hexColor,
             multidayEvent: state.multidayEvent,
             modalState: state.modalState,
             messageState: state.messageState,
@@ -389,30 +499,6 @@ export default function calendarForm(state = calInit, action){
             excludeDates: state.excludeDates,
             includeDates: state.includeDates,
             description: action.description,
-            location: state.location,
-            courseId: state.courseId
-          };
-
-        case calFormConstants.SET_CAL_LOC:
-          return {
-            originalCal: state.originalCal,
-            showRecur: state.showRecur,
-            multidayEvent: state.multidayEvent,
-            modalState: state.modalState,
-            messageState: state.messageState,
-            messageText: state.messageText,
-            messageTitle: state.messageTitle,
-            events: state.events,
-            sDate: state.sDate,
-            eDate: state.eDate,
-            sTime: state.sTime,
-            eTime: state.eTime,
-            repeatDays: state.repeatDays,
-            recurrence: state.recurrence,
-            excludeDates: state.excludeDates,
-            includeDates: state.includeDates,
-            description: state.description,
-            location: action.location,
             courseId: state.courseId
           };
 
@@ -420,6 +506,9 @@ export default function calendarForm(state = calInit, action){
           return {
             originalCal: state.originalCal,
             showRecur: state.showRecur,
+            room: state.room,
+            url: state.url,
+            hexColor: state.hexColor,
             multidayEvent: state.multidayEvent,
             modalState: state.modalState,
             messageState: state.messageState,
@@ -435,7 +524,6 @@ export default function calendarForm(state = calInit, action){
             excludeDates: state.excludeDates,
             includeDates: state.includeDates,
             description: state.description,
-            location: state.location,
             courseId: action.courseId
           };
 
@@ -450,6 +538,9 @@ export default function calendarForm(state = calInit, action){
 const calInit = {
     originalCal: [],
     showRecur: false,
+    room: "",
+    url: "",
+    hexColor: "",
     multidayEvent: false,
     modalState: false,
     messageState: false,
@@ -465,6 +556,5 @@ const calInit = {
     excludeDates: [],
     includeDates: [],
     description: "",
-    location: "",
     courseId: ""
   }

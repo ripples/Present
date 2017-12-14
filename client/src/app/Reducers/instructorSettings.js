@@ -6,35 +6,48 @@ export default function instructorPage(state = initialState, action) {
             return {
                 page: action.page,
                 status: state.status,
-                fpath: state.fpath
+                modalState: state.modalState,
+                roomOptions: state.roomOptions,
             };
 
         case instructorSettingsConstants.CLEAR_INSTRUCTOR_PAGE:
             return {
                 page: "",
                 status: "",
-                fpath: ""
+                modalState: false,
+                roomOptions: []
             };
 
         case instructorSettingsConstants.SET_STATUS_MESSAGE:
             return {
                 page: state.page,
                 status: action.status,
-                fpath: state.fpath
+                modalState: state.modalState,
+                roomOptions: state.roomOptions
             };
 
         case instructorSettingsConstants.CLEAR_STATUS_MESSAGE:
             return {
                 page: state.page,
                 status: "",
-                fpath: state.fpath
+                modalState: state.modalState,
+                roomOptions: state.roomOptions
             };
 
-        case instructorSettingsConstants.SET_CAL_FPATH:
+        case instructorSettingsConstants.SET_ROOM_MODAL_STATE:
           return {
             path: state.page,
             status: state.status,
-            fpath: action.fpath
+            modalState: action.modalState,
+            roomOptions: state.roomOptions
+          };
+
+        case instructorSettingsConstants.SET_ROOM_OPTIONS:
+          return {
+            path: state.page,
+            status: state.status,
+            modalState: state.modalState,
+            roomOptions: action.roomOptions
           };
 
         default:
@@ -45,5 +58,6 @@ export default function instructorPage(state = initialState, action) {
 var initialState = {
     page: "",
     status: "",
-    fpath: ""
+    modalState: false,
+    roomOptions: []
 }

@@ -14,6 +14,27 @@ export function setCalShowRecur(showRecur){
   }
 }
 
+export function setCalRoom(room){
+  return {
+    type: calFormConstants.SET_CAL_ROOM,
+    room
+  }
+}
+
+export function setCalURL(url){
+  return {
+    type: calFormConstants.SET_CAL_URL,
+    url
+  }
+}
+
+export function setCalHexColor(hexColor){
+  return {
+    type: calFormConstants.SET_CAL_HEX_COLOR,
+    hexColor
+  }
+}
+
 export function setCalMultidayEvent(multidayEvent){
   return {
     type: calFormConstants.SET_CAL_MULTIDAY_EVENT,
@@ -116,13 +137,6 @@ export function setCalDescription(description){
     return {
         type: calFormConstants.SET_CAL_DESCRIPTION,
         description
-    }
-}
-
-export function setCalLoc(location){
-    return {
-        type: calFormConstants.SET_CAL_LOC,
-        location
     }
 }
 
