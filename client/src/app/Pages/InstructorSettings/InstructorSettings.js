@@ -19,14 +19,15 @@ class InstructorSettings extends Component {
         }).then(res => (res.status === 200 || res.status === 204 || res.status === 304) ? res.json() : -1
       ).then((json) => {
         let valid_Cal_Room = json[0];
+        json.splice(0, 1);
+        this.props.setRoomOptions(json);
         if(valid_Cal_Room === ""){
           this.props.setCalRoom("MODAL");
         }
         else{
           this.props.setCalRoom(valid_Cal_Room);
+          this.props.setCalURL(this.getCorrectURL(valid_Cal_Room));
         }
-        json.splice(0, 1);
-        this.props.setRoomOptions(json);
       }).catch((err) => console.log(err));
     }
 
