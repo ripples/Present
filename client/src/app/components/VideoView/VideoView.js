@@ -3,9 +3,16 @@ import videojs from "video.js";
 
 export default class VideoView extends React.Component {
   componentDidMount() {
+    if(this.props.manifest && (this.props.manifest.whiteboardCount + this.props.manifest.computerCount) > 0){
+      var height = 240;
+      var width = 320;
+    } else {
+      var height = 480;
+      var width = 640;
+    }
     const videoJsOptions = {
-      height: 358,
-      width: 638,
+      height: height,
+      width: width,
       autoPlay: true,
       controls: true,
       sources: [{
@@ -28,15 +35,26 @@ export default class VideoView extends React.Component {
   }
 
   render() {
+    var video = {
+      margin: "0 auto"
+    };
+    if(this.props.manifest && (this.props.manifest.whiteboardCount + this.props.manifest.computerCount) > 0){
+      video = {
+        float: "left"
+      }
+    }
+
     return (
       <div>
         <div className="video-view">
-          <video 
+          <video
             ref={node => this.videoNode = node}
-            className="video-js vjs-default-skin vjs-big-play-centered">
+            className="video-js vjs-default-skin vjs-big-play-centered"
+            style = {video}>
           </video>
         </div>
       </div>
     );
   }
 }
+

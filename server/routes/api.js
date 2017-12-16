@@ -22,23 +22,25 @@ router.get('/identify/', function (req, res) {
 });
 
 router.get('/listOfCourseLectures/', function (req, res) {
-	dirToJson("./lectures/" + req.session.lti_token.lis_course_section_sourcedid.toString(), function (err, dirTree) {
+	const fpath = "./lectures/" + req.session.lti_token.lis_course_section_sourcedid.toString()
+	dirToJson(fpath, function (err, dirTree) {
 		if (err) {
 			throw err;
 		} else {
 			dirTree.children = dirTree.children.filter((lecture) => {
 				var patt = /^\d\d-\d\d-\d\d\d\d--\d\d-\d\d-\d\d$/;
-				if(patt.test(lecture.name)){
-					return true;
-				} else {
-					return false;
-				}
+					if(patt.test(lecture.name) && utils.videoExists(fpath + '/' + lecture.name)){
+						return true;
+					} else {
+						return false;
+					}
+
 			});
 
 			if(!req.session.lti_token.roles.toString().toLowerCase().includes("instructor")){ //not instructor so filter future lectures out
 				var date = new Date();
 				dirTree.children = dirTree.children.filter((lecture) => {
-					var lecDate = new Date(parseInt(lecture.name.substring(6, 11)), parseInt(lecture.name.substring(0, 2)) - 1, parseInt(lecture.name.substring(3, 5)));
+					var lecDate = utils.lectureFolderNameToDate(lecture)
 					if(lecDate > date){
 						return false;
 					} else {
@@ -46,6 +48,9 @@ router.get('/listOfCourseLectures/', function (req, res) {
 					}
 				});
 			}
+			
+			dirTree.children = dirTree.children.sort((a, b) => (utils.lectureFolderNameToDate(a) < utils.lectureFolderNameToDate(b)) ? -1 : 1 )
+
 			res.send(dirTree);
 		}
 	});

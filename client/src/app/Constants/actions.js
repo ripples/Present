@@ -40,8 +40,15 @@ export const calFormConstants = {
 
 //lecture delete actions
 export const deleteLectureConstants = {
-    SET_DELETE_LECTURE: "SET_DELETE_LECTURE",
-    CLEAR_DELETE_LECTURE: "CLEAR_DELETE_LECTURE"
+    SET_DELETE_LECTURE: 'SET_DELETE_LECTURE',
+    CLEAR_DELETE_LECTURE: 'CLEAR_DELETE_LECTURE'
+}
+
+export const lectureImageConstants = {
+    SET_LECTURE_IMAGE: 'SET_LECTURE_IMAGE',
+    CLEAR_LECTURE_IMAGE: 'CLEAR_LECTURE_IMAGE',
+    SET_IMAGE_TYPE: 'SET_IMAGE_TYPE',
+    SET_INDEX: 'SET_INDEX'
 }
 
 export const instructorSettingsConstants = {
