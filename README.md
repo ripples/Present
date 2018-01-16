@@ -128,7 +128,7 @@ With Sakai, you may need to have your system administrator allow for you to add 
 
 ![Step 1](https://i.imgur.com/kMqeOS2.png)
 
-On our installation, you then need to go to Plugin Tools and select PAOL LTI; however, on other installations, you may just select external tool under the general menu.
+On our installation, you then need to go to Plugin Tools and select PAOL LTI; however, on other installations, you must add a Lesson. Name the lesson PAOL LTI and then Add Content-Add External Tool. Manage or Install Tools (on right hand side) then Add LTI 1.1. etc. 
 
 ![Step 2](https://i.imgur.com/HcMTdKE.png)
 
