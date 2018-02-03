@@ -48,7 +48,7 @@ router.get('/listOfCourseLectures/', function (req, res) {
 					}
 				});
 			}
-			
+
 			dirTree.children = dirTree.children.sort((a, b) => (utils.lectureFolderNameToDate(a) < utils.lectureFolderNameToDate(b)) ? -1 : 1 )
 
 			res.send(dirTree);
@@ -265,8 +265,8 @@ router.post('/calendar/save/:courseId/:fpath/:url', function (req, res) {
 });
 
 router.get('/calendar/recent', function (req, res) {
-	var mostRecentICSPath = calUtils.getMostRecentICS('./lectures/Calendars/','.ics', new Date('1970-01-01T00:00:00Z'), '');
-	let root = path.join("lectures", "/Calendars/");
+	var mostRecentICSPath = calUtils.getMostRecentICS('./lectures/','.ics', new Date('1970-01-01T00:00:00Z'), '');
+	let root = path.join("lectures/");
 	let base = path.join("/Calendar.ics");
 	let mostRecentICSRoom = mostRecentICSPath.replace(root, "").replace(base, "");
 	let csvdata = require('csvdata');

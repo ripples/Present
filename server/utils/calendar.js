@@ -19,7 +19,6 @@ module.exports = {
 		var index = 0;
 		for (let event of events) {
 			fileText += "BEGIN:VEVENT\n";
-			//fileText += "UID:" + DTSTAMP + "-LV-" + event.title + "\n";
       fileText += "UID:" + DTSTAMP + "-LV-" + event.title + "-LV-" + event.hexColor + "\n";
 			fileText += (index + "@default\nCLASS:PUBLIC\n");
 			fileText += ("DESCRIPTION:" + event.description + "\n");
@@ -189,8 +188,9 @@ module.exports = {
 
   getMostRecentICS: function(startPath, filter, mostRecentDate, fpath) {
     if(!fs.existsSync(startPath)){
-      console.log("Error: Directory doesn't exist.");
-      return -1;
+      throw "Error: Directory doesn't exist or invalid directory given.";
+      //console.log("Error: Directory doesn't exist.");
+      //return -1;
     }
     var files = fs.readdirSync(startPath);
     for(var i = 0; i < files.length; i++){

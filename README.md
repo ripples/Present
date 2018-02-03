@@ -1,9 +1,9 @@
 # PAOL Present
 PAOL Present is a web client for PAOL lecture capture. It is simple, lightweight, requires little configuration, and open source. It uses technology from [IMS Global Learning Consortium's Learning Tools Interopability](http://www.imsglobal.org/activity/learning-tools-interoperability).
 
-## Enviornment Setup
+## Environment Setup
 
-Present's developer enviornment can be in Windows, OSX, and Linux.
+Present's developer environment can be in Windows, OSX, and Linux.
 
 1. Install the latest version of [NodeJS](https://nodejs.org/en/).
 1. If on Windows, install [OpenSSL 1.0.2m](https://slproweb.com/products/Win32OpenSSL.html) and have either a C++ compiler installed (I.E. Visual Studio) or use [Windows Build Tools](https://github.com/felixrieseberg/windows-build-tools) .
@@ -128,7 +128,7 @@ With Sakai, you may need to have your system administrator allow for you to add 
 
 ![Step 1](https://i.imgur.com/kMqeOS2.png)
 
-On our installation, you then need to go to Plugin Tools and select PAOL LTI; however, on other installations, you must add a Lesson. Name the lesson PAOL LTI and then Add Content-Add External Tool. Manage or Install Tools (on right hand side) then Add LTI 1.1. etc. 
+On our installation, you then need to go to Plugin Tools and select PAOL LTI; however, on other installations, you may just select external tool under the general menu.
 
 ![Step 2](https://i.imgur.com/HcMTdKE.png)
 
