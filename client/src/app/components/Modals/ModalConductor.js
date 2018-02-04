@@ -1,37 +1,26 @@
 import React from 'react';
-import {connect} form 'react-redux';
-
-import * as actions from '../Actions/modalActions.js';
+import {connect} from 'react-redux';
 import AddEventModal from './AddEventModal.js';
 import EditEventModal from './EditEventModal.js';
 
+const MODAL_COMPONENTS = {
+  'ADD_EVENT': AddEventModal,
+  'EDIT_EVENT': EditEventModal
+}
+
 const ModalConductor = props => {
-  switch(props.currentModal) {
-    case 'ADD EVENT':
-      props.setCurrentModal('ADD EVENT');
-      return <AddEventModal {...props}/>;
-
-    case 'EDIT EVENT':
-      props.setCurrentModal('EDIT EVENT');
-      return <EditEventModal {...props}/>;
-
-    default:
-      props.setCurrentModal(null);
-      return null;
+  if(!props.modal.modalType) {
+    return null
   }
+
+  const DispatchedModal = MODAL_COMPONENTS[props.modal.modalType]
+  return <DispatchedModal {...props} />
 };
 
 const mapStateToProps = state => {
   return {
-    currentModal: state.modal.currentModal,
+    modal: state.modal
   };
-};
+}
 
-const mapDispatchToProps = (dispatch, ownProps) => {
-  return {
-    setCurrentModal: (modal) => dispatch(setCurrentModal(modal))
-  }
-};
-
-
-export default connect(mapStateToProps, mapDispatchToProps)(ModalConductor);
+export default connect(mapStateToProps)(ModalConductor);

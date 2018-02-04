@@ -67,8 +67,8 @@ export const lectureUploadConstants = {
 }
 
 export const modalConstants = {
-  SET_MODAL_STATE: 'SET_MODAL_STATE',
-  SET_CURRENT_MODAL: 'SET_CURRENT_MODAL'
+  SHOW_MODAL: 'SHOW_MODAL',
+  HIDE_MODAL: 'HIDE_MODAL'
 }
 
 export const messageConstants = {

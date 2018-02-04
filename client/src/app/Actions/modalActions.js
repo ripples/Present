@@ -1,15 +1,14 @@
 import {modalConstants} from '../Constants/actions.js';
 
-export function setModalState(state){
+export function showModal(modalType){
   return {
-    type: modalConstants.SET_MODAL_STATE,
-    state
+    type: modalConstants.SHOW_MODAL,
+    modalType
   }
 }
 
-export function setCurrentModal(modal){
+export function hideModal(){
   return {
-    type: modalConstants.SET_CURRENT_MODAL,
-    modal
+    type: modalConstants.HIDE_MODAL
   }
 }

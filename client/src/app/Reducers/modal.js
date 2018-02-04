@@ -1,25 +1,21 @@
 import {modalConstants} from '../Constants/actions.js';
 
-export default function modal(state = modalInit, action){
+export default function modal(state = initialState, action){
     switch(action.type){
-        case modalConstants.SET_MODAL_STATE:
+
+        case modalConstants.SHOW_MODAL:
           return {
-            isOpen: action.isOpen,
-            currentModal: state.currentModal
+            modalType: action.modalType,
           };
 
-          case modalConstant.SET_CURRENT_MODAL:
-            return {
-              isOpen: state.isOpen,
-              currentModal: action.currentModal
-            }
+          case modalConstants.HIDE_MODAL:
+            return initialState;
 
         default:
             return state;
     }
 }
 
-const modalInit = {
-    isOpen: false,
-    currentModal: null
+const initialState = {
+    modalType: null
   }

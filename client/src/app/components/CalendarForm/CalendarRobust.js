@@ -11,6 +11,7 @@ import {getCurrentSemester, formatDate, revertDate, isEqual, formatTime, getEven
 import {setCalModalState, setCalMessageState, setCalMessageText, setCalMessageTitle, setCalEvents, setCalSTime, setCalETime, setCalHexColor,
   setCalSDate, setCalEDate, setCalRepeatDays, setCalRecurrence, setCalExcludeDates, setCalShowRecur, setCalMultidayEvent, setCalOriginalCal,
   setCalIncludeDates, setCalDescription, setCalRoom, setCalURL, setCalCourseId, clearForm} from '../../Actions/calFormActions.js';
+import {showModal, hideModal} from '../../Actions/modalActions.js';
 
 BigCalendar.momentLocalizer(moment);
 
@@ -158,9 +159,9 @@ class CalendarRobust extends React.Component {
     this.props.setCalRepeatDays(rDays);
   }
 
-  onOpenModal = () => {
-    this.props.setCalModalState(true);
-  };
+  openModal(modalType) {
+    this.props.showModal(modalType);
+  }
 
   onCloseModal = () => {
     this.clear();
@@ -553,9 +554,6 @@ class CalendarRobust extends React.Component {
         <div className="row">
           <label name="currentRoom" style={roomLblStyle}>Currently Selected Room: {this.props.calendarForm.room}</label>
           <label name='numEvents' style={eventsScheduledStyle}>Events Scheduled: {this.props.calendarForm.events.length}</label>
-          <Modal open={this.props.calendarForm.modalState} onClose={this.onCloseModal} showCloseIcon={false} little>
-            {addEventForm}
-          </Modal>
           <Modal open={this.props.calendarForm.messageState} onClose={this.onCloseMessage} showCloseIcon={false} little>
             {this.props.calendarForm.messageTitle}
             {this.props.calendarForm.messageText}
@@ -575,7 +573,7 @@ class CalendarRobust extends React.Component {
           />
         </div>
         <div className="row">
-          <button type='button' style={modalBtnStyle} onClick={this.onOpenModal}>Add Event(s)</button>
+          <button type='button' style={modalBtnStyle} onClick={this.openModal.bind(this, 'ADD_EVENT')}>Add Event(s)</button>
           <button type='button' style={modalBtnStyle} onClick={this.handleSave.bind(this)}>Save Calendar</button>
         </div>
       </div>
@@ -684,6 +682,7 @@ var inputStyle = {
 const mapStateToProps = state => {
 
 	return {
+    modalType: state.modalType,
     calendarForm: state.calendarForm,
     courseId: state.token.lis_course_section_sourcedid,
     courseTitle: state.token.context_title
@@ -703,7 +702,6 @@ const mapDispatchToProps = (dispatch, ownProps) => {
     setCalEDate: (date) => dispatch(setCalEDate(date)),
     setCalDescription: (desc) => dispatch(setCalDescription(desc)),
     setCalEvents: (events) => dispatch(setCalEvents(events)),
-    setCalModalState: (modalState) => dispatch(setCalModalState(modalState)),
     setCalMessageState: (messageState) => dispatch(setCalMessageState(messageState)),
     setCalMessageText: (messageText) => dispatch(setCalMessageText(messageText)),
     setCalMessageTitle: (messageTitle) => dispatch(setCalMessageTitle(messageTitle)),
@@ -714,7 +712,9 @@ const mapDispatchToProps = (dispatch, ownProps) => {
     setCalMultidayEvent: (multidayEvent) => dispatch(setCalMultidayEvent(multidayEvent)),
     setCalHexColor: (hexColor) => dispatch(setCalHexColor(hexColor)),
     setCalRoom: (room) => dispatch(setCalRoom(room)),
-    setCalURL: (url) => dispatch(setCalURL(url))
+    setCalURL: (url) => dispatch(setCalURL(url)),
+    showModal: (modalType) => dispatch(showModal(modalType)),
+    hideModal: () => dispatch(hideModal())
 	}
 };
 

@@ -4,7 +4,7 @@ import {createStore, applyMiddleware, compose} from "redux";
 import {Provider} from "react-redux";
 import thunkMiddleware from "redux-thunk";
 
-import appReducer from './app/Reducers/reducer.js'; 
+import appReducer from './app/Reducers/reducer.js';
 import {setToken} from './app/Actions/tokenActions.js';
 import {setCourseFiles} from './app/Actions/courseFilesActions.js';
 
@@ -12,6 +12,7 @@ import Application from './Application.js';
 import LecturesList from './app/Pages/LecturesList/LecturesList';
 import Lecture from './app/Pages/Lecture/Lecture.js';
 import InstructorSettings from './app/Pages/InstructorSettings/InstructorSettings.js';
+
 
 
 export default class App extends Component {
@@ -28,7 +29,7 @@ export default class App extends Component {
       ))
     );
   }
-  
+
   componentDidMount() {
     fetch(('/api/identify/'), {
       credentials: 'same-origin' // or 'include'

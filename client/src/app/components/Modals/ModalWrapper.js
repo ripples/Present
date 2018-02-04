@@ -1,43 +1,41 @@
 import React from 'react';
-const {PropTypes} = React;
-import Modal from 'react-bootstrap';
+import {Modal} from 'react-bootstrap';
 import {connect} from 'react-redux';
-import * as modalActions from '../Actions/modalActions.js';
+import PropTypes from 'prop-types';
+import {hideModal} from '../../Actions/modalActions.js';
 
 class ModalWrapper extends React.Component {
 
-  constructor(props){
-    super(props);
-  }
-
   render() {
-    <div className="modal-container" style={this.props.containerStyle}>
-      <Modal show={this.props.modal.modalState} onHide={this.onHideModal} container={this} aria-labelledby="modal-title" animation={this.props.animation} keyboard={this.props.keyboard}>
-        <Modal.Header closeButton style={this.props.headerStyle}>
-          <Modal.Title id="modal-title">
-            {this.props.title}
-          </Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          {this.props.body}
-        </Modal.Body>
-        <Modal.Footer style={this.props.footerStyle}>
-          {this.props.footerBtns}
-          <Button onClick={this.onHideModal}>Close</Button>
-        </Modal.Footer>
-      </Modal>
-    </div>
+    return (
+      <div className="modal-container" style={this.props.style}>
+        <Modal show={true} container={this} aria-labelledby="modal-title" animation={this.props.animation} keyboard={this.props.keyboard} onHide={this.props.hideModal}>
+          <Modal.Header closeButton={true}>
+            <Modal.Title id="modal-title">
+              {this.props.title}
+            </Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            {this.props.body}
+          </Modal.Body>
+          <Modal.Footer>
+            <div style={{textAlign: 'center'}}>
+              {this.props.footerBtns}
+              <button onClick={this.props.hideModal} style={this.props.closeStyle}>{this.props.closeText}</button>
+            </div>
+          </Modal.Footer>
+        </Modal>
+      </div>
+    );
   }
 }
 
 ModalWrapper.propTypes = {
   // props
   title: PropTypes.string.isRequired,
-  containerStyle: PropTypes.object,
-  headerStyle: PropTypes.object,
-  footerStyle: PropTypes.object,
-  animation: PropTypes.boolean,
-  keyboard: PropTypes.boolean,
+  style: PropTypes.object,
+  animation: PropTypes.bool,
+  keyboard: PropTypes.bool,
   body: PropTypes.oneOfType([
     PropTypes.array,
     PropTypes.element,
@@ -48,32 +46,34 @@ ModalWrapper.propTypes = {
     PropTypes.element,
     PropTypes.object,
   ]).isRequired,
+  closeText: PropTypes.string,
+  closeStyle: PropTypes.object,
 
   // methods
-  onHideModal: PropTypes.func,
+  hideModal: PropTypes.func,
 };
 
 ModalWrapper.defaultProps = {
   title: 'Modal Title',
-  body: "Modal Body"
+  body: "Modal Body",
   animation: true,
   keyboard: true,
   footerBtns: [],
-  containerStyle: {},
-  headerStyle: {},
-  footerStyle: {},
-  onHideModal: () => {this.props.setModalState(false)}
+  style: {},
+  closeStyle: {},
+  closeText: "Close",
+  hideModal: () => {this.props.hideModal()}
 };
 
 const mapStateToProps = state => {
   return {
-    modal: state.modal,
+    modal: state.modal
   };
-};
+}
 
 const mapDispatchToProps = (dispatch, ownProps) => {
   return {
-    setModalState: (state) => dispatch(setModalState(state))
+    hideModal: () => dispatch(hideModal())
   }
 };
 

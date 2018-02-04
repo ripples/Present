@@ -2,7 +2,25 @@ import React from 'react';
 import TimeRange from '../CalendarForm/TimeRange.js';
 import ModalWrapper from './ModalWrapper.js';
 import moment from 'moment';
-import {getCurrentSemester, formatDate, revertDate, formatTime, getEventDT, isValidDate} from './CalendarUtils.js';
+import Datetime from 'react-datetime';
+import {connect} from 'react-redux';
+import 'react-datetime/css/react-datetime.css';
+import {getCurrentSemester, formatDate, revertDate, formatTime, getEventDT, isValidDate} from '../CalendarForm/CalendarUtils.js';
+import {hideModal} from '../../Actions/modalActions.js';
+import {clearForm, setCalRepeatDays, setCalRecurrence, setCalExcludeDates, setCalIncludeDates, setCalSDate, setCalEDate, setCalDescription, setCalEvents, setCalShowRecur, setCalSTime, setCalETime, setCalMultidayEvent} from '../../Actions/calFormActions.js';
+
+class Event {
+  constructor(courseId, title, start, end, description, location, summary, hexColor){
+    this.courseId = courseId;
+    this.title = title;
+    this.start = start;
+    this.end = end;
+    this.description = description;
+    this.location = location;
+    this.summary = summary;
+    this.hexColor = hexColor;
+  }
+}
 
 class AddEventModal extends React.Component {
 
@@ -143,7 +161,7 @@ class AddEventModal extends React.Component {
     currentEvents.push(event);
     let newEvents = currentEvents;
     this.props.setCalEvents(newEvents);
-    if(this.props.calendarForm.modalState){
+    if(this.props.modalType){
       this.onCloseModal();
     }
   }
@@ -222,88 +240,84 @@ class AddEventModal extends React.Component {
     this.props.setCalDescription('');
   }
 
-  onOpenModal = () => {
-    this.props.setCalModalState(true);
-  };
-
   onHideModal = () => {
     this.clear();
-    this.props.setModalState(false);
+    this.props.hideModal();
   };
 
-  const addEventForm = (
-    <form onSubmit={this.handleSubmit.bind(this)}>
-      <fieldset style={fieldsetStyle}>
-        <div>
-          <label style={labelStyle} htmlFor='showRecur'><input style={chkbxStyle} type='checkbox' name='showRecur' onChange={this.handleChange.bind(this, 'showRecur')}/>Create Recurring Event?</label>
-          <label hidden={this.props.calendarForm.showRecur} style={labelStyle} htmlFor='multidayEvent'><input style={chkbxStyle} type='checkbox' name='multidayEvent' onChange={this.handleChange.bind(this, 'multidayEvent')} ref={'mdchkbx'}/>Multi-Day Event?</label>
-        </div>
-        <div>
-          <Datetime inputProps={{ placeholder: 'Start Date: MM/DD/YYYY', style: pickerStyle }} onChange={this.handleChange.bind(this, 'sDate')} timeFormat={false} closeOnSelect={true}/>
-        </div>
-        <div hidden={showEndDate}>
-          <Datetime inputProps={{ placeholder: 'End Date: MM/DD/YYYY', style: pickerStyle }} onChange={this.handleChange.bind(this, 'eDate')} timeFormat={false} closeOnSelect={true}/>
-        </div>
-        <div>
-          <TimeRange handleChange={this.handleChange.bind(this)}/>
-        </div>
-        <div name='recurringEventDiv' hidden={!this.props.calendarForm.showRecur}>
-          <div>
-            <label style={labelStyle}>Repeat? (WEEKLY): </label>
-            <label style={labelStyle} htmlFor='Monday'><input style={chkbxStyle} type='checkbox' name='Monday' onChange={this.handleCheckboxChange.bind(this)}/>Monday</label>
-            <label style={labelStyle} htmlFor='Tuesday'><input style={chkbxStyle} type='checkbox' name='Tuesday' onChange={this.handleCheckboxChange.bind(this)}/>Tuesday</label>
-            <label style={labelStyle} htmlFor='Wednesday'><input style={chkbxStyle} type='checkbox' name='Wednesday' onChange={this.handleCheckboxChange.bind(this)}/>Wednesday</label>
-            <label style={labelStyle} htmlFor='Thursday'><input style={chkbxStyle} type='checkbox' name='Thursday' onChange={this.handleCheckboxChange.bind(this)}/>Thursday</label>
-            <label style={labelStyle} htmlFor='Friday'><input style={chkbxStyle} type='checkbox' name='Friday' onChange={this.handleCheckboxChange.bind(this)}/>Friday</label>
-          </div>
-          <div id='exclude/include'>
-            <div id='exclude'>
-              <Datetime inputProps={{ placeholder: 'Exclude A Date', style: pickerStyle }} onChange={this.handleAddDate.bind(this, 'exclude')} timeFormat={false} closeOnSelect={true}/>
-              <button type='button' style={undoStyle} onClick={this.undoAddDate.bind(this, 'exclude')}>Undo Exclude</button>
-              <label name='excludeDates'>Currently Excluded: [{this.props.calendarForm.excludeDates.map((date, i) => {
-                var newDate = "";
-                if(i === 0){
-                  newDate = revertDate(date);
-                }
-                else{
-                  newDate = ", " + revertDate(date);
-                }
-                return (<p key={i} style={dateStyle}>{newDate}</p>)})}]
-              </label>
-            </div>
-            <div id='include'>
-              <Datetime inputProps={{ placeholder: 'Include A Date', style: pickerStyle }} onChange={this.handleAddDate.bind(this, 'include')} timeFormat={false} closeOnSelect={true}/>
-              <button type='button' style={undoStyle} onClick={this.undoAddDate.bind(this, 'include')}>Undo Include</button>
-              <label name='includeDates'>Currently Added: [{this.props.calendarForm.includeDates.map((date, i) => {
-                var newDate = "";
-                if(i === 0){
-                  newDate = revertDate(date);
-                }
-                else{
-                  newDate = ", " + revertDate(date);
-                }
-                return (<p key={i} style={dateStyle}>{newDate}</p>)})}]
-              </label>
-            </div>
-          </div>
-        </div>
-        <div id='description'>
-          <input type='text' style={inputStyle} placeholder='Description' onChange={this.handleChange.bind(this, 'description')}></input>
-        </div>
-      </fieldset>
-    </form>
-  );
-
-  const buttons = (
-    <div style={{textAlign: 'center'}}>
-      <input type='submit' style={modalBtnStyle} value='Add Event'/>
-      <button type='button' style={modalBtnStyle} onClick={this.onHideModal}>Cancel</button>
-    </div>
-  );
-
   render() {
+
+    var showEndDate = !(this.props.calendarForm.multidayEvent || this.props.calendarForm.showRecur);
+
+    const addEventForm = (
+      <form onSubmit={this.handleSubmit.bind(this)}>
+        <fieldset style={fieldsetStyle}>
+          <div>
+            <label style={labelStyle} htmlFor='showRecur'><input style={chkbxStyle} type='checkbox' name='showRecur' onChange={this.handleChange.bind(this, 'showRecur')}/>Create Recurring Event?</label>
+            <label hidden={this.props.calendarForm.showRecur} style={labelStyle} htmlFor='multidayEvent'><input style={chkbxStyle} type='checkbox' name='multidayEvent' onChange={this.handleChange.bind(this, 'multidayEvent')} ref={'mdchkbx'}/>Multi-Day Event?</label>
+          </div>
+          <div>
+            <Datetime inputProps={{ placeholder: 'Start Date: MM/DD/YYYY', style: pickerStyle }} onChange={this.handleChange.bind(this, 'sDate')} timeFormat={false} closeOnSelect={true}/>
+          </div>
+          <div hidden={showEndDate}>
+            <Datetime inputProps={{ placeholder: 'End Date: MM/DD/YYYY', style: pickerStyle }} onChange={this.handleChange.bind(this, 'eDate')} timeFormat={false} closeOnSelect={true}/>
+          </div>
+          <div>
+            <TimeRange handleChange={this.handleChange.bind(this)}/>
+          </div>
+          <div name='recurringEventDiv' hidden={!this.props.calendarForm.showRecur}>
+            <div>
+              <label style={labelStyle}>Repeat? (WEEKLY): </label>
+              <label style={labelStyle} htmlFor='Monday'><input style={chkbxStyle} type='checkbox' name='Monday' onChange={this.handleCheckboxChange.bind(this)}/>Monday</label>
+              <label style={labelStyle} htmlFor='Tuesday'><input style={chkbxStyle} type='checkbox' name='Tuesday' onChange={this.handleCheckboxChange.bind(this)}/>Tuesday</label>
+              <label style={labelStyle} htmlFor='Wednesday'><input style={chkbxStyle} type='checkbox' name='Wednesday' onChange={this.handleCheckboxChange.bind(this)}/>Wednesday</label>
+              <label style={labelStyle} htmlFor='Thursday'><input style={chkbxStyle} type='checkbox' name='Thursday' onChange={this.handleCheckboxChange.bind(this)}/>Thursday</label>
+              <label style={labelStyle} htmlFor='Friday'><input style={chkbxStyle} type='checkbox' name='Friday' onChange={this.handleCheckboxChange.bind(this)}/>Friday</label>
+            </div>
+            <div id='exclude/include'>
+              <div id='exclude'>
+                <Datetime inputProps={{ placeholder: 'Exclude A Date', style: pickerStyle }} onChange={this.handleAddDate.bind(this, 'exclude')} timeFormat={false} closeOnSelect={true}/>
+                <button type='button' style={undoStyle} onClick={this.undoAddDate.bind(this, 'exclude')}>Undo Exclude</button>
+                <label name='excludeDates'>Currently Excluded: [{this.props.calendarForm.excludeDates.map((date, i) => {
+                  var newDate = "";
+                  if(i === 0){
+                    newDate = revertDate(date);
+                  }
+                  else{
+                    newDate = ", " + revertDate(date);
+                  }
+                  return (<p key={i} style={dateStyle}>{newDate}</p>)})}]
+                </label>
+              </div>
+              <div id='include'>
+                <Datetime inputProps={{ placeholder: 'Include A Date', style: pickerStyle }} onChange={this.handleAddDate.bind(this, 'include')} timeFormat={false} closeOnSelect={true}/>
+                <button type='button' style={undoStyle} onClick={this.undoAddDate.bind(this, 'include')}>Undo Include</button>
+                <label name='includeDates'>Currently Added: [{this.props.calendarForm.includeDates.map((date, i) => {
+                  var newDate = "";
+                  if(i === 0){
+                    newDate = revertDate(date);
+                  }
+                  else{
+                    newDate = ", " + revertDate(date);
+                  }
+                  return (<p key={i} style={dateStyle}>{newDate}</p>)})}]
+                </label>
+              </div>
+            </div>
+          </div>
+          <div id='description'>
+            <input type='text' style={inputStyle} placeholder='Description' onChange={this.handleChange.bind(this, 'description')}></input>
+          </div>
+        </fieldset>
+      </form>
+    );
+
+    const buttons = (
+        <input type='submit' style={modalBtnStyle} value='Add Event'/>
+    );
+
     return (
-      <ModalWrapper title="Add New Event(s)" body={addEventForm} footerBtns={buttons} onHideModal={this.onHideModal} />
+      <ModalWrapper title="Add New Event(s)" body={addEventForm} footerBtns={buttons} hideModal={this.onHideModal} closeText="Cancel" closeStyle={modalBtnStyle}/>
     );
   }
 }
@@ -369,7 +383,7 @@ var inputStyle = {
 
 const mapStateToProps = state => {
   return {
-    modal: state.modal,
+    modalType: state.modal.modalType,
     calendarForm: state.calendarForm,
     courseId: state.token.lis_course_section_sourcedid,
     courseTitle: state.token.context_title
@@ -378,7 +392,7 @@ const mapStateToProps = state => {
 
 const mapDispatchToProps = (dispatch, ownProps) => {
   return {
-    setModalState: (state) => dispatch(setModalState(state)),
+    hideModal: () => dispatch(hideModal()),
     clearForm: () => dispatch(clearForm()),
     setCalRepeatDays: (days) => dispatch(setCalRepeatDays(days)),
     setCalRecurrence: (recurrence) => dispatch(setCalRecurrence(recurrence)),
