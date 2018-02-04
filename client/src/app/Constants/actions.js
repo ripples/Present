@@ -65,3 +65,14 @@ export const lectureUploadConstants = {
     SET_LECTURE_DATE: 'SET_LECTURE_DATE',
     CLEAR_UPLOAD: 'CLEAR_UPLOAD'
 }
+
+export const modalConstants = {
+  SET_MODAL_STATE: 'SET_MODAL_STATE',
+  SET_CURRENT_MODAL: 'SET_CURRENT_MODAL'
+}
+
+export const messageConstants = {
+  SET_MESSAGE_STATE: 'SET_MESSAGE_STATE',
+  SET_MESSAGE_TEXT: 'SET_MESSAGE_TEXT',
+  SET_MESSAGE_TITLE: 'SET_MESSAGE_TITLE'
+}

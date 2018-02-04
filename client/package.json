@@ -6,6 +6,7 @@
     "passport": "^0.4.0",
     "react": "16.1.1",
     "react-big-calendar": "^0.17.0",
+    "react-bootstrap": "^0.32.1",
     "react-datetime": "^2.11.0",
     "react-dom": "16.1.1",
     "react-image-fallback": "^7.0.1",
