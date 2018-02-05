@@ -162,7 +162,7 @@ class AddEventModal extends React.Component {
     let newEvents = currentEvents;
     this.props.setCalEvents(newEvents);
     if(this.props.modalType){
-      this.onCloseModal();
+      this.onClose();
     }
   }
 
@@ -193,7 +193,7 @@ class AddEventModal extends React.Component {
     }
     let newEvents = currentEvents;
     this.props.setCalEvents(newEvents);
-    this.onCloseModal();
+    this.onClose();
     }).catch((err) => console.log(err));
   }
 
@@ -240,19 +240,46 @@ class AddEventModal extends React.Component {
     this.props.setCalDescription('');
   }
 
-  onHideModal = () => {
+  onClose = () => {
     this.clear();
     this.props.hideModal();
-  };
+  }
 
   render() {
 
     var showEndDate = !(this.props.calendarForm.multidayEvent || this.props.calendarForm.showRecur);
 
+    const helpMessage = (
+      <div>
+        <div>
+          <p>To add a single event:</p>
+          <ul>
+            <li>Select a starting and ending date (You can have an event span multiple days)</li>
+            <li>Type in a start and end time for your event, and specify AM or PM</li>
+            <li>Provide a description and location for your event</li>
+            <li>Click "Add Event"</li>
+          </ul>
+        </div>
+        <div>
+          <p>To add a recurring event:</p>
+          <ul>
+            <li>Click the checkbox in the upper left corner that says "Create Recurring Event?" to bring up the recurrence options</li>
+            <li>Select the date you wish the recurring event to start on</li>
+            <li>Select the date you wish the recurrence to end on (inclusive of selected date)</li>
+            <li>Type in a start and end time, which will be applied to every event in the reccurence</li>
+            <li>Click the checkboxes for the days of the week you wish the event to repeat on</li>
+            <li>If you want, you may select individual dates to exclude and/or include from the repeating event range of dates, if you make a mistake you can press the undo button to remove your last added date</li>
+            <li>Provide a description and location for the recurring event</li>
+            <li>Click "Add Event"</li>
+          </ul>
+        </div>
+      </div>
+    );
+
     const addEventForm = (
-      <form onSubmit={this.handleSubmit.bind(this)}>
+      <form>
         <fieldset style={fieldsetStyle}>
-          <div>
+          <div style={{textAlign: 'center'}}>
             <label style={labelStyle} htmlFor='showRecur'><input style={chkbxStyle} type='checkbox' name='showRecur' onChange={this.handleChange.bind(this, 'showRecur')}/>Create Recurring Event?</label>
             <label hidden={this.props.calendarForm.showRecur} style={labelStyle} htmlFor='multidayEvent'><input style={chkbxStyle} type='checkbox' name='multidayEvent' onChange={this.handleChange.bind(this, 'multidayEvent')} ref={'mdchkbx'}/>Multi-Day Event?</label>
           </div>
@@ -305,7 +332,7 @@ class AddEventModal extends React.Component {
               </div>
             </div>
           </div>
-          <div id='description'>
+          <div id='description' style={{textAlign: 'center'}}>
             <input type='text' style={inputStyle} placeholder='Description' onChange={this.handleChange.bind(this, 'description')}></input>
           </div>
         </fieldset>
@@ -313,11 +340,13 @@ class AddEventModal extends React.Component {
     );
 
     const buttons = (
-        <input type='submit' style={modalBtnStyle} value='Add Event'/>
+      <span>
+        <button type='button' style={modalBtnStyle} onClick={this.handleSubmit.bind(this)}>Add Event</button>
+      </span>
     );
 
     return (
-      <ModalWrapper title="Add New Event(s)" body={addEventForm} footerBtns={buttons} hideModal={this.onHideModal} closeText="Cancel" closeStyle={modalBtnStyle}/>
+      <ModalWrapper title="Add New Event(s)" body={addEventForm} footerBtns={buttons} hideModal={this.onClose} closeText="Cancel" closeStyle={modalBtnStyle}/>
     );
   }
 }

@@ -14,7 +14,7 @@ const ModalConductor = props => {
   }
 
   const DispatchedModal = MODAL_COMPONENTS[props.modal.modalType]
-  return <DispatchedModal {...props} />
+  return <DispatchedModal />
 };
 
 const mapStateToProps = state => {
