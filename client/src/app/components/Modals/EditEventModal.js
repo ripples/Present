@@ -132,7 +132,7 @@ class EditEventModal extends React.Component {
           <Datetime inputProps={{ placeholder: this.props.currentEvent.end.toLocaleString(), style: pickerStyle }} onChange={this.handleChange.bind(this, 'eDate')} timeFormat={false} closeOnSelect={true}/>
         </div>
         <div>
-          <TimeRange handleChange={this.handleChange}/>
+          <TimeRange handleChange={this.handleChange.bind(this)}/>
         </div>
         <div id='description'>
           <input type='text' style={inputStyle} placeholder={this.props.currentEvent.description} onChange={this.handleChange.bind(this, 'description')}></input>
