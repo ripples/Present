@@ -6,10 +6,17 @@ export default function modal(state = initialState, action){
         case modalConstants.SHOW_MODAL:
           return {
             modalType: action.modalType,
+            currentEvent: state.currentEvent
           };
 
-          case modalConstants.HIDE_MODAL:
-            return initialState;
+        case modalConstants.HIDE_MODAL:
+          return initialState;
+
+        case modalConstants.SHOW_EVENT:
+          return {
+            modalType: 'VIEW_EVENT',
+            currentEvent: action.currentEvent
+          };
 
         default:
             return state;
@@ -17,5 +24,6 @@ export default function modal(state = initialState, action){
 }
 
 const initialState = {
-    modalType: null
+    modalType: null,
+    currentEvent: {}
   }

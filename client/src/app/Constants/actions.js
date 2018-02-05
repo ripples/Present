@@ -35,7 +35,8 @@ export const calFormConstants = {
     SET_CAL_INCLUDE_DATES: 'SET_CAL_INCLUDE_DATES',
     SET_CAL_DESCRIPTION: 'SET_CAL_DESCRIPTION',
     SET_CAL_COURSE_ID: 'SET_CAL_COURSE_ID',
-    CLEAR_FORM: 'CLEAR_FORM'
+    CLEAR_FORM: 'CLEAR_FORM',
+    INIT_FORM: 'INIT_FORM'
 }
 
 //lecture delete actions
@@ -68,7 +69,8 @@ export const lectureUploadConstants = {
 
 export const modalConstants = {
   SHOW_MODAL: 'SHOW_MODAL',
-  HIDE_MODAL: 'HIDE_MODAL'
+  HIDE_MODAL: 'HIDE_MODAL',
+  SHOW_EVENT: 'SHOW_EVENT'
 }
 
 export const messageConstants = {

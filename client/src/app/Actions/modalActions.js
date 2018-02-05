@@ -12,3 +12,10 @@ export function hideModal(){
     type: modalConstants.HIDE_MODAL
   }
 }
+
+export function showEvent(currentEvent){
+  return {
+    type: modalConstants.SHOW_EVENT,
+    currentEvent
+  }
+}

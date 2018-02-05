@@ -11,7 +11,7 @@ import {getCurrentSemester, isEqual, getEventDT, deepCopy, processEvents, genera
 import {setCalMessageState, setCalMessageText, setCalMessageTitle, setCalEvents, setCalSTime, setCalETime, setCalHexColor,
   setCalSDate, setCalEDate, setCalRepeatDays, setCalRecurrence, setCalExcludeDates, setCalShowRecur, setCalMultidayEvent, setCalOriginalCal,
   setCalIncludeDates, setCalDescription, setCalRoom, setCalURL, setCalCourseId, clearForm} from '../../Actions/calFormActions.js';
-import {showModal, hideModal} from '../../Actions/modalActions.js';
+import {showModal, hideModal, showEvent} from '../../Actions/modalActions.js';
 
 BigCalendar.momentLocalizer(moment);
 
@@ -47,7 +47,7 @@ class CalendarRobust extends React.Component {
 
   loadCalendarData = () => {
     this.props.setCourseId(this.props.courseId);
-    fetch(('/api/calendar/populate/' + encodeURIComponent("./lectures/Calendars/" + this.props.calendarForm.room + "/Calendar.ics")), {
+    fetch(('/api/calendar/populate/' + encodeURIComponent("./lectures/" + this.props.calendarForm.room + "/Calendar.ics")), {
       credentials: 'same-origin' // or 'include'
     }).then(
       res => (res.status === 200 || res.status === 204 || res.status === 304) ? res.json() : []
@@ -286,7 +286,7 @@ class CalendarRobust extends React.Component {
             defaultView='month'
             scrollToTime={new Date(1970, 1, 1, 6)}
             defaultDate={new Date()}
-            onSelectEvent={event => this.generateSelectedEvent(event)}
+            onSelectEvent={event => this.props.showEvent(event)}
             onSelectSlot={(slotInfo) => this.launchMessage('Empty Slot Selected', 'There are no events scheduled in this time slot')}
             eventPropGetter={(event => this.eventStyleGetter(event))}
           />
@@ -402,7 +402,8 @@ const mapDispatchToProps = (dispatch, ownProps) => {
     setCalRoom: (room) => dispatch(setCalRoom(room)),
     setCalURL: (url) => dispatch(setCalURL(url)),
     showModal: (modalType) => dispatch(showModal(modalType)),
-    hideModal: () => dispatch(hideModal())
+    hideModal: () => dispatch(hideModal()),
+    showEvent: (currentEvent) => dispatch(showEvent(currentEvent))
 	}
 };
 

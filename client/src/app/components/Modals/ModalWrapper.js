@@ -39,7 +39,10 @@ const footerStyle = {
 
 ModalWrapper.propTypes = {
   // props
-  title: PropTypes.string.isRequired,
+  title: PropTypes.oneOfType([
+    PropTypes.string,
+    PropTypes.object,
+  ]).isRequired,
   animation: PropTypes.bool,
   keyboard: PropTypes.bool,
   headerStyle: PropTypes.object,

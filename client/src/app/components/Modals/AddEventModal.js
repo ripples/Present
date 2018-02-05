@@ -8,19 +8,7 @@ import 'react-datetime/css/react-datetime.css';
 import {getCurrentSemester, formatDate, revertDate, formatTime, getEventDT, isValidDate} from '../CalendarForm/CalendarUtils.js';
 import {hideModal} from '../../Actions/modalActions.js';
 import {clearForm, setCalRepeatDays, setCalRecurrence, setCalExcludeDates, setCalIncludeDates, setCalSDate, setCalEDate, setCalDescription, setCalEvents, setCalShowRecur, setCalSTime, setCalETime, setCalMultidayEvent} from '../../Actions/calFormActions.js';
-
-class Event {
-  constructor(courseId, title, start, end, description, location, summary, hexColor){
-    this.courseId = courseId;
-    this.title = title;
-    this.start = start;
-    this.end = end;
-    this.description = description;
-    this.location = location;
-    this.summary = summary;
-    this.hexColor = hexColor;
-  }
-}
+import Event from '../../utils/Event.js';
 
 class AddEventModal extends React.Component {
 
@@ -28,7 +16,6 @@ class AddEventModal extends React.Component {
     super(props);
     this.addNewEvent = this.addNewEvent.bind(this);
     this.addRecurringEvent = this.addRecurringEvent.bind(this);
-    this.clear = this.clear.bind(this);
   }
 
   handleChange(name, e){
@@ -226,22 +213,8 @@ class AddEventModal extends React.Component {
     }
   }
 
-  clear(){
-    this.props.setCalShowRecur(false);
-    this.props.setCalMultidayEvent(false);
-    this.props.setCalSDate('');
-    this.props.setCalEDate('');
-    this.props.setCalSTime('');
-    this.props.setCalETime('');
-    this.props.setCalRepeatDays([]);
-    this.props.setCalRecurrence([]);
-    this.props.setCalExcludeDates([]);
-    this.props.setCalIncludeDates([]);
-    this.props.setCalDescription('');
-  }
-
   onClose = () => {
-    this.clear();
+    this.props.clearForm();
     this.props.hideModal();
   }
 

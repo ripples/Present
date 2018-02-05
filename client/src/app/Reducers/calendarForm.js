@@ -1,6 +1,6 @@
 import {calFormConstants} from '../Constants/actions.js';
 
-export default function calendarForm(state = calInit, action){
+export default function calendarForm(state = initialState, action){
     switch(action.type){
         case calFormConstants.SET_CAL_ORIGINAL_CAL:
           return {
@@ -528,14 +528,39 @@ export default function calendarForm(state = calInit, action){
           };
 
         case calFormConstants.CLEAR_FORM:
-            return calInit;
+            return {
+              originalCal: state.originalCal,
+              showRecur: false,
+              room: state.room,
+              url: state.url,
+              hexColor: state.hexColor,
+              multidayEvent: false,
+              modalState: state.modalState,
+              messageState: state.messageState,
+              messageText: state.messageText,
+              messageTitle: state.messageTitle,
+              events: state.events,
+              sDate: '',
+              eDate: '',
+              sTime: '',
+              eTime: '',
+              repeatDays: [],
+              recurrence: [],
+              excludeDates: [],
+              includeDates: [],
+              description: '',
+              courseId: state.courseId
+            };
+
+        case calFormConstants.INIT_FORM:
+            return initialState;
 
         default:
             return state;
     }
 }
 
-const calInit = {
+const initialState = {
     originalCal: [],
     showRecur: false,
     room: "",

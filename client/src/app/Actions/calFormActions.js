@@ -152,3 +152,9 @@ export function clearForm(){
         type: calFormConstants.CLEAR_FORM
     }
 }
+
+export function initForm(){
+  return {
+    type: calFormConstants.INIT_FORM
+  }
+}

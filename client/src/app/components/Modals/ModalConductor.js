@@ -2,10 +2,12 @@ import React from 'react';
 import {connect} from 'react-redux';
 import AddEventModal from './AddEventModal.js';
 import EditEventModal from './EditEventModal.js';
+import ViewEventModal from './ViewEventModal.js';
 
 const MODAL_COMPONENTS = {
   'ADD_EVENT': AddEventModal,
-  'EDIT_EVENT': EditEventModal
+  'EDIT_EVENT': EditEventModal,
+  'VIEW_EVENT': ViewEventModal
 }
 
 const ModalConductor = props => {
