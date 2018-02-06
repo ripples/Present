@@ -13,7 +13,7 @@ import {showModal, hideModal, showEvent} from '../../Actions/modalActions.js';
 
 BigCalendar.momentLocalizer(moment);
 
-class CalendarRobust extends React.Component {
+class Calendar extends React.Component {
 
   constructor(props){
     super(props);
@@ -252,4 +252,4 @@ const mapDispatchToProps = (dispatch, ownProps) => {
 	}
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(CalendarRobust);
+export default connect(mapStateToProps, mapDispatchToProps)(Calendar);

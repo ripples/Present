@@ -3,11 +3,13 @@ import {connect} from 'react-redux';
 import AddEventModal from './AddEventModal.js';
 import EditEventModal from './EditEventModal.js';
 import ViewEventModal from './ViewEventModal.js';
+import RoomSelectionModal from './RoomSelectionModal.js';
 
 const MODAL_COMPONENTS = {
   'ADD_EVENT': AddEventModal,
   'EDIT_EVENT': EditEventModal,
-  'VIEW_EVENT': ViewEventModal
+  'VIEW_EVENT': ViewEventModal,
+  'ROOM_SELECT': RoomSelectionModal
 }
 
 const ModalConductor = props => {
