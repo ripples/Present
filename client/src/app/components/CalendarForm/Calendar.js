@@ -12,6 +12,7 @@ import {setCalEvents, setCalHexColor, setCalOriginalCal, setCalRoom, setCalURL, 
 import {showModal, hideModal, showEvent} from '../../Actions/modalActions.js';
 import {showMessage, setMessageBody} from '../../Actions/messageActions.js';
 
+//Sets the localizer for the BigCalendar component to moment.js
 BigCalendar.momentLocalizer(moment);
 
 class Calendar extends React.Component {
@@ -22,7 +23,8 @@ class Calendar extends React.Component {
     this.eventStyleGetter = this.eventStyleGetter.bind(this);
   }
 
-  componentWillMount(){ //Read any existing calendar file from server, if none exists, blank calendar. (GET)
+  //On component mounting to DOM, load in the calendar data to populate gui. (Returns either valid calendar or blank calendar from GET request)
+  componentWillMount(){
       this.loadCalendarData();
   }
 
@@ -30,34 +32,35 @@ class Calendar extends React.Component {
     this.props.clearForm();
   }
 
-  loadCalendarData = () => {
+  loadCalendarData = () => { //Queries the server for the desired ics file, if one exists.
     this.props.setCourseId(this.props.courseId);
-    fetch(('/api/calendar/populate/' + encodeURIComponent("./lectures/" + this.props.calendarForm.room + "/Calendar.ics")), {
+    fetch(('/api/calendar/populate/' + encodeURIComponent("./lectures/" + this.props.calendarForm.room + "/Calendar.ics")), { //fetch the ics file assigned to the room the user selected
       credentials: 'same-origin' // or 'include'
     }).then(
       res => (res.status === 200 || res.status === 204 || res.status === 304) ? res.json() : []
     ).then((json) => {
-      if(json.length !== 0){ //If there was no valid calendar file
-        const calendar = processEvents(json);
+      if(json.length !== 0){ //If there was a valid ics file
+        const calendar = processEvents(json); //This populates the calendar with the events in the ics file.
         this.props.setCalOriginalCal(calendar);
         this.props.setCalEvents(deepCopy(calendar));
         this.props.setCalHexColor(calendar[0].hexColor);
       }
-      else{
-        this.props.setCalOriginalCal([]);
+      else{ //If there was no valid ics file
+        this.props.setCalOriginalCal([]); //This sets up a blank calendar for the given room.
         this.props.setCalEvents([]);
-        this.props.setCalHexColor(generateRandomHexColor());
+        this.props.setCalHexColor(generateRandomHexColor()); //Assigns random hex color to new class.
       }
     }).catch((err) => console.log(err));
   };
 
+  //Add the given event to the current calendar (does not save changes to the server!)
   addNewEvent(event){
-    let currentEvents = this.props.calendarForm.events;
-    currentEvents.push(event);
-    let newEvents = currentEvents;
-    this.props.setCalEvents(newEvents);
-    if(this.props.modalType){
-      this.onCloseModal();
+    let currentEvents = this.props.calendarForm.events; //Get the current state of the events on the calendar
+    currentEvents.push(event); //Push the new event into the group
+    let newEvents = currentEvents; //Create new array containing all new events
+    this.props.setCalEvents(newEvents); //Set the current displayed calendar to the new events
+    if(this.props.modalType){ //If modal is open
+      this.onCloseModal(); //Close it
     }
   }
 
@@ -65,43 +68,51 @@ class Calendar extends React.Component {
     this.props.showModal(modalType);
   }
 
+  //Deletes the given event from the calendar gui (doesn't save the calendar changes to the server!)
   deleteEvent(event, e){
-    if(e){
+    if(e){ //If a button triggered this
       e.preventDefault();
     }
-    let events = this.props.calendarForm.events;
-    if(events.includes(event)){
-      events.splice(events.indexOf(event), 1);
-      this.props.setCalEvents(events);
+    let events = this.props.calendarForm.events; //Get the current events
+    if(events.includes(event)){ //If the event we want to delete exists in the calendar
+      events.splice(events.indexOf(event), 1); //Remove it
+      this.props.setCalEvents(events); //Set calendar to new array without the deleted event
     }
   }
 
+  //Once changes have been made to the calendar, queries the server to save the new ics file.
   handleSave(e){
     e.preventDefault();
-    if(!isEqual(this.props.calendarForm.originalCal, this.props.calendarForm.events)){
+    if(!isEqual(this.props.calendarForm.originalCal, this.props.calendarForm.events)){ //If there have been changes to the calendar
       var options = {method: 'POST',
                     headers: {"Content-Type": "application/json"},
                     credentials: 'same-origin',
                     body: JSON.stringify(this.props.calendarForm.events)};
+      //TODO(Jon):
+      //Launch confirmation modal for save ("Are you sure you want to override previous calendar?")
+      //.then() the below code on affirmative close, else, return
 
+      //Make POST request to server
       fetch('/api/calendar/save/' + this.props.courseId + '/' + encodeURIComponent("./lectures/" + this.props.calendarForm.room + "/Calendar.ics") + '/' + encodeURIComponent(this.props.calendarForm.url), options).then((response) => {
         return response.text()
       }).then((data) => {
-        this.props.setCalOriginalCal(deepCopy(this.props.calendarForm.events)); //So user can't re-save the same calendar
-        this.props.setMessageBody(data);
-        this.props.showMessage('CUSTOM');
+        this.props.setCalOriginalCal(deepCopy(this.props.calendarForm.events)); //So the user can't re-save the same calendar
+        this.props.setMessageBody(data); //Populate a message modal with the result of the POST request
+        this.props.showMessage('CUSTOM'); //Display message to the user
       }).catch((err) => console.log(err));
     }
-    else{
+    else{ //If there haven't been any changes to the calendar
       this.props.setMessageBody('ERROR: You haven\'t made any changes to the current calendar.');
       this.props.showMessage('CUSTOM');
     }
   }
 
+  //Displays the Room Selection modal if the user clicks the "Change Room" button
   handleRoomChange(e){
     this.props.showModal('ROOM_SELECT');
   }
 
+  //Gets the style of each event on the calendar
   eventStyleGetter(event){
     var backgroundColor = event.hexColor;
     var style = {

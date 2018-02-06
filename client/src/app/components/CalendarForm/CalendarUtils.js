@@ -1,6 +1,7 @@
 import moment from 'moment';
 import Event from '../../utils/Event.js';
 
+//Based on average dates from UMass Amherst Academic Calendar... gets the current semester and year. (SPRING18, etc.)
 export function getCurrentSemester(){
   var year = new Date().getFullYear().toString().substr(-2);
   var curMonth = new Date().getMonth(); //Jan:0, May=4, Aug=7, Dec=11, 1-3, 5-6, 8-10
@@ -26,6 +27,7 @@ export function getCurrentSemester(){
   return semester + year;
 }
 
+//Given a date and time, converts it to a Date object usable by events.
 export function getEventDT(date, time){
   let year = date.getFullYear();
   let month = date.getMonth();
@@ -36,7 +38,8 @@ export function getEventDT(date, time){
   return new Date(year, month, day, hour, min, sec);
 }
 
-export function processEvents(events){ //Converts the JSON representation of the start/end times of each event from server into JS Date objects (required by calendar component for reading).
+//Converts the JSON representation of the start/end times of each event from server into JS Date objects (required by calendar component for reading).
+export function processEvents(events){
   let processedEvents = [];
   for (let event of events){
     let newEvent = new Event(event.courseId, event.title, new Date(event.start), new Date(event.end), event.description, event.location, event.summary, event.hexColor, event.isInRecurrence, event.recurrenceId);
@@ -45,20 +48,24 @@ export function processEvents(events){ //Converts the JSON representation of the
   return processedEvents;
 }
 
+//Creates a non-reference deep copy of the given object.
 export function deepCopy(obj){
   return processEvents(JSON.parse(JSON.stringify(obj)));
 }
 
+//Formats a given time into "THHMMSS00Z" format
 export function formatTime(time){
   var split = time.split(":");
   return 'T' + split[0] + split[1] + '00Z'
 }
 
+//Formats a given date into MMDDYYYY format
 export function formatDate(date) {
   var split = date.split("-");
   return split[0] + split[1] + split[2];
 }
 
+//Determines if a given date is of a valid format for the calendar.
 export function isValidDate(str){
   var regex = /[0-9]{1,2}\/[0-9]{1,2}\/[0-9]{4}/
   if(regex.test(str) && moment(str, "MDY").isValid()){
@@ -69,10 +76,12 @@ export function isValidDate(str){
   }
 }
 
+//Generates a random hexadecimal color for the event objects on the Calendar GUI. One color is assigned to each unique class.
 export function generateRandomHexColor(){
   return '#'+('00000'+(Math.random()*(1<<24)|0).toString(16)).slice(-6);
 }
 
+//Compares the custom event object for equality (by value of fields).
 function isEqualEvent(event1, event2){
   let courseId = (event1.courseId === event2.courseId);
   let title = (event1.title === event2.title);
@@ -87,14 +96,15 @@ function isEqualEvent(event1, event2){
   return (courseId && title && start && end && description && location && summary && hexColor && isInRecurrence && recurrenceId);
 }
 
-export function revertDate(date) { //20171014
+//Formats date from YYYYMMDD to MM/DD/YYYY format (for display on gui).
+export function revertDate(date) {
   var yyyy = date.substring(0, 4);
   var mm = date.substring(4, 6);
   var dd = date.substring(6, 8);
-
   return mm + "/" + dd + "/" + yyyy;
 }
 
+//Compares custom event arrays for equality (if they contain the same number of equivalent events).
 export function isEqual(array1, array2){
 	if(array1.length !== array2.length){
   	return false;

@@ -12,27 +12,28 @@ class RoomSelectionModal extends React.Component {
     super(props);
   }
 
-  loadCalendarData = () => {
+  loadCalendarData = () => { //Queries the server for the desired ics file, if one exists.
     this.props.setCourseId(this.props.courseId);
-    fetch(('/api/calendar/populate/' + encodeURIComponent("./lectures/" + this.props.calendarForm.room + "/Calendar.ics")), {
+    fetch(('/api/calendar/populate/' + encodeURIComponent("./lectures/" + this.props.calendarForm.room + "/Calendar.ics")), { //fetch the ics file assigned to the room the user selected
       credentials: 'same-origin' // or 'include'
     }).then(
       res => (res.status === 200 || res.status === 204 || res.status === 304) ? res.json() : []
     ).then((json) => {
-      if(json.length !== 0){ //If there was no valid calendar file
-        const calendar = processEvents(json);
+      if(json.length !== 0){ //If there was a valid ics file
+        const calendar = processEvents(json); //This populates the calendar with the events in the ics file.
         this.props.setCalOriginalCal(calendar);
         this.props.setCalEvents(deepCopy(calendar));
         this.props.setCalHexColor(calendar[0].hexColor);
       }
-      else{
-        this.props.setCalOriginalCal([]);
+      else{ //If there was no valid ics file
+        this.props.setCalOriginalCal([]); //This sets up a blank calendar for the given room.
         this.props.setCalEvents([]);
-        this.props.setCalHexColor(generateRandomHexColor());
+        this.props.setCalHexColor(generateRandomHexColor()); //Assigns random hex color to new class.
       }
     }).catch((err) => console.log(err));
   };
 
+  //Returns the available rooms specified in the csv file on the server for the room selection dropdown.
   populateDropdown = () => {
     let items = [];
     for(var i = 0; i < this.props.ipage.roomOptions.length; i++){
@@ -56,6 +57,7 @@ class RoomSelectionModal extends React.Component {
     this.props.hideModal();
   }
 
+  //Given a room name, gives the correct url for the server to query
   getCorrectURL = (room) => {
     for(var i = 0; i < this.props.ipage.roomOptions.length; i++){
       let room_url = this.props.ipage.roomOptions[i].split("-URL-");
@@ -66,6 +68,7 @@ class RoomSelectionModal extends React.Component {
     return "";
   };
 
+  //Updates the state with the correct room selected on the modal by the user
   handleRoomSelect(e){
     if(!e){
       this.props.setCalRoom("MODAL");

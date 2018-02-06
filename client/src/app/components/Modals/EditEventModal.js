@@ -18,6 +18,7 @@ class EditEventModal extends React.Component {
     this.deleteEvent = this.deleteEvent.bind(this);
   }
 
+  //Updates the appropriate field of calendarForm's state with the given value
   handleChange(name, e){
     switch(name){
       case 'sDate':
@@ -81,27 +82,29 @@ class EditEventModal extends React.Component {
     }
   }
 
+  //Deletes the given event from the calendar if it exists
   deleteEvent(event, e){
-    if(e){
+    if(e){ //If called from a button
       e.preventDefault();
     }
-    let events = this.props.calendarForm.events;
-    if(events.includes(event)){
+    let events = this.props.calendarForm.events; //Get the current list of events
+    if(events.includes(event)){ //If the given event exists in the calendar
       events.splice(events.indexOf(event), 1);
-      this.props.setCalEvents(events);
-      if(this.props.modalType){
-        this.onClose();
+      this.props.setCalEvents(events); //Remove it and update the state
+      if(this.props.modalType){ //If the modal is still open
+        this.onClose(); //Close it
       }
     }
   }
 
+  //Adds the given event to the calendar
   addNewEvent(event){
-    let currentEvents = this.props.calendarForm.events;
+    let currentEvents = this.props.calendarForm.events; //Get the current list of events
     currentEvents.push(event);
     let newEvents = currentEvents;
-    this.props.setCalEvents(newEvents);
-    if(this.props.modalType){
-      this.onClose();
+    this.props.setCalEvents(newEvents); //Add the event to the list and update the state
+    if(this.props.modalType){ //If the modal is still open
+      this.onClose(); //Close it
     }
   }
 
@@ -110,16 +113,18 @@ class EditEventModal extends React.Component {
     this.props.hideModal();
   }
 
+  //Makes changes to the given event as specified by the user
   handleEdit(event, e){
-    if(e){
+    if(e){ //If called from a button
       e.preventDefault();
     }
+    //Create the new edited event with the new specifications by the user
     let editedEvent = new Event(this.props.courseId, event.title, getEventDT(this.props.calendarForm.sDate, this.props.calendarForm.sTime),
                                 getEventDT(this.props.calendarForm.eDate, this.props.calendarForm.eTime), this.props.calendarForm.description,
                                 this.props.calendarForm.room, (getCurrentSemester() + ' ' + this.props.courseId), event.hexColor);
-    this.deleteEvent(event);
-    this.addNewEvent(editedEvent);
-    this.onClose();
+    this.deleteEvent(event); //Remove the old event
+    this.addNewEvent(editedEvent); //Add the new one
+    this.onClose(); //Close the modal
   }
 
   render() {

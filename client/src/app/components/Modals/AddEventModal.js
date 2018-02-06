@@ -19,6 +19,7 @@ class AddEventModal extends React.Component {
     this.addRecurringEvent = this.addRecurringEvent.bind(this);
   }
 
+  //Updates the appropriate field of calendarForm's state with the given value
   handleChange(name, e){
     switch(name){
       case 'sDate':
@@ -82,40 +83,42 @@ class AddEventModal extends React.Component {
     }
   }
 
+  //Updates the state of a change to any checkboxes
   handleCheckboxChange(e){
     const rDays = this.props.calendarForm.repeatDays;
     let index
-    if(e.target.checked) {rDays.push(e.target.name);}
-    else {
-      index = rDays.indexOf(e.target.name);
-      rDays.splice(index, 1);
+    if(e.target.checked) {rDays.push(e.target.name);} //If one of the days (Mon-Fri) is checked, add that day to the list of ones checked
+    else { //If it was unchecked
+      index = rDays.indexOf(e.target.name); //Get the index of the box that was checked (essentially getting the day)
+      rDays.splice(index, 1); //Remove that day from the list
     }
     this.props.setCalRepeatDays(rDays);
   }
 
+  //Adds a date to either exclude dates or include dates when creating an event.
   handleAddDate(type, e){
-    var m = false;
-    if(!moment.isMoment(e) && isValidDate(e)){
-      m = moment(e, "MDY")
+    var m = false; //Default value false for moment object
+    if(!moment.isMoment(e) && isValidDate(e)){ //If the value is a valid date but not yet a moment object
+      m = moment(e, "MDY") //Make it a moment object
     }
     else if(moment.isMoment(e)){
       m = e;
     }
-    if(!m){
+    if(!m){ //If m didn't get assigned to a value
       return;
     }
-    else{
-      if(m.format("YYYYMMDD").toString() !== moment().format("YYYYMMDD").toString()){
-        if(type === 'exclude'){
-          const currentExcludes = this.props.calendarForm.excludeDates;
-          let newDate = formatDate(m.format("YYYY-MM-DD").toString());
-          if(!currentExcludes.includes(newDate)){
+    else{ //There was a valid date and it was made into a moment object
+      if(m.format("YYYYMMDD").toString() !== moment().format("YYYYMMDD").toString()){ //Check validity of formatting
+        if(type === 'exclude'){ //If it is a date to be exluded
+          const currentExcludes = this.props.calendarForm.excludeDates; //Get the current list of exluded dates
+          let newDate = formatDate(m.format("YYYY-MM-DD").toString()); //Create the new date
+          if(!currentExcludes.includes(newDate)){ //If the date isn't already present in the list
             const newExcludes = currentExcludes.concat(newDate);
-            this.props.setCalExcludeDates(newExcludes);
+            this.props.setCalExcludeDates(newExcludes); //Add it and update the state of the exluded dates list
           }
         }
-        else if(type === 'include'){
-          const currentIncludes = this.props.calendarForm.includeDates;
+        else if(type === 'include'){ //If it is an extra date to be included
+          const currentIncludes = this.props.calendarForm.includeDates; //Same process as excluded dates
           let newDate = formatDate(m.format("YYYY-MM-DD").toString());
           if(!currentIncludes.includes(newDate)){
             const newIncludes = currentIncludes.concat(newDate);
@@ -126,6 +129,7 @@ class AddEventModal extends React.Component {
     }
   }
 
+  //Removes the last date added to either exclude or include
   undoAddDate(type, e){
     e.preventDefault();
     if(type === 'exclude'){
@@ -144,32 +148,34 @@ class AddEventModal extends React.Component {
     }
   }
 
+  //Adds a new event to the calendar list (doesn't save the calendar changes to the server!)
   addNewEvent(event){
-    let currentEvents = this.props.calendarForm.events;
-    currentEvents.push(event);
+    let currentEvents = this.props.calendarForm.events; //Get the current list of events
+    currentEvents.push(event); //Push the new event
     let newEvents = currentEvents;
-    this.props.setCalEvents(newEvents);
-    if(this.props.modalType){
-      this.onClose();
+    this.props.setCalEvents(newEvents); //Update the state
+    if(this.props.modalType){ //If modal is open
+      this.onClose(); //Close it
     }
   }
 
+  //Adds a recurring event to the calendar (Doesn't save the calendar changes to the server!)
   addRecurringEvent(){
-    let start = this.props.calendarForm.sDate;
+    let start = this.props.calendarForm.sDate; //Get the start/end dates, days to repeat on, and included and excluded dates
     let end = this.props.calendarForm.eDate;
     let repeatDays = this.props.calendarForm.repeatDays;
     let includes = this.props.calendarForm.includeDates;
     if(includes.length === 0){includes = -1} //Important for checking on server, do not change unless in both places.
     let excludes = this.props.calendarForm.excludeDates;
     if(excludes.length === 0){excludes = -1} //Important for checking on server, do not change unless in both places.
-    fetch(('/api/calendar/recur/' + repeatDays + '/' + start + '/' + end + '/' + includes + '/' + excludes), {
+    fetch(('/api/calendar/recur/' + repeatDays + '/' + start + '/' + end + '/' + includes + '/' + excludes), { //Query the server to generate the list of dates based on the desired recurrence
       credentials: 'same-origin' // or 'include'
     }).then(res => (res.status === 200 || res.status === 204 || res.status === 304) ? res.json() : []
     ).then((json) => {
-    this.props.setCalRecurrence(json);
+    this.props.setCalRecurrence(json); //Update the state with the list of dates in the recurrence
     let recurrence = this.props.calendarForm.recurrence;
     let currentEvents = this.props.calendarForm.events;
-    var date = new Date();
+    var date = new Date(); //Generate a timestamp as a "most-likely" unique recurrence id
     var components = [
         date.getYear(),
         date.getMonth(),
@@ -180,22 +186,26 @@ class AddEventModal extends React.Component {
         date.getMilliseconds()
     ];
     var recurrenceId = components.join("");
-    for (let date of recurrence){
+    for (let date of recurrence){ //For every date in the recurrence
+      //Generate the start date of the recurrence
       let sDate = new Date(parseInt(date.substring(0, 4), 10), parseInt(date.substring(4, 6), 10)-1,
                            parseInt(date.substring(6,8), 10), this.props.calendarForm.sDate.getHours(), this.props.calendarForm.sDate.getMinutes());
+      //Generate the end date of the recurrence
       let eDate = new Date(parseInt(date.substring(0, 4), 10), parseInt(date.substring(4, 6), 10)-1,
                            parseInt(date.substring(6,8), 10), this.props.calendarForm.eDate.getHours(), this.props.calendarForm.eDate.getMinutes());
+      //Create the event with the appropriate data, assign to this unique recurrence with the generated recurrence id
       let newEvent = new Event(this.props.courseId, (this.props.courseTitle + ' ' + getCurrentSemester()), getEventDT(sDate, this.props.calendarForm.sTime),
                               getEventDT(eDate, this.props.calendarForm.eTime), this.props.calendarForm.description, this.props.calendarForm.room,
                               (getCurrentSemester() + ' ' + this.props.courseId), this.props.calendarForm.hexColor, true, recurrenceId);
-      currentEvents.push(newEvent);
+      currentEvents.push(newEvent); //Add the event to the list
     }
     let newEvents = currentEvents;
-    this.props.setCalEvents(newEvents);
-    this.onClose();
+    this.props.setCalEvents(newEvents); //Add the array of dates (recurrence) to the calendar
+    this.onClose(); //Close the modal
     }).catch((err) => console.log(err));
   }
 
+  //Takes the data input to the modal for a new event/multiday event/recurrence and calls the appropriate methods to add to the calendar gui
   handleSubmit(e){
     e.preventDefault();
     let start = this.props.calendarForm.sDate;
@@ -262,11 +272,8 @@ class AddEventModal extends React.Component {
   }
 
   render() {
-
     var showEndDate = !(this.props.calendarForm.multidayEvent || this.props.calendarForm.showRecur);
-
-
-
+    
     const addEventForm = (
       <form>
         <fieldset style={fieldsetStyle}>

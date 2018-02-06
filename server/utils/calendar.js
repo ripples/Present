@@ -5,6 +5,7 @@ require('moment-recur');
 
 
 module.exports = {
+  //Generates an ics file given the array of events from the gui calendar and saves it to the specified path
   generateICS: function(events, courseId, fpath, capture_url) {
 	var START_TAG = "BEGIN:VCALENDAR\nPRODID:Calendar\nVERSION:2.0\n", END_TAG = "END:VCALENDAR";
 	var fileText = "";
@@ -66,6 +67,7 @@ module.exports = {
   		});
   },
 
+  //Converts a JSDate object into an ics friendly date format
   jsDateToICSDate: function(datestring) {
   	let yyyy = datestring.substring(0, 4);
   	let mm = datestring.substring(5, 7);
@@ -76,10 +78,12 @@ module.exports = {
   	return (yyyy + mm + dd + 'T' + hh + min + ss + "Z");
   },
 
+  //Determines if includes and excludes both contain the same given date (redundant to include and exclude the same one)
   isDuplicate: function(date, dates, excludes) {
   	return (dates.includes(date) && !excludes.includes(date));
   },
 
+  //Formats a recurring date into a moment.js object
   formatRecurringDate: function(date) {
   	let year = date.getFullYear().toString();
   	let month = (date.getMonth() + 1).toString();
@@ -89,6 +93,7 @@ module.exports = {
   	return moment(year + month + day, "YYYYMMDD");
   },
 
+  //Generates the list of dates to include, removing duplicates and copies in excludes
   includeDates: function(includes, initial, excludes) {
   	var newArr = initial;
   	for (var i = 0; i < includes.length; i++) {
@@ -99,7 +104,8 @@ module.exports = {
   	return newArr;
   },
 
-  getICSDateNow: function() { //Gets the current timestamp in YYYYMMDDTHHMMSS format (for ics file generation)
+  //Gets the current timestamp in YYYYMMDDTHHMMSS format (for ics file generation)
+  getICSDateNow: function() {
   	var now = new Date();
   	var year = "" + now.getFullYear();
   	var month = "" + (now.getMonth() + 1); if (month.length == 1) { month = "0" + month; }
@@ -110,7 +116,8 @@ module.exports = {
   	return [year, month, day, "T", hour, minute, second];
   },
 
-  icsToEventObjectArray: function(icsFileText) { //Converts the text of an ics file to an array of JSON objects readable by the calendar component
+  //Converts the text of an ics file to an array of JSON objects readable by the calendar component
+  icsToEventObjectArray: function(icsFileText) {
   	var eventArray = [];
   	var filetextsplit = icsFileText.split('\n');
   	filetextsplit.splice(0, 3); //Remove the first 3 unnecessary lines from file
@@ -128,7 +135,7 @@ module.exports = {
   		var currentEvent = {};
   		for (var line = 0; line < 12; line++) {
   			var curline = filetextsplit[0];
-  			switch (line) {
+  			switch (line) { //Based on the line in the file, get the specific event fields from it.
   				case 1:
   					let line1 = curline.split("-LV-");
   					currentEvent.title = line1[1];
@@ -188,28 +195,27 @@ module.exports = {
   	return eventArray;
   },
 
+  //Recursive solution to finding the last edited ics file on the server. TODO(Jon): Make it so it finds the last ics file edited by the class that is logged in.
   getMostRecentICS: function(startPath, filter, mostRecentDate, fpath) {
     if(!fs.existsSync(startPath)){
       throw "Error: Directory doesn't exist or invalid directory given.";
-      //console.log("Error: Directory doesn't exist.");
-      //return -1;
     }
-    var files = fs.readdirSync(startPath);
-    for(var i = 0; i < files.length; i++){
-	  var filename = path.join(startPath, files[i]);
-      var stat = fs.lstatSync(filename);
+    var files = fs.readdirSync(startPath); //Get the file tree of the given start path
+    for(var i = 0; i < files.length; i++){ //Walking the tree
+	  var filename = path.join(startPath, files[i]); //Get the current filename
+      var stat = fs.lstatSync(filename); //Get the stats
       if(stat.isDirectory()){
-        fpath = module.exports.getMostRecentICS(filename, filter, mostRecentDate, fpath); //recurse
+        fpath = module.exports.getMostRecentICS(filename, filter, mostRecentDate, fpath); //Recurse
       }
-      else if(filename.indexOf(filter) >= 0){
-        if(stat.mtime > mostRecentDate){
-          mostRecentDate = stat.mtime;
+      else if(filename.indexOf(filter) >= 0){ //If it's not a directory
+        if(stat.mtime > mostRecentDate){ //If this file was edited more recently than the current "most recent ics".
+          mostRecentDate = stat.mtime; //New "most recent"
           fpath = filename;
-          console.log('MOST RECENT: ' + fpath + ' ' + mostRecentDate);
-          return fpath; //Return the file path of the most recent calendar file.
+          console.log('MOST RECENT: ' + fpath + ' ' + mostRecentDate); //Log it
+          return fpath; //Return the file path of the most recent ics file.
         }
       }
     }
-    return fpath;
+    return fpath; //Return the overall most recent ics file.
   }
 }

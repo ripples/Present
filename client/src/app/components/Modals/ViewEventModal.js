@@ -17,20 +17,22 @@ class ViewEventModal extends React.Component {
     this.props.showModal('EDIT_EVENT');
   }
 
+  //Deletes the given event from the calendar (Doesn't save the calendar changes to the server!)
   deleteEvent(event, e){
-    if(e){
+    if(e){ //If called from a button
       e.preventDefault();
     }
-    let events = this.props.calendarForm.events;
-    if(events.includes(event)){
+    let events = this.props.calendarForm.events; //Get the list of current events
+    if(events.includes(event)){ //If the event exists in the calendar
       events.splice(events.indexOf(event), 1);
-      this.props.setCalEvents(events);
-      if(this.props.modalType){
-        this.onClose();
+      this.props.setCalEvents(events); //Remove it and update the state
+      if(this.props.modalType){ //If the modal is still open
+        this.onClose(); //Close it
       }
     }
   }
 
+  //Given one event in a recurrence, deletes every event in that same recurrence from the calendar (Doesn't save calendar changes to the server!)
   deleteRecurrence(event, e){
     if(e){
       e.preventDefault();
@@ -38,14 +40,14 @@ class ViewEventModal extends React.Component {
     let recurrenceId = event.recurrenceId;
     let events = this.props.calendarForm.events;
     let eventsToDelete = [];
-    for (let ev1 of events){
+    for (let ev1 of events){ //Gather all the events to be deleted
       if(ev1.isInRecurrence){
         if(ev1.recurrenceId === recurrenceId){
           eventsToDelete.push(ev1);
         }
       }
     }
-    for (let ev2 of eventsToDelete){
+    for (let ev2 of eventsToDelete){ //Removes all the specified events from the calendar
       events.splice(events.indexOf(ev2), 1);
     }
     this.props.setCalEvents(events);
