@@ -14,7 +14,6 @@ import {showModal, hideModal, showEvent} from '../../Actions/modalActions.js';
 BigCalendar.momentLocalizer(moment);
 
 class Calendar extends React.Component {
-
   constructor(props){
     super(props);
     this.addNewEvent = this.addNewEvent.bind(this);
@@ -26,6 +25,10 @@ class Calendar extends React.Component {
 
   componentWillMount(){ //Read any existing calendar file from server, if none exists, blank calendar. (GET)
       this.loadCalendarData();
+  }
+
+  componentWillUnmount(){
+    this.props.clearForm();
   }
 
   loadCalendarData = () => {
@@ -48,10 +51,6 @@ class Calendar extends React.Component {
       }
     }).catch((err) => console.log(err));
   };
-
-  componentWillUnmount(){
-    this.props.clearForm();
-  }
 
   addNewEvent(event){
     let currentEvents = this.props.calendarForm.events;
@@ -133,6 +132,10 @@ class Calendar extends React.Component {
     }
   }
 
+  handleRoomChange(e){
+    this.props.showModal('ROOM_SELECT');
+  }
+
   eventStyleGetter(event){
     var backgroundColor = event.hexColor;
     var style = {
@@ -148,6 +151,7 @@ class Calendar extends React.Component {
   }
 
   render() {
+    var currentRoom = JSON.parse(JSON.stringify(this.props.calendarForm.room));
 
     return (
       <div className="col-md-12">
@@ -174,6 +178,7 @@ class Calendar extends React.Component {
         </div>
         <div className="row">
           <button type='button' style={modalBtnStyle} onClick={this.openModal.bind(this, 'ADD_EVENT')}>Add Event(s)</button>
+          <button type='button' style={modalBtnStyle} onClick={this.handleRoomChange.bind(this)}>Change Room</button>
           <button type='button' style={modalBtnStyle} onClick={this.handleSave.bind(this)}>Save Calendar</button>
         </div>
       </div>
@@ -228,7 +233,7 @@ const mapStateToProps = state => {
     modalType: state.modalType,
     calendarForm: state.calendarForm,
     courseId: state.token.lis_course_section_sourcedid,
-    courseTitle: state.token.context_title
+    courseTitle: state.token.context_title,
 	};
 };
 
@@ -248,7 +253,7 @@ const mapDispatchToProps = (dispatch, ownProps) => {
     setCalURL: (url) => dispatch(setCalURL(url)),
     showModal: (modalType) => dispatch(showModal(modalType)),
     hideModal: () => dispatch(hideModal()),
-    showEvent: (currentEvent) => dispatch(showEvent(currentEvent))
+    showEvent: (currentEvent) => dispatch(showEvent(currentEvent)),
 	}
 };
 

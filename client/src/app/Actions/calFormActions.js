@@ -42,13 +42,6 @@ export function setCalMultidayEvent(multidayEvent){
   }
 }
 
-export function setCalModalState(modalState){
-  return {
-    type: calFormConstants.SET_CAL_MODAL_STATE,
-    modalState
-  }
-}
-
 export function setCalMessageState(messageState){
   return {
     type: calFormConstants.SET_CAL_MESSAGE_STATE,
