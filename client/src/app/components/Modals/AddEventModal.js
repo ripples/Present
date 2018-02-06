@@ -8,7 +8,7 @@ import 'react-datetime/css/react-datetime.css';
 import {getCurrentSemester, formatDate, revertDate, formatTime, getEventDT, isValidDate} from '../CalendarForm/CalendarUtils.js';
 import {hideModal} from '../../Actions/modalActions.js';
 import {clearForm, setCalRepeatDays, setCalRecurrence, setCalExcludeDates, setCalIncludeDates, setCalSDate, setCalEDate, setCalDescription, setCalEvents, setCalShowRecur, setCalSTime, setCalETime, setCalMultidayEvent} from '../../Actions/calFormActions.js';
-import {showMessage, setMessageTitle, setMessageBody} from '../../Actions/messageActions.js';
+import {showMessage, setMessageBody} from '../../Actions/messageActions.js';
 import Event from '../../utils/Event.js';
 
 class AddEventModal extends React.Component {
@@ -205,7 +205,8 @@ class AddEventModal extends React.Component {
     }
     let repeatDays = this.props.calendarForm.repeatDays;
     if(+start > +end){
-      console.log('ERROR: Start Date later than End Date', 'Your ending date must be later than or the same as your starting date.');
+      this.props.setMessageBody('ERROR (Start Date later than End Date): Your ending date must be later than or the same as your starting date.');
+      this.props.showMessage('CUSTOM');
     }
     else if(repeatDays.length === 0){
       let newEvent = new Event(this.props.courseId, (this.props.courseTitle + ' ' + getCurrentSemester()), getEventDT(start, this.props.calendarForm.sTime),
@@ -215,7 +216,8 @@ class AddEventModal extends React.Component {
     }
     else {
       if(+start === +end && repeatDays.length !== 0){ //If the user input a recurrence but set the same start and end date
-        console.log('ERROR: Single Day Recurrence', 'If you want a recurring date, you must have the start and end dates be different.');
+        this.props.setMessageBody('ERROR (Single Day Recurrence): If you want a recurring date, you must have the start and end dates be different.');
+        this.props.showMessage('CUSTOM');
       }
       else {
         this.addRecurringEvent(); //Add a recurring event
@@ -341,8 +343,6 @@ class AddEventModal extends React.Component {
   }
 }
 
-
-
 var labelStyle = {
   fontWeight: "bold",
   marginRight: "5px",
@@ -426,7 +426,6 @@ const mapDispatchToProps = (dispatch, ownProps) => {
     setCalETime: (eTime) => dispatch(setCalETime(eTime)),
     setCalMultidayEvent: (multidayEvent) => dispatch(setCalMultidayEvent(multidayEvent)),
     showMessage: (messageType) => dispatch(showMessage(messageType)),
-    setMessageTitle: (title) => dispatch(setMessageTitle(title)),
     setMessageBody: (body) => dispatch(setMessageBody(body))
   }
 };
