@@ -1,22 +1,26 @@
 import {messageConstants} from '../Constants/actions.js';
 
-export function setMessageState(state){
+export function showMessage(messageType) {
   return {
-    type: messageConstants.SET_MESSAGE_STATE,
-    state
+    type: messageConstants.SHOW_MESSAGE,
+    messageType
   }
 }
 
-export function setMessageText(text){
+export function hideMessage() {
   return {
-    type: messageConstants.SET_MESSAGE_TEXT,
-    text
+    type: messageConstants.HIDE_MESSAGE
   }
 }
 
 export function setMessageTitle(title){
+  type: messageConstants.SET_MESSSAGE_TITLE,
+  title
+}
+
+export function setMessageBody(body){
   return {
-    type: messageConstants.SET_MESSAGE_TITLE,
-    title
+    type: messageConstants.SET_MESSAGE_BODY,
+    body
   }
 }

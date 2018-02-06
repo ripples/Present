@@ -1,25 +1,26 @@
 import React from 'react';
-import {connect} form 'react-redux';
-
-import * as actions from '../Actions/messageActions.js';
-import HelpMessage from './HelpMessage.js';
-import WarningMessage from './WarningMessage.js';
+import {connect} from 'react-redux';
+import CustomMessage from './CustomMessage.js';
 import ConfirmationMessage from './ConfirmationMessage.js';
 
+const MESSAGE_COMPONENTS = {
+  'CUSTOM': CustomMessage,
+  'CONFIRM': ConfirmationMessage
+}
+
 const MessageConductor = props => {
-  switch(props.currentMessage) {
-    case 'HELP':
-      return <HelpMessage {...props}/>;
-
-    case 'WARNING':
-      return <WarningMessage {...props}/>;
-
-    case 'CONFIRM':
-      return <ConfirmationMessage {...props}/>;
-
-    default:
-      return null;
+  if(!props.message.messageType) {
+    return null
   }
+
+  const DispatchedMessage = MESSAGE_COMPONENTS[props.message.messageType]
+  return <DispatchedMessage />
 };
 
-export default connect(state => state, () => actions)(MessageConductor);
+const mapStateToProps = state => {
+  return {
+    message: state.message
+  };
+}
+
+export default connect(mapStateToProps)(MessageConductor);

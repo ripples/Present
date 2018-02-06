@@ -8,6 +8,7 @@ import 'react-datetime/css/react-datetime.css';
 import {getCurrentSemester, formatDate, revertDate, formatTime, getEventDT, isValidDate} from '../CalendarForm/CalendarUtils.js';
 import {hideModal} from '../../Actions/modalActions.js';
 import {clearForm, setCalRepeatDays, setCalRecurrence, setCalExcludeDates, setCalIncludeDates, setCalSDate, setCalEDate, setCalDescription, setCalEvents, setCalShowRecur, setCalSTime, setCalETime, setCalMultidayEvent} from '../../Actions/calFormActions.js';
+import {showMessage, setMessageTitle, setMessageBody} from '../../Actions/messageActions.js';
 import Event from '../../utils/Event.js';
 
 class AddEventModal extends React.Component {
@@ -213,23 +214,15 @@ class AddEventModal extends React.Component {
     }
   }
 
-  onClose = () => {
-    this.props.clearForm();
-    this.props.hideModal();
-  }
-
-  render() {
-
-    var showEndDate = !(this.props.calendarForm.multidayEvent || this.props.calendarForm.showRecur);
-
+  handleHelpMessage = () => {
     const helpMessage = (
       <div>
         <div>
           <p>To add a single event:</p>
           <ul>
-            <li>Select a starting and ending date (You can have an event span multiple days)</li>
+            <li>Select a starting date (You can have an event span multiple days, just click the checkbox for Multi-Day Event!)</li>
             <li>Type in a start and end time for your event, and specify AM or PM</li>
-            <li>Provide a description and location for your event</li>
+            <li>Provide a description for your event</li>
             <li>Click "Add Event"</li>
           </ul>
         </div>
@@ -242,12 +235,26 @@ class AddEventModal extends React.Component {
             <li>Type in a start and end time, which will be applied to every event in the reccurence</li>
             <li>Click the checkboxes for the days of the week you wish the event to repeat on</li>
             <li>If you want, you may select individual dates to exclude and/or include from the repeating event range of dates, if you make a mistake you can press the undo button to remove your last added date</li>
-            <li>Provide a description and location for the recurring event</li>
+            <li>Provide a description for the recurring event</li>
             <li>Click "Add Event"</li>
           </ul>
         </div>
       </div>
     );
+    this.props.setMessageBody(helpMessage);
+    this.props.showMessage('CUSTOM');
+  };
+
+  onClose = () => {
+    this.props.clearForm();
+    this.props.hideModal();
+  }
+
+  render() {
+
+    var showEndDate = !(this.props.calendarForm.multidayEvent || this.props.calendarForm.showRecur);
+
+
 
     const addEventForm = (
       <form>
@@ -315,6 +322,7 @@ class AddEventModal extends React.Component {
     const buttons = (
       <span>
         <button type='button' style={modalBtnStyle} onClick={this.handleSubmit.bind(this)}>Add Event</button>
+        <button type='button' style={modalBtnStyle} onClick={this.handleHelpMessage}>Help</button>
       </span>
     );
 
@@ -324,7 +332,7 @@ class AddEventModal extends React.Component {
   }
 }
 
-//<button type='button' style={modalBtnStyle} onClick={this.launchMessageBtn.bind(this, this.generateTitle('How to add different types of events:'), helpMessage)}>Help</button>
+
 
 var labelStyle = {
   fontWeight: "bold",
@@ -408,6 +416,9 @@ const mapDispatchToProps = (dispatch, ownProps) => {
     setCalSTime: (sTime) => dispatch(setCalSTime(sTime)),
     setCalETime: (eTime) => dispatch(setCalETime(eTime)),
     setCalMultidayEvent: (multidayEvent) => dispatch(setCalMultidayEvent(multidayEvent)),
+    showMessage: (messageType) => dispatch(showMessage(messageType)),
+    setMessageTitle: (title) => dispatch(setMessageTitle(title)),
+    setMessageBody: (body) => dispatch(setMessageBody(body))
   }
 };
 

@@ -42,27 +42,6 @@ export function setCalMultidayEvent(multidayEvent){
   }
 }
 
-export function setCalMessageState(messageState){
-  return {
-    type: calFormConstants.SET_CAL_MESSAGE_STATE,
-    messageState
-  }
-}
-
-export function setCalMessageText(messageText){
-  return {
-    type: calFormConstants.SET_CAL_MESSAGE_TEXT,
-    messageText
-  }
-}
-
-export function setCalMessageTitle(messageTitle){
-  return {
-    type: calFormConstants.SET_CAL_MESSAGE_TITLE,
-    messageTitle
-  }
-}
-
 export function setCalEvents(events){
   return {
     type: calFormConstants.SET_CAL_EVENTS,

@@ -10,6 +10,7 @@ import lectureImage from './lectureImage.js';
 import instructorPage from './instructorSettings.js';
 import lectureUpload from './lectureUpload.js';
 import modal from './modal.js';
+import message from './message.js';
 
 const appReducer = combineReducers({
     token,
@@ -21,7 +22,8 @@ const appReducer = combineReducers({
     lectureImage,
     instructorPage,
     lectureUpload,
-    modal
+    modal,
+    message
 });
 
 export default appReducer;

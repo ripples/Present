@@ -8,8 +8,9 @@ import 'react-datetime/css/react-datetime.css';
 import {connect} from "react-redux";
 import TimeRange from './TimeRange.js';
 import {getCurrentSemester, isEqual, getEventDT, deepCopy, processEvents, generateRandomHexColor} from './CalendarUtils.js';
-import {setCalMessageState, setCalMessageText, setCalMessageTitle, setCalEvents, setCalHexColor, setCalOriginalCal, setCalRoom, setCalURL, setCalCourseId, clearForm, initForm} from '../../Actions/calFormActions.js';
+import {setCalEvents, setCalHexColor, setCalOriginalCal, setCalRoom, setCalURL, setCalCourseId, clearForm, initForm} from '../../Actions/calFormActions.js';
 import {showModal, hideModal, showEvent} from '../../Actions/modalActions.js';
+import {showMessage, setMessageBody} from '../../Actions/messageActions.js';
 
 BigCalendar.momentLocalizer(moment);
 
@@ -18,8 +19,6 @@ class Calendar extends React.Component {
     super(props);
     this.addNewEvent = this.addNewEvent.bind(this);
     this.deleteEvent = this.deleteEvent.bind(this);
-    this.generateTitle = this.generateTitle.bind(this);
-    this.launchMessage = this.launchMessage.bind(this);
     this.eventStyleGetter = this.eventStyleGetter.bind(this);
   }
 
@@ -66,37 +65,6 @@ class Calendar extends React.Component {
     this.props.showModal(modalType);
   }
 
-  onOpenMessage = () => {
-    this.props.setCalMessageState(true);
-  };
-
-  onCloseMessage = () => {
-    if(!this.props.calendarForm.modalState){
-      this.props.clearForm();
-    }
-    this.props.setCalMessageTitle('');
-    this.props.setCalMessageText('');
-    this.props.setCalMessageState(false);
-  };
-
-  launchMessage(title, text){
-    this.props.setCalMessageTitle(this.generateTitle(title));
-    this.props.setCalMessageText(text);
-    this.onOpenMessage();
-  }
-
-  launchMessageBtn(title, text, e){
-    e.preventDefault();
-    this.launchMessage(title, text);
-  }
-
-  generateTitle(text){
-    const title = (
-      <h1 style={legendStyle}>{text}</h1>
-    );
-    return title;
-  }
-
   deleteEvent(event, e){
     if(e){
       e.preventDefault();
@@ -105,9 +73,6 @@ class Calendar extends React.Component {
     if(events.includes(event)){
       events.splice(events.indexOf(event), 1);
       this.props.setCalEvents(events);
-      if(this.props.calendarForm.messageState){
-        this.onCloseMessage();
-      }
     }
   }
 
@@ -123,12 +88,13 @@ class Calendar extends React.Component {
         return response.text()
       }).then((data) => {
         this.props.setCalOriginalCal(deepCopy(this.props.calendarForm.events)); //So user can't re-save the same calendar
-        this.launchMessage('Calendar saved successfully!', data);
-
+        this.props.setMessageBody(data);
+        this.props.showMessage('CUSTOM');
       }).catch((err) => console.log(err));
     }
     else{
-      this.launchMessage('ERROR: No Changes Made', 'You haven\'t made any changes to the current calendar.');
+      this.props.setMessageBody('ERROR: You haven\'t made any changes to the current calendar.');
+      this.props.showMessage('CUSTOM');
     }
   }
 
@@ -151,7 +117,6 @@ class Calendar extends React.Component {
   }
 
   render() {
-    var currentRoom = JSON.parse(JSON.stringify(this.props.calendarForm.room));
 
     return (
       <div className="col-md-12">
@@ -172,7 +137,6 @@ class Calendar extends React.Component {
             scrollToTime={new Date(1970, 1, 1, 6)}
             defaultDate={new Date()}
             onSelectEvent={event => this.props.showEvent(event)}
-            onSelectSlot={(slotInfo) => this.launchMessage('Empty Slot Selected', 'There are no events scheduled in this time slot')}
             eventPropGetter={(event => this.eventStyleGetter(event))}
           />
         </div>
@@ -244,9 +208,6 @@ const mapDispatchToProps = (dispatch, ownProps) => {
     clearForm: () => dispatch(clearForm()),
     setCourseId: (id) => dispatch(setCalCourseId(id)),
     setCalEvents: (events) => dispatch(setCalEvents(events)),
-    setCalMessageState: (messageState) => dispatch(setCalMessageState(messageState)),
-    setCalMessageText: (messageText) => dispatch(setCalMessageText(messageText)),
-    setCalMessageTitle: (messageTitle) => dispatch(setCalMessageTitle(messageTitle)),
     setCalOriginalCal: (originalCal) => dispatch(setCalOriginalCal(originalCal)),
     setCalHexColor: (hexColor) => dispatch(setCalHexColor(hexColor)),
     setCalRoom: (room) => dispatch(setCalRoom(room)),
@@ -254,6 +215,8 @@ const mapDispatchToProps = (dispatch, ownProps) => {
     showModal: (modalType) => dispatch(showModal(modalType)),
     hideModal: () => dispatch(hideModal()),
     showEvent: (currentEvent) => dispatch(showEvent(currentEvent)),
+    showMessage: (messageType) => dispatch(showMessage(messageType)),
+    setMessageBody: (body) => dispatch(setMessageBody(body))
 	}
 };
 
