@@ -1,17 +1,5 @@
 import moment from 'moment';
-
-class Event {
-  constructor(courseId, title, start, end, description, location, summary, hexColor){
-    this.courseId = courseId;
-    this.title = title;
-    this.start = start;
-    this.end = end;
-    this.description = description;
-    this.location = location;
-    this.summary = summary;
-    this.hexColor = hexColor;
-  }
-}
+import Event from '../../utils/Event.js';
 
 export function getCurrentSemester(){
   var year = new Date().getFullYear().toString().substr(-2);
@@ -51,7 +39,7 @@ export function getEventDT(date, time){
 export function processEvents(events){ //Converts the JSON representation of the start/end times of each event from server into JS Date objects (required by calendar component for reading).
   let processedEvents = [];
   for (let event of events){
-    let newEvent = new Event(event.courseId, event.title, new Date(event.start), new Date(event.end), event.description, event.location, event.summary, event.hexColor);
+    let newEvent = new Event(event.courseId, event.title, new Date(event.start), new Date(event.end), event.description, event.location, event.summary, event.hexColor, event.isInRecurrence, event.recurrenceId);
     processedEvents.push(newEvent);
   }
   return processedEvents;
@@ -94,7 +82,9 @@ function isEqualEvent(event1, event2){
   let location = (event1.location === event2.location);
   let summary = (event1.summary === event2.summary);
   let hexColor = (event1.hexColor === event2.hexColor);
-  return (courseId && title && start && end && description && location && summary && hexColor);
+  let isInRecurrence = (event1.isInRecurrence === event2.isInRecurrence);
+  let recurrenceId = (event1.recurrenceId === event2.recurrenceId);
+  return (courseId && title && start && end && description && location && summary && hexColor && isInRecurrence && recurrenceId);
 }
 
 export function revertDate(date) { //20171014

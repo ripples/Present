@@ -169,6 +169,17 @@ class AddEventModal extends React.Component {
     this.props.setCalRecurrence(json);
     let recurrence = this.props.calendarForm.recurrence;
     let currentEvents = this.props.calendarForm.events;
+    var date = new Date();
+    var components = [
+        date.getYear(),
+        date.getMonth(),
+        date.getDate(),
+        date.getHours(),
+        date.getMinutes(),
+        date.getSeconds(),
+        date.getMilliseconds()
+    ];
+    var recurrenceId = components.join("");
     for (let date of recurrence){
       let sDate = new Date(parseInt(date.substring(0, 4), 10), parseInt(date.substring(4, 6), 10)-1,
                            parseInt(date.substring(6,8), 10), this.props.calendarForm.sDate.getHours(), this.props.calendarForm.sDate.getMinutes());
@@ -176,7 +187,7 @@ class AddEventModal extends React.Component {
                            parseInt(date.substring(6,8), 10), this.props.calendarForm.eDate.getHours(), this.props.calendarForm.eDate.getMinutes());
       let newEvent = new Event(this.props.courseId, (this.props.courseTitle + ' ' + getCurrentSemester()), getEventDT(sDate, this.props.calendarForm.sTime),
                               getEventDT(eDate, this.props.calendarForm.eTime), this.props.calendarForm.description, this.props.calendarForm.room,
-                              (getCurrentSemester() + ' ' + this.props.courseId), this.props.calendarForm.hexColor);
+                              (getCurrentSemester() + ' ' + this.props.courseId), this.props.calendarForm.hexColor, true, recurrenceId);
       currentEvents.push(newEvent);
     }
     let newEvents = currentEvents;
@@ -194,18 +205,16 @@ class AddEventModal extends React.Component {
     }
     let repeatDays = this.props.calendarForm.repeatDays;
     if(+start > +end){
-      //this.launchMessage('ERROR: Start Date later than End Date', 'Your ending date must be later than or the same as your starting date.');
       console.log('ERROR: Start Date later than End Date', 'Your ending date must be later than or the same as your starting date.');
     }
     else if(repeatDays.length === 0){
       let newEvent = new Event(this.props.courseId, (this.props.courseTitle + ' ' + getCurrentSemester()), getEventDT(start, this.props.calendarForm.sTime),
                                getEventDT(end, this.props.calendarForm.eTime), this.props.calendarForm.description, this.props.calendarForm.room,
-                               (getCurrentSemester() + ' ' + this.props.courseId), this.props.calendarForm.hexColor);
+                               (getCurrentSemester() + ' ' + this.props.courseId), this.props.calendarForm.hexColor, false, null);
       this.addNewEvent(newEvent); //Add a single event
     }
     else {
       if(+start === +end && repeatDays.length !== 0){ //If the user input a recurrence but set the same start and end date
-        //this.launchMessage('ERROR: Single Day Recurrence', 'If you want a recurring date, you must have the start and end dates be different.');
         console.log('ERROR: Single Day Recurrence', 'If you want a recurring date, you must have the start and end dates be different.');
       }
       else {

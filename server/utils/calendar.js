@@ -19,7 +19,7 @@ module.exports = {
 		var index = 0;
 		for (let event of events) {
 			fileText += "BEGIN:VEVENT\n";
-      fileText += "UID:" + DTSTAMP + "-LV-" + event.title + "-LV-" + event.hexColor + "\n";
+      fileText += "UID:" + DTSTAMP + "-LV-" + event.title + "-LV-" + event.hexColor + "-LV-" + event.isInRecurrence + "-LV-" + event.recurrenceId + "\n";
 			fileText += (index + "@default\nCLASS:PUBLIC\n");
 			fileText += ("DESCRIPTION:" + event.description + "\n");
 			fileText += ("DTSTAMP;VALUE=DATE-TIME:" + DTSTAMP + "\n");
@@ -113,16 +113,16 @@ module.exports = {
   icsToEventObjectArray: function(icsFileText) { //Converts the text of an ics file to an array of JSON objects readable by the calendar component
   	var eventArray = [];
   	var filetextsplit = icsFileText.split('\n');
-	filetextsplit.splice(0, 3); //Remove the first 3 unnecessary lines from file
-	var index = filetextsplit.indexOf("");
-	while(index !== -1){ //Remove all blank strings that may have gotten into the file text
-		filetextsplit.splice(index, 1);
-		index = filetextsplit.indexOf("");
-	}
-	filetextsplit.splice(-1, 1); //Remove last line from file, also don't need
-	if(filetextsplit.length === 0){
-		return []
-	}
+  	filetextsplit.splice(0, 3); //Remove the first 3 unnecessary lines from file
+  	var index = filetextsplit.indexOf("");
+  	while(index !== -1){ //Remove all blank strings that may have gotten into the file text
+  		filetextsplit.splice(index, 1);
+  		index = filetextsplit.indexOf("");
+  	}
+  	filetextsplit.splice(-1, 1); //Remove last line from file, also don't need
+  	if(filetextsplit.length === 0){
+  		return []
+  	}
   	var numEvents = parseInt(filetextsplit[filetextsplit.length - 10].substring(0, 2)); //Contains the number of events in calendar
   	for (var i = 0; i <= numEvents; i++) {
   		var currentEvent = {};
@@ -130,9 +130,11 @@ module.exports = {
   			var curline = filetextsplit[0];
   			switch (line) {
   				case 1:
-  					let title = curline.split("-LV-");
-  					currentEvent.title = title[1];
-            currentEvent.hexColor = title[2];
+  					let line1 = curline.split("-LV-");
+  					currentEvent.title = line1[1];
+            currentEvent.hexColor = line1[2];
+            currentEvent.isInRecurrence = (line1[3].toLowerCase() === "true");
+            currentEvent.recurrenceId = line1[4];
   					filetextsplit.splice(0, 1);
   					break;
   				case 4:

@@ -123,10 +123,6 @@ class Calendar extends React.Component {
         <div className="row">
           <label name="currentRoom" style={roomLblStyle}>Currently Selected Room: {this.props.calendarForm.room}</label>
           <label name='numEvents' style={eventsScheduledStyle}>Events Scheduled: {this.props.calendarForm.events.length}</label>
-          <Modal open={this.props.calendarForm.messageState} onClose={this.onCloseMessage} showCloseIcon={false} little>
-            {this.props.calendarForm.messageTitle}
-            {this.props.calendarForm.messageText}
-          </Modal>
         </div>
         <div className="row" style={divStyle}>
           <BigCalendar

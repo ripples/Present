@@ -31,15 +31,43 @@ class ViewEventModal extends React.Component {
     }
   }
 
+  deleteRecurrence(event, e){
+    if(e){
+      e.preventDefault();
+    }
+    let recurrenceId = event.recurrenceId;
+    let events = this.props.calendarForm.events;
+    let eventsToDelete = [];
+    for (let ev1 of events){
+      if(ev1.isInRecurrence){
+        if(ev1.recurrenceId === recurrenceId){
+          eventsToDelete.push(ev1);
+        }
+      }
+    }
+    for (let ev2 of eventsToDelete){
+      events.splice(events.indexOf(ev2), 1);
+    }
+    this.props.setCalEvents(events);
+    if(this.props.modalType){
+      this.onClose();
+    }
+  }
+
   onClose = () => {
     this.props.hideModal();
   }
 
   render() {
     const editDisabled = (this.props.courseId !== this.props.currentEvent.courseId);
-    let style = modalBtnStyle;
+    const deleteRecurDisabled = editDisabled || (!this.props.currentEvent.isInRecurrence);
+    let editStyle = modalBtnStyle;
     if(editDisabled){
-      style = disabledButtonStyle;
+      editStyle = disabledButtonStyle;
+    }
+    let delRecurStyle = modalBtnStyle;
+    if(deleteRecurDisabled){
+      delRecurStyle = disabledButtonStyle;
     }
     const selectedEvent = (
       <div>
@@ -74,8 +102,9 @@ class ViewEventModal extends React.Component {
 
     const buttons = (
       <span>
-        <button type='button' style={style} onClick={this.showEditPane.bind(this, this.props.currentEvent)} disabled={editDisabled}>Edit</button>
-        <button type='button' style={style} onClick={this.deleteEvent.bind(this, this.props.currentEvent)} disabled={editDisabled}>Delete</button>
+        <button type='button' style={editStyle} onClick={this.showEditPane.bind(this, this.props.currentEvent)} disabled={editDisabled}>Edit</button>
+        <button type='button' style={editStyle} onClick={this.deleteEvent.bind(this, this.props.currentEvent)} disabled={editDisabled}>Delete This Event</button>
+        <button type='button' style={delRecurStyle} onClick={this.deleteRecurrence.bind(this, this.props.currentEvent)} disabled={deleteRecurDisabled}>Delete Recurrence</button>
       </span>
     );
 
