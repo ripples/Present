@@ -9,11 +9,12 @@ import LectureUpload from '../../components/LectureUpload/LectureUpload';
 import LectureDelete from '../../components/LectureDelete/LectureDelete';
 import {setInstructorPage, clearInstructorPage, setRoomModalState, setRoomOptions} from '../../Actions/instructorSettingsActions.js';
 import {setCalRoom, setCalURL} from '../../Actions/calFormActions.js';
+import { slide as Menu} from 'react-burger-menu';
 
 class InstructorSettings extends Component {
 
     componentWillMount() {
-        this.props.setInstructorPage(this.props.instructorPage);
+      this.props.setInstructorPage(this.props.instructorPage);
         fetch(('/api/calendar/recent'), {
           credentials: 'same-origin' // or 'include'
         }).then(res => (res.status === 200 || res.status === 204 || res.status === 304) ? res.json() : -1
@@ -44,7 +45,7 @@ class InstructorSettings extends Component {
             case "lectureDelete":
                 return <LectureDelete />
             default:
-                return <div />
+                return <LectureUpload />
         }
     }
 
@@ -132,20 +133,15 @@ class InstructorSettings extends Component {
                 { ((typeof(this.props.roles) !== "undefined" && this.props.roles.toLowerCase().includes("instructor")) ?
                 <div className="row" >
                     <div className="col-md-12">
-                        <h1 style = {headerStyle} >Settings</h1>
+                      <Menu noOverlay styles={styles}>
+                                <a style={buttonStyle} className="menu-item" onClick={this.onOpenModal}><div style = {textStyle}>Calendar</div></a>
+                                <a style={buttonStyle} className="menu-item" onClick={this.onClick.bind(this, "lectureUpload")}><div style = {textStyle}>Lecture Upload</div></a>
+                                <a style={buttonStyle} className="menu-item" onClick={this.onClick.bind(this, "lectureDelete")}><div style = {textStyle}>Lecture Delete</div></a>
+                        </Menu>
                         <div className="col-md-4">
                             <Modal open={this.props.modalState} onClose={this.onCloseModal} showCloseIcon={false} little>
                               {roomSelectionForm}
                             </Modal>
-                            <div>
-                                    <button style={buttonStyle} onClick={this.onOpenModal}><div style = {textStyle}>Calendar</div></button>
-                            </div>
-                            <div>
-                                    <button style={buttonStyle} onClick={this.onClick.bind(this, "lectureUpload")}><div style = {textStyle}>Lecture Upload</div></button>
-                            </div>
-                            <div>
-                                    <button style={buttonStyle} onClick={this.onClick.bind(this, "lectureDelete")}><div style = {textStyle}>Lecture Delete</div></button>
-                            </div>
                         </div>
                         <div className="col-md-8" >
                             {this.renderComponent(this.props.instructorPage)}
@@ -235,6 +231,41 @@ var headerStyle= {
 
 var textStyle = {
     fontSize: "20px"
+}
+
+var styles = {
+  bmBurgerButton: {
+    position: 'fixed',
+    width: '40px',
+    height: '40px',
+    top: '90px'
+  },
+  bmBurgerBars: {
+    background: '#373a47'
+  },
+  bmCrossButton: {
+    height: '24px',
+    width: '24px',
+  },
+  bmCross: {
+    background: '#bdc3c7'
+  },
+  bmMenu: {
+    background: '#373a47',
+    fontSize: '1.15em',
+    height: "100%",
+    width: "100%",
+  },
+  bmMorphShape: {
+    fill: '#373a47'
+  },
+  bmItemList: {
+    color: '#b8b7ad',
+    padding: '0.8em'
+  },
+  bmOverlay: {
+    background: 'rgba(0, 0, 0, 0.3)'
+  }
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(InstructorSettings);
