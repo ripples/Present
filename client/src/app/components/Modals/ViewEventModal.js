@@ -6,9 +6,6 @@ import {setCalEvents} from '../../Actions/calFormActions.js';
 
 
 class ViewEventModal extends React.Component {
-  constructor(props){
-    super(props);
-  }
 
   showEditPane(event, e){
     if(e){

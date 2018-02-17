@@ -4,12 +4,13 @@ import ModalWrapper from './ModalWrapper.js';
 import moment from 'moment';
 import Datetime from 'react-datetime';
 import {connect} from 'react-redux';
+import Event from '../../utils/Event.js';
 import 'react-datetime/css/react-datetime.css';
 import {getCurrentSemester, formatDate, revertDate, formatTime, getEventDT, isValidDate} from '../CalendarForm/CalendarUtils.js';
 import {hideModal} from '../../Actions/modalActions.js';
 import {clearForm, setCalRepeatDays, setCalRecurrence, setCalExcludeDates, setCalIncludeDates, setCalSDate, setCalEDate, setCalDescription, setCalEvents, setCalShowRecur, setCalSTime, setCalETime, setCalMultidayEvent} from '../../Actions/calFormActions.js';
-import {showMessage, setMessageBody} from '../../Actions/messageActions.js';
-import Event from '../../utils/Event.js';
+import {showMessage, setMessageBody, setMessageTitle} from '../../Actions/messageActions.js';
+
 
 class AddEventModal extends React.Component {
 
@@ -60,6 +61,12 @@ class AddEventModal extends React.Component {
       case 'showRecur':
         if(this.props.calendarForm.showRecur){
           this.props.setCalShowRecur(false);
+          this.props.setCalRepeatDays([]);
+          this.refs['chkbxMON'].checked = false;
+          this.refs['chkbxTUE'].checked = false;
+          this.refs['chkbxWED'].checked = false;
+          this.refs['chkbxTHU'].checked = false;
+          this.refs['chkbxFRI'].checked = false;
         }
         else{
           if(this.props.calendarForm.multidayEvent){
@@ -148,15 +155,28 @@ class AddEventModal extends React.Component {
     }
   }
 
+  eventDoesConflict(event){
+    let currentEvents = this.props.calendarForm.events;
+    for(let e of currentEvents){
+      if(((event.start >= e.start) && (event.start <= e.end)) || ((event.end >= e.start) && (event.end <= e.end))){
+        return true;
+      }
+    }
+    return false;
+  }
+
   //Adds a new event to the calendar list (doesn't save the calendar changes to the server!)
   addNewEvent(event){
     let currentEvents = this.props.calendarForm.events; //Get the current list of events
-    currentEvents.push(event); //Push the new event
-    let newEvents = currentEvents;
-    this.props.setCalEvents(newEvents); //Update the state
-    if(this.props.modalType){ //If modal is open
-      this.onClose(); //Close it
+    if(this.eventDoesConflict(event)){
+      this.props.setMessageTitle("ERROR");
+      this.props.setMessageBody("Error (Overlapping Event): You cannot have any events overlapping each other. Please change the timeframe for this event.");
+      this.props.showMessage('CUSTOM');
+      return;
     }
+    currentEvents.push(event); //Push the new event
+    this.props.setCalEvents(currentEvents); //Update the state
+    this.onClose();
   }
 
   //Adds a recurring event to the calendar (Doesn't save the calendar changes to the server!)
@@ -174,6 +194,7 @@ class AddEventModal extends React.Component {
     ).then((json) => {
     this.props.setCalRecurrence(json); //Update the state with the list of dates in the recurrence
     let recurrence = this.props.calendarForm.recurrence;
+    var conflictingEvents = [];
     let currentEvents = this.props.calendarForm.events;
     var date = new Date(); //Generate a timestamp as a "most-likely" unique recurrence id
     var components = [
@@ -197,10 +218,32 @@ class AddEventModal extends React.Component {
       let newEvent = new Event(this.props.courseId, (this.props.courseTitle + ' ' + getCurrentSemester()), getEventDT(sDate, this.props.calendarForm.sTime),
                               getEventDT(eDate, this.props.calendarForm.eTime), this.props.calendarForm.description, this.props.calendarForm.room,
                               (getCurrentSemester() + ' ' + this.props.courseId), this.props.calendarForm.hexColor, true, recurrenceId);
-      currentEvents.push(newEvent); //Add the event to the list
+      if(this.eventDoesConflict(newEvent)){
+        conflictingEvents.push(newEvent);
+      }
+      else{
+        currentEvents.push(newEvent); //Add the event to the list
+      }
     }
-    let newEvents = currentEvents;
-    this.props.setCalEvents(newEvents); //Add the array of dates (recurrence) to the calendar
+    this.props.setCalEvents(currentEvents); //Add the array of dates (recurrence) to the calendar
+    if(conflictingEvents.length > 0){
+      const body = (
+        <div>
+          <div>
+            <p>Warning! The following {conflictingEvents.length} events conflicted with other existing events and could not be added:</p>
+            <ul>
+              {conflictingEvents.map((event, i) => {
+                var ev = ("Name: " + event.title + ", Date: " + event.start);
+                return (<li key={i}>{ev}</li>)})}
+            </ul>
+            <p>All other events in this recurrence have been added.</p>
+          </div>
+        </div>
+      );
+      this.props.setMessageTitle("WARNING");
+      this.props.setMessageBody(body);
+      this.props.showMessage('CUSTOM');
+    }
     this.onClose(); //Close the modal
     }).catch((err) => console.log(err));
   }
@@ -213,25 +256,36 @@ class AddEventModal extends React.Component {
     if(end === ""){
       end = start;
     }
+    let isRecurringEvent = this.props.calendarForm.showRecur;
     let repeatDays = this.props.calendarForm.repeatDays;
     if(+start > +end){
+      this.props.setMessageTitle("ERROR");
       this.props.setMessageBody('ERROR (Start Date later than End Date): Your ending date must be later than or the same as your starting date.');
       this.props.showMessage('CUSTOM');
     }
-    else if(repeatDays.length === 0){
+    if(isRecurringEvent){
+      if(repeatDays.length > 0){
+        if(+start === +end){ //If the user input a recurrence but set the same start and end date
+          this.props.setMessageTitle("ERROR");
+          this.props.setMessageBody('ERROR (Single Day Recurrence): If you want a recurring date, you must have the start and end dates be different.');
+          this.props.showMessage('CUSTOM');
+        }
+        else {
+          this.addRecurringEvent(); //Add a recurring event
+        }
+      }
+      else{
+        this.props.setMessageTitle("ERROR");
+        this.props.setMessageBody("Error (No Repeat Days): In order to make a recurring event, you must check the boxes of the days you want the event to repeat on.");
+        this.props.showMessage('CUSTOM');
+        //error need to check repeat days
+      }
+    }
+    else{ //If single event
       let newEvent = new Event(this.props.courseId, (this.props.courseTitle + ' ' + getCurrentSemester()), getEventDT(start, this.props.calendarForm.sTime),
                                getEventDT(end, this.props.calendarForm.eTime), this.props.calendarForm.description, this.props.calendarForm.room,
                                (getCurrentSemester() + ' ' + this.props.courseId), this.props.calendarForm.hexColor, false, null);
       this.addNewEvent(newEvent); //Add a single event
-    }
-    else {
-      if(+start === +end && repeatDays.length !== 0){ //If the user input a recurrence but set the same start and end date
-        this.props.setMessageBody('ERROR (Single Day Recurrence): If you want a recurring date, you must have the start and end dates be different.');
-        this.props.showMessage('CUSTOM');
-      }
-      else {
-        this.addRecurringEvent(); //Add a recurring event
-      }
     }
   }
 
@@ -262,6 +316,7 @@ class AddEventModal extends React.Component {
         </div>
       </div>
     );
+    this.props.setMessageTitle("HELP");
     this.props.setMessageBody(helpMessage);
     this.props.showMessage('CUSTOM');
   };
@@ -273,7 +328,7 @@ class AddEventModal extends React.Component {
 
   render() {
     var showEndDate = !(this.props.calendarForm.multidayEvent || this.props.calendarForm.showRecur);
-    
+
     const addEventForm = (
       <form>
         <fieldset style={fieldsetStyle}>
@@ -293,11 +348,11 @@ class AddEventModal extends React.Component {
           <div name='recurringEventDiv' hidden={!this.props.calendarForm.showRecur}>
             <div>
               <label style={labelStyle}>Repeat? (WEEKLY): </label>
-              <label style={labelStyle} htmlFor='Monday'><input style={chkbxStyle} type='checkbox' name='Monday' onChange={this.handleCheckboxChange.bind(this)}/>Monday</label>
-              <label style={labelStyle} htmlFor='Tuesday'><input style={chkbxStyle} type='checkbox' name='Tuesday' onChange={this.handleCheckboxChange.bind(this)}/>Tuesday</label>
-              <label style={labelStyle} htmlFor='Wednesday'><input style={chkbxStyle} type='checkbox' name='Wednesday' onChange={this.handleCheckboxChange.bind(this)}/>Wednesday</label>
-              <label style={labelStyle} htmlFor='Thursday'><input style={chkbxStyle} type='checkbox' name='Thursday' onChange={this.handleCheckboxChange.bind(this)}/>Thursday</label>
-              <label style={labelStyle} htmlFor='Friday'><input style={chkbxStyle} type='checkbox' name='Friday' onChange={this.handleCheckboxChange.bind(this)}/>Friday</label>
+              <label style={labelStyle} htmlFor='Monday'><input style={chkbxStyle} type='checkbox' name='Monday' onChange={this.handleCheckboxChange.bind(this)} ref={'chkbxMON'}/>Monday</label>
+              <label style={labelStyle} htmlFor='Tuesday'><input style={chkbxStyle} type='checkbox' name='Tuesday' onChange={this.handleCheckboxChange.bind(this)} ref={'chkbxTUE'}/>Tuesday</label>
+              <label style={labelStyle} htmlFor='Wednesday'><input style={chkbxStyle} type='checkbox' name='Wednesday' onChange={this.handleCheckboxChange.bind(this)} ref={'chkbxWED'}/>Wednesday</label>
+              <label style={labelStyle} htmlFor='Thursday'><input style={chkbxStyle} type='checkbox' name='Thursday' onChange={this.handleCheckboxChange.bind(this)} ref={'chkbxTHU'}/>Thursday</label>
+              <label style={labelStyle} htmlFor='Friday'><input style={chkbxStyle} type='checkbox' name='Friday' onChange={this.handleCheckboxChange.bind(this)} ref={'chkbxFRI'}/>Friday</label>
             </div>
             <div id='exclude/include'>
               <div id='exclude'>
@@ -433,7 +488,8 @@ const mapDispatchToProps = (dispatch, ownProps) => {
     setCalETime: (eTime) => dispatch(setCalETime(eTime)),
     setCalMultidayEvent: (multidayEvent) => dispatch(setCalMultidayEvent(multidayEvent)),
     showMessage: (messageType) => dispatch(showMessage(messageType)),
-    setMessageBody: (body) => dispatch(setMessageBody(body))
+    setMessageBody: (body) => dispatch(setMessageBody(body)),
+    setMessageTitle: (title) => dispatch(setMessageTitle(title))
   }
 };
 

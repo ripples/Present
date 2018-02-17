@@ -14,8 +14,10 @@ export function hideMessage() {
 }
 
 export function setMessageTitle(title){
-  type: messageConstants.SET_MESSSAGE_TITLE,
-  title
+    return {
+      type: messageConstants.SET_MESSAGE_TITLE,
+      title
+  }
 }
 
 export function setMessageBody(body){

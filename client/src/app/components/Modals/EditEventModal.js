@@ -4,12 +4,14 @@ import Datetime from 'react-datetime';
 import {connect} from 'react-redux';
 import 'react-datetime/css/react-datetime.css';
 import moment from 'moment';
+import Event from '../../utils/Event.js';
+import ModalWrapper from './ModalWrapper.js';
 import {getCurrentSemester, formatTime, getEventDT, isValidDate} from '../CalendarForm/CalendarUtils.js';
 import {hideModal} from '../../Actions/modalActions.js';
 import {clearForm, setCalRepeatDays, setCalRecurrence, setCalExcludeDates, setCalIncludeDates, setCalSDate,
         setCalEDate, setCalDescription, setCalEvents, setCalShowRecur, setCalSTime, setCalETime, setCalMultidayEvent} from '../../Actions/calFormActions.js';
-import Event from '../../utils/Event.js';
-import ModalWrapper from './ModalWrapper.js';
+import {showMessage, setMessageBody} from '../../Actions/messageActions.js';
+
 
 class EditEventModal extends React.Component {
   constructor(props){
@@ -97,15 +99,29 @@ class EditEventModal extends React.Component {
     }
   }
 
-  //Adds the given event to the calendar
+  //Adds a new event to the calendar list (doesn't save the calendar changes to the server!)
+  eventDoesConflict(event){
+    let currentEvents = this.props.calendarForm.events;
+    for(let e of currentEvents){
+      if(((event.start >= e.start) && (event.start <= e.end)) || ((event.end >= e.start) && (event.end <= e.end))){
+        return true;
+      }
+    }
+    return false;
+  }
+
+  //Adds a new event to the calendar list (doesn't save the calendar changes to the server!)
   addNewEvent(event){
     let currentEvents = this.props.calendarForm.events; //Get the current list of events
-    currentEvents.push(event);
-    let newEvents = currentEvents;
-    this.props.setCalEvents(newEvents); //Add the event to the list and update the state
-    if(this.props.modalType){ //If the modal is still open
-      this.onClose(); //Close it
+    if(this.eventDoesConflict(event)){
+      this.props.setMessageTitle("ERROR");
+      this.props.setMessageBody("Error (Overlapping Event): You cannot have any events overlapping each other. Please change the timeframe for this event.");
+      this.props.showMessage('CUSTOM');
+      return;
     }
+    currentEvents.push(event); //Push the new event
+    this.props.setCalEvents(currentEvents); //Update the state
+    this.onClose();
   }
 
   onClose = () => {
@@ -169,7 +185,7 @@ var modalBtnStyle = {
   color: "#000080"
 }
 
-var disabledButtonStyle = {
+/*var disabledButtonStyle = {
   display: 'inline',
   margin: '10px 5px 10px 5px',
   paddingLeft: "10px",
@@ -179,7 +195,7 @@ var disabledButtonStyle = {
   backgroundColor: "grey",
   borderRadius: "4px",
   color: "#00008"
-}
+}*/
 
 var pickerStyle = {
   display: 'inline-block',
@@ -217,6 +233,8 @@ const mapDispatchToProps = (dispatch, ownProps) => {
     setCalSTime: (sTime) => dispatch(setCalSTime(sTime)),
     setCalETime: (eTime) => dispatch(setCalETime(eTime)),
     setCalMultidayEvent: (multidayEvent) => dispatch(setCalMultidayEvent(multidayEvent)),
+    showMessage: (messageType) => dispatch(showMessage(messageType)),
+    setMessageBody: (body) => dispatch(setMessageBody(body))
   }
 };
 

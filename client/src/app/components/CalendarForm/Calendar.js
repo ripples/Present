@@ -2,15 +2,11 @@ import React from 'react';
 import moment from 'moment';
 import BigCalendar from 'react-big-calendar';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
-import Modal from 'react-responsive-modal';
-import Datetime from 'react-datetime';
-import 'react-datetime/css/react-datetime.css';
 import {connect} from "react-redux";
-import TimeRange from './TimeRange.js';
-import {getCurrentSemester, isEqual, getEventDT, deepCopy, processEvents, generateRandomHexColor} from './CalendarUtils.js';
+import {isEqual, deepCopy, processEvents, generateRandomHexColor} from './CalendarUtils.js';
 import {setCalEvents, setCalHexColor, setCalOriginalCal, setCalRoom, setCalURL, setCalCourseId, clearForm, initForm} from '../../Actions/calFormActions.js';
 import {showModal, hideModal, showEvent} from '../../Actions/modalActions.js';
-import {showMessage, setMessageBody} from '../../Actions/messageActions.js';
+import {showMessage, setMessageBody, setMessageTitle} from '../../Actions/messageActions.js';
 
 //Sets the localizer for the BigCalendar component to moment.js
 BigCalendar.momentLocalizer(moment);
@@ -18,8 +14,6 @@ BigCalendar.momentLocalizer(moment);
 class Calendar extends React.Component {
   constructor(props){
     super(props);
-    this.addNewEvent = this.addNewEvent.bind(this);
-    this.deleteEvent = this.deleteEvent.bind(this);
     this.eventStyleGetter = this.eventStyleGetter.bind(this);
   }
 
@@ -53,31 +47,8 @@ class Calendar extends React.Component {
     }).catch((err) => console.log(err));
   };
 
-  //Add the given event to the current calendar (does not save changes to the server!)
-  addNewEvent(event){
-    let currentEvents = this.props.calendarForm.events; //Get the current state of the events on the calendar
-    currentEvents.push(event); //Push the new event into the group
-    let newEvents = currentEvents; //Create new array containing all new events
-    this.props.setCalEvents(newEvents); //Set the current displayed calendar to the new events
-    if(this.props.modalType){ //If modal is open
-      this.onCloseModal(); //Close it
-    }
-  }
-
   openModal(modalType) {
     this.props.showModal(modalType);
-  }
-
-  //Deletes the given event from the calendar gui (doesn't save the calendar changes to the server!)
-  deleteEvent(event, e){
-    if(e){ //If a button triggered this
-      e.preventDefault();
-    }
-    let events = this.props.calendarForm.events; //Get the current events
-    if(events.includes(event)){ //If the event we want to delete exists in the calendar
-      events.splice(events.indexOf(event), 1); //Remove it
-      this.props.setCalEvents(events); //Set calendar to new array without the deleted event
-    }
   }
 
   //Once changes have been made to the calendar, queries the server to save the new ics file.
@@ -97,11 +68,13 @@ class Calendar extends React.Component {
         return response.text()
       }).then((data) => {
         this.props.setCalOriginalCal(deepCopy(this.props.calendarForm.events)); //So the user can't re-save the same calendar
+        this.props.setMessageTitle("Save Successful");
         this.props.setMessageBody(data); //Populate a message modal with the result of the POST request
         this.props.showMessage('CUSTOM'); //Display message to the user
       }).catch((err) => console.log(err));
     }
     else{ //If there haven't been any changes to the calendar
+      this.props.setMessageTitle("ERROR");
       this.props.setMessageBody('ERROR: You haven\'t made any changes to the current calendar.');
       this.props.showMessage('CUSTOM');
     }
@@ -178,13 +151,13 @@ var divStyle = {
   margin: 'auto'
 }
 
-var legendStyle = {
+/*var legendStyle = {
   background: "#000080",
   padding: "6px",
   fontWeight: "bold",
   color: "white",
   textAlign: 'center'
-}
+}*/
 
 var modalBtnStyle = {
   display: 'inline',
@@ -223,7 +196,8 @@ const mapDispatchToProps = (dispatch, ownProps) => {
     hideModal: () => dispatch(hideModal()),
     showEvent: (currentEvent) => dispatch(showEvent(currentEvent)),
     showMessage: (messageType) => dispatch(showMessage(messageType)),
-    setMessageBody: (body) => dispatch(setMessageBody(body))
+    setMessageBody: (body) => dispatch(setMessageBody(body)),
+    setMessageTitle: (title) => dispatch(setMessageTitle(title))
 	}
 };
 

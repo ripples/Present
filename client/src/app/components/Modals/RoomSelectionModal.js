@@ -8,9 +8,6 @@ import {setRoomModalState, setRoomOptions, setInstructorPage} from '../../Action
 import {generateRandomHexColor, deepCopy, processEvents} from '../CalendarForm/CalendarUtils.js';
 
 class RoomSelectionModal extends React.Component {
-  constructor(props){
-    super(props);
-  }
 
   loadCalendarData = () => { //Queries the server for the desired ics file, if one exists.
     this.props.setCourseId(this.props.courseId);
@@ -108,11 +105,11 @@ class RoomSelectionModal extends React.Component {
   }
 }
 
-var headerStyle= {
+/*var headerStyle= {
 	fontWeight: "bold",
     fontSize: "36px",
     marginBottom: "40px"
-}
+}*/
 
 var selectStyle = {
   margin: '10px 0px 10px 0px'

@@ -5,9 +5,6 @@ import {hideMessage} from '../../Actions/messageActions.js';
 
 
 class CustomMessage extends React.Component {
-  constructor(props){
-    super(props);
-  }
 
   onClose = () => {
     this.props.hideMessage();
@@ -15,7 +12,7 @@ class CustomMessage extends React.Component {
 
   render() {
     return (
-      <MessageWrapper title="" body={this.props.message.body} hideMessage={this.onClose} />
+      <MessageWrapper title={this.props.message.title} body={this.props.message.body} hideMessage={this.onClose} />
     );
   }
 }

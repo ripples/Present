@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import {connect} from "react-redux";
-import { Link } from 'react-router';
 import 'react-select/dist/react-select.css';
 import Calendar from '../../components/CalendarForm/Calendar';
 import LectureUpload from '../../components/LectureUpload/LectureUpload';

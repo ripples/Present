@@ -49,9 +49,9 @@ const closeStyle = {
   color: "#000080"
 }
 
-const bodyStyle = {
+/*const bodyStyle = {
   textAlign: 'center'
-}
+}*/
 
 MessageWrapper.propTypes = {
   // props
