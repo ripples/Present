@@ -1,12 +1,12 @@
 import React from 'react';
-import TimeRange from '../CalendarForm/TimeRange.js';
+import TimeRange from '../Calendar/TimeRange.js';
 import Datetime from 'react-datetime';
 import {connect} from 'react-redux';
 import 'react-datetime/css/react-datetime.css';
 import moment from 'moment';
 import Event from '../../utils/Event.js';
 import ModalWrapper from './ModalWrapper.js';
-import {getCurrentSemester, formatTime, getEventDT, isValidDate} from '../CalendarForm/CalendarUtils.js';
+import {getCurrentSemester, formatTime, getEventDT, isValidDate} from '../Calendar/CalendarUtils.js';
 import {hideModal} from '../../Actions/modalActions.js';
 import {clearForm, setCalRepeatDays, setCalRecurrence, setCalExcludeDates, setCalIncludeDates, setCalSDate,
         setCalEDate, setCalDescription, setCalEvents, setCalShowRecur, setCalSTime, setCalETime, setCalMultidayEvent} from '../../Actions/calFormActions.js';

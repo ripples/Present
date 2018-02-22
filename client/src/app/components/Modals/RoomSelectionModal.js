@@ -5,7 +5,7 @@ import {connect} from 'react-redux';
 import {showModal, hideModal} from '../../Actions/modalActions.js';
 import {setCalRoom, setCalURL, setCalOriginalCal, setCalEvents, setCalHexColor, setCalCourseId} from '../../Actions/calFormActions.js';
 import {setRoomModalState, setRoomOptions, setInstructorPage} from '../../Actions/instructorSettingsActions.js';
-import {generateRandomHexColor, deepCopy, processEvents} from '../CalendarForm/CalendarUtils.js';
+import {generateRandomHexColor, deepCopy, processEvents} from '../Calendar/CalendarUtils.js';
 
 class RoomSelectionModal extends React.Component {
 
