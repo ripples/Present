@@ -26,3 +26,10 @@ export function setMessageBody(body){
     body
   }
 }
+
+export function setConfirmed(confirmed){
+  return {
+    type: messageConstants.SET_CONFIRMED,
+    confirmed
+  }
+}

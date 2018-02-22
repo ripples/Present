@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import {connect} from "react-redux";
 import 'react-select/dist/react-select.css';
-import Calendar from '../../components/CalendarForm/Calendar';
+import Calendar from '../../components/Calendar/Calendar';
 import LectureUpload from '../../components/LectureUpload/LectureUpload';
 import LectureDelete from '../../components/LectureDelete/LectureDelete';
 import {setInstructorPage, clearInstructorPage, setRoomOptions} from '../../Actions/instructorSettingsActions.js';

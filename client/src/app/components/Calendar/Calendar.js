@@ -7,6 +7,7 @@ import {isEqual, deepCopy, processEvents, generateRandomHexColor} from './Calend
 import {setCalEvents, setCalHexColor, setCalOriginalCal, setCalRoom, setCalURL, setCalCourseId, clearForm, initForm} from '../../Actions/calFormActions.js';
 import {showModal, hideModal, showEvent} from '../../Actions/modalActions.js';
 import {showMessage, setMessageBody, setMessageTitle} from '../../Actions/messageActions.js';
+import {confirm} from '../Messages/Confirm.js';
 
 //Sets the localizer for the BigCalendar component to moment.js
 BigCalendar.momentLocalizer(moment);
@@ -55,23 +56,24 @@ class Calendar extends React.Component {
   handleSave(e){
     e.preventDefault();
     if(!isEqual(this.props.calendarForm.originalCal, this.props.calendarForm.events)){ //If there have been changes to the calendar
-      var options = {method: 'POST',
-                    headers: {"Content-Type": "application/json"},
-                    credentials: 'same-origin',
-                    body: JSON.stringify(this.props.calendarForm.events)};
-      //TODO(Jon):
-      //Launch confirmation modal for save ("Are you sure you want to override previous calendar?")
-      //.then() the below code on affirmative close, else, return
-
-      //Make POST request to server
-      fetch('/api/calendar/save/' + this.props.courseId + '/' + encodeURIComponent("./lectures/" + this.props.calendarForm.room + "/Calendar.ics") + '/' + encodeURIComponent(this.props.calendarForm.url), options).then((response) => {
-        return response.text()
-      }).then((data) => {
-        this.props.setCalOriginalCal(deepCopy(this.props.calendarForm.events)); //So the user can't re-save the same calendar
-        this.props.setMessageTitle("Save Successful");
-        this.props.setMessageBody(data); //Populate a message modal with the result of the POST request
-        this.props.showMessage('CUSTOM'); //Display message to the user
-      }).catch((err) => console.log(err));
+      //Launch confirmation message, asking if user wants to override the currently saved calendar
+      confirm('Are you sure you want to override the currently saved calendar file?', {title: "Warning: File Override"}).then(() => {
+        //Make POST request to server
+        var options = {method: 'POST',
+                      headers: {"Content-Type": "application/json"},
+                      credentials: 'same-origin',
+                      body: JSON.stringify(this.props.calendarForm.events)};
+        fetch('/api/calendar/save/' + this.props.courseId + '/' + encodeURIComponent("./lectures/" + this.props.calendarForm.room + "/Calendar.ics") + '/' + encodeURIComponent(this.props.calendarForm.url), options).then((response) => {
+          return response.text()
+        }).then((data) => {
+          this.props.setCalOriginalCal(deepCopy(this.props.calendarForm.events)); //So the user can't re-save the same calendar
+          this.props.setMessageTitle("Save Successful");
+          this.props.setMessageBody(data); //Populate a message modal with the result of the POST request
+          this.props.showMessage('CUSTOM'); //Display message to the user
+        }).catch((err) => console.log(err));
+      }, () => {
+        console.log('Calendar save aborted.');
+      });
     }
     else{ //If there haven't been any changes to the calendar
       this.props.setMessageTitle("ERROR");
@@ -150,14 +152,6 @@ var divStyle = {
   width: 'auto',
   margin: 'auto'
 }
-
-/*var legendStyle = {
-  background: "#000080",
-  padding: "6px",
-  fontWeight: "bold",
-  color: "white",
-  textAlign: 'center'
-}*/
 
 var modalBtnStyle = {
   display: 'inline',

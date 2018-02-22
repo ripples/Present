@@ -11,6 +11,7 @@ import {hideModal} from '../../Actions/modalActions.js';
 import {clearForm, setCalRepeatDays, setCalRecurrence, setCalExcludeDates, setCalIncludeDates, setCalSDate,
         setCalEDate, setCalDescription, setCalEvents, setCalShowRecur, setCalSTime, setCalETime, setCalMultidayEvent} from '../../Actions/calFormActions.js';
 import {showMessage, setMessageBody} from '../../Actions/messageActions.js';
+import {confirm} from '../Messages/Confirm.js';
 
 
 class EditEventModal extends React.Component {
@@ -84,19 +85,23 @@ class EditEventModal extends React.Component {
     }
   }
 
-  //Deletes the given event from the calendar if it exists
+  //Deletes the given event from the calendar (Doesn't save the calendar changes to the server!)
   deleteEvent(event, e){
-    if(e){ //If called from a button
-      e.preventDefault();
-    }
-    let events = this.props.calendarForm.events; //Get the current list of events
-    if(events.includes(event)){ //If the given event exists in the calendar
-      events.splice(events.indexOf(event), 1);
-      this.props.setCalEvents(events); //Remove it and update the state
-      if(this.props.modalType){ //If the modal is still open
-        this.onClose(); //Close it
+    confirm('Are you sure you want to delete this event? To make the changes permanent, you must save the calendar.', {title: 'Warning: Event Deletion'}).then(() => {
+      if(e){ //If called from a button
+        e.preventDefault();
       }
-    }
+      let events = this.props.calendarForm.events; //Get the list of current events
+      if(events.includes(event)){ //If the event exists in the calendar
+        events.splice(events.indexOf(event), 1);
+        this.props.setCalEvents(events); //Remove it and update the state
+        if(this.props.modalType){ //If the modal is still open
+          this.onClose(); //Close it
+        }
+      }
+    }, () => {
+      console.log('Single event deletion aborted.');
+    });
   }
 
   //Adds a new event to the calendar list (doesn't save the calendar changes to the server!)

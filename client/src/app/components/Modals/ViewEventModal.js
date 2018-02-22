@@ -3,6 +3,7 @@ import {connect} from 'react-redux';
 import {showModal, hideModal} from '../../Actions/modalActions.js';
 import ModalWrapper from './ModalWrapper.js';
 import {setCalEvents} from '../../Actions/calFormActions.js';
+import {confirm} from '../Messages/Confirm.js';
 
 
 class ViewEventModal extends React.Component {
@@ -16,41 +17,49 @@ class ViewEventModal extends React.Component {
 
   //Deletes the given event from the calendar (Doesn't save the calendar changes to the server!)
   deleteEvent(event, e){
-    if(e){ //If called from a button
-      e.preventDefault();
-    }
-    let events = this.props.calendarForm.events; //Get the list of current events
-    if(events.includes(event)){ //If the event exists in the calendar
-      events.splice(events.indexOf(event), 1);
-      this.props.setCalEvents(events); //Remove it and update the state
-      if(this.props.modalType){ //If the modal is still open
-        this.onClose(); //Close it
+    confirm('Are you sure you want to delete this event? To make the changes permanent, you must save the calendar.', {title: 'Warning: Event Deletion'}).then(() => {
+      if(e){ //If called from a button
+        e.preventDefault();
       }
-    }
+      let events = this.props.calendarForm.events; //Get the list of current events
+      if(events.includes(event)){ //If the event exists in the calendar
+        events.splice(events.indexOf(event), 1);
+        this.props.setCalEvents(events); //Remove it and update the state
+        if(this.props.modalType){ //If the modal is still open
+          this.onClose(); //Close it
+        }
+      }
+    }, () => {
+      console.log('Single event deletion aborted.');
+    });
   }
 
   //Given one event in a recurrence, deletes every event in that same recurrence from the calendar (Doesn't save calendar changes to the server!)
   deleteRecurrence(event, e){
-    if(e){
-      e.preventDefault();
-    }
-    let recurrenceId = event.recurrenceId;
-    let events = this.props.calendarForm.events;
-    let eventsToDelete = [];
-    for (let ev1 of events){ //Gather all the events to be deleted
-      if(ev1.isInRecurrence){
-        if(ev1.recurrenceId === recurrenceId){
-          eventsToDelete.push(ev1);
+    confirm('Are you sure you want to delete every event in this recurrence? To make changes permanent, you must save the calendar.', {title: 'Warning: Recurring Event Deletion'}).then(() => {
+      if(e){
+        e.preventDefault();
+      }
+      let recurrenceId = event.recurrenceId;
+      let events = this.props.calendarForm.events;
+      let eventsToDelete = [];
+      for (let ev1 of events){ //Gather all the events to be deleted
+        if(ev1.isInRecurrence){
+          if(ev1.recurrenceId === recurrenceId){
+            eventsToDelete.push(ev1);
+          }
         }
       }
-    }
-    for (let ev2 of eventsToDelete){ //Removes all the specified events from the calendar
-      events.splice(events.indexOf(ev2), 1);
-    }
-    this.props.setCalEvents(events);
-    if(this.props.modalType){
-      this.onClose();
-    }
+      for (let ev2 of eventsToDelete){ //Removes all the specified events from the calendar
+        events.splice(events.indexOf(ev2), 1);
+      }
+      this.props.setCalEvents(events);
+      if(this.props.modalType){
+        this.onClose();
+      }
+    }, () => {
+      console.log('Recurring event deletion aborted.');
+    });
   }
 
   onClose = () => {

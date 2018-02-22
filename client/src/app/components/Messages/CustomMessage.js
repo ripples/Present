@@ -12,7 +12,7 @@ class CustomMessage extends React.Component {
 
   render() {
     return (
-      <MessageWrapper title={this.props.message.title} body={this.props.message.body} hideMessage={this.onClose} />
+      <MessageWrapper show={true} title={this.props.message.title} body={this.props.message.body} onDestroyDialog={this.onClose} onCloseBtn={this.onClose} />
     );
   }
 }

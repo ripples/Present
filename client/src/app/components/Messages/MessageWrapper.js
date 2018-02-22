@@ -5,7 +5,7 @@ import PropTypes from 'prop-types';
 const MessageWrapper = props => {
 
   return (
-    <Modal show={true} aria-labelledby="modal-title" animation={props.animation} keyboard={props.keyboard} onHide={props.hideMessage}>
+    <Modal show={props.show} aria-labelledby="modal-title" animation={props.animation} keyboard={props.keyboard} onHide={props.onDestroyDialog}>
       <Modal.Header closeButton={true} style={props.headerStyle}>
         <Modal.Title id="modal-title" style={props.titleStyle}>
           {props.title}
@@ -16,7 +16,7 @@ const MessageWrapper = props => {
       </Modal.Body>
       <Modal.Footer style={props.footerStyle}>
           {props.footerBtns}
-          <button onClick={props.hideMessage} style={props.closeStyle}>{props.closeText}</button>
+          <button onClick={props.onCloseBtn} style={props.closeStyle}>{props.closeText}</button>
       </Modal.Footer>
     </Modal>
   );
@@ -55,6 +55,7 @@ const closeStyle = {
 
 MessageWrapper.propTypes = {
   // props
+  show: PropTypes.bool.isRequired,
   title: PropTypes.oneOfType([
     PropTypes.string,
     PropTypes.object,
@@ -79,7 +80,8 @@ MessageWrapper.propTypes = {
   closeStyle: PropTypes.object,
 
   // methods
-  hideMessage: PropTypes.func,
+  onDestroyDialog: PropTypes.func.isRequired,
+  onCloseBtn: PropTypes.func.isRequired,
 };
 
 MessageWrapper.defaultProps = {
@@ -94,7 +96,8 @@ MessageWrapper.defaultProps = {
   footerBtns: [],
   closeStyle: closeStyle,
   closeText: "Okay",
-  hideMessage: () => {this.props.hideMessage()}
+  onCloseBtn: () => {this.props.onCloseBtn()},
+  onDestroyDialog: () => {this.props.onDestroyDialog()}
 };
 
 export default MessageWrapper;

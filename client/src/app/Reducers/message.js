@@ -6,29 +6,41 @@ export default function message(state = initialState, action){
           return {
             messageType: action.messageType,
             title: state.title,
-            body: state.body
+            body: state.body,
+            confirmed: state.confirmed
           };
 
         case messageConstants.SET_MESSAGE_TITLE:
           return {
             messageType: state.messageType,
             title: action.title,
-            body: state.body
+            body: state.body,
+            confirmed: state.confirmed
           };
 
         case messageConstants.SET_MESSAGE_BODY:
           return {
             messageType: state.messageType,
             title: state.title,
-            body: action.body
+            body: action.body,
+            confirmed: state.confirmed
           };
 
         case messageConstants.HIDE_MESSAGE:
           return {
             messageType: null,
             title: {},
-            body: {}
+            body: {},
+            confirmed: null
           };
+
+      case messageConstants.SET_CONFIRM:
+        return {
+          messageType: state.messageType,
+          title: state.title,
+          body: state.body,
+          confirmed: action.confirmed
+        }
 
         default:
             return state;
@@ -38,5 +50,6 @@ export default function message(state = initialState, action){
 const initialState = {
     messageType: null,
     title: {},
-    body: {}
+    body: {},
+    confirmed: null
   }
