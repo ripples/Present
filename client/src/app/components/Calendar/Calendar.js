@@ -54,23 +54,13 @@ class Calendar extends React.Component {
 
   //Once changes have been made to the calendar, queries the server to save the new ics file.
   handleSave(e){
-    e.preventDefault();
+    if(e){
+      e.preventDefault();
+    }
     if(!isEqual(this.props.calendarForm.originalCal, this.props.calendarForm.events)){ //If there have been changes to the calendar
       //Launch confirmation message, asking if user wants to override the currently saved calendar
       confirm('Are you sure you want to override the currently saved calendar file?', {title: "Warning: File Override"}).then(() => {
-        //Make POST request to server
-        var options = {method: 'POST',
-                      headers: {"Content-Type": "application/json"},
-                      credentials: 'same-origin',
-                      body: JSON.stringify(this.props.calendarForm.events)};
-        fetch('/api/calendar/save/' + this.props.courseId + '/' + encodeURIComponent("./lectures/" + this.props.calendarForm.room + "/Calendar.ics") + '/' + encodeURIComponent(this.props.calendarForm.url), options).then((response) => {
-          return response.text()
-        }).then((data) => {
-          this.props.setCalOriginalCal(deepCopy(this.props.calendarForm.events)); //So the user can't re-save the same calendar
-          this.props.setMessageTitle("Save Successful");
-          this.props.setMessageBody(data); //Populate a message modal with the result of the POST request
-          this.props.showMessage('CUSTOM'); //Display message to the user
-        }).catch((err) => console.log(err));
+        this.saveCalendar();
       }, () => {
         console.log('Calendar save aborted.');
       });
@@ -82,9 +72,35 @@ class Calendar extends React.Component {
     }
   }
 
+  saveCalendar(){ //Make POST request to server to save new ics file.
+    var options = {method: 'POST',
+                  headers: {"Content-Type": "application/json"},
+                  credentials: 'same-origin',
+                  body: JSON.stringify(this.props.calendarForm.events)};
+    fetch('/api/calendar/save/' + this.props.courseId + '/' + encodeURIComponent("./lectures/" + this.props.calendarForm.room + "/Calendar.ics") + '/' + encodeURIComponent(this.props.calendarForm.url), options).then((response) => {
+      return response.text()
+    }).then((data) => {
+      this.props.setCalOriginalCal(deepCopy(this.props.calendarForm.events)); //So the user can't re-save the same calendar
+      this.props.setMessageTitle("Save Successful");
+      this.props.setMessageBody(data); //Populate a message modal with the result of the POST request
+      this.props.showMessage('CUSTOM'); //Display message to the user
+    }).catch((err) => console.log(err));
+  }
+
   //Displays the Room Selection modal if the user clicks the "Change Room" button
   handleRoomChange(e){
-    this.props.showModal('ROOM_SELECT');
+    if(!isEqual(this.props.calendarForm.originalCal, this.props.calendarForm.events)){
+      confirm('There have been changes made to the calendar, would you like to save your changes before switching rooms?', {title: 'Warning: Unsaved Changes', okLabel: 'Yes', cancelLabel: 'No'}).then(() => {
+        this.saveCalendar();
+      }, () => {
+        console.log('Save declined.');
+      }).then(() => {
+        this.props.showModal('ROOM_SELECT');
+      });
+    }
+    else{
+      this.props.showModal('ROOM_SELECT');
+    }
   }
 
   //Gets the style of each event on the calendar
