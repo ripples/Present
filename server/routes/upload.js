@@ -28,15 +28,14 @@ router.post('/:courseId/lecture-zip', function (req, res) {
 	const tmp_path = file.file;
 	const target_path = './lectures/' + courseId;
 	try {
-		fs.createReadStream(tmp_path).pipe(unzip.Extract({ path: target_path }));
+		fs.createReadStream(tmp_path).pipe(unzip.Extract({ path: target_path })).on('close', () => {
+			utils.deleteFolderRecursive('./uploads/' + file.uuid + '/');
+		});
 		res.status(200).send()
 	}
 	catch (err) {
 		res.status(400).send(err)
 	}
-
-	utils.deleteFolderRecursive(tmp_path);
-
 });
 
 module.exports = router;
