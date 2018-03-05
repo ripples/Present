@@ -1,6 +1,5 @@
 var express = require('express');
 var path = require('path');
-var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bb = require('express-busboy');
 var session = require('express-session');
@@ -21,7 +20,13 @@ app.use(cookieParser())
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
 
-app.use(logger('dev'));
+
+//****** NEW LOGGING STUFF, MAY OR MAY NOT WORK *************************//
+var morgan = require('morgan')
+var accessLogStream = fs.createWriteStream(path.join(__dirname, 'appAccess.log'), {flags: 'a'})
+// setup the logger
+app.use(morgan('combined', {stream: accessLogStream}))
+//********IF DOESN'T WORK, GET RID OF THIS ***************************//
 
 bb.extend(app, {
     upload: true,
@@ -34,11 +39,11 @@ app.use(session({secret: process.env.COOKIE_SECRET}))
 //Passport
 passport.use('lti-strategy', new CustomStrategy(
 	function(req, callback) {
-		var val = (req.body) ? req.body : req.user		
+		var val = (req.body) ? req.body : req.user
 		try{
-			var provider = new lti.Provider(val , process.env.LTI_SECRET)	
+			var provider = new lti.Provider(val , process.env.LTI_SECRET)
 			if(req.user){
-				callback(null, val)			
+				callback(null, val)
 			}
 			else{
 				provider.valid_request(req, function(err, isValid) {
@@ -47,7 +52,7 @@ passport.use('lti-strategy', new CustomStrategy(
 					}
 					callback(err, val)
 				});
-			}		
+			}
 		}
 		catch(err){
 			console.log("Authenication error", err)
@@ -59,7 +64,7 @@ passport.use('lti-strategy', new CustomStrategy(
 passport.serializeUser(function(user, done) {
 	done(null, user);
   });
-  
+
   passport.deserializeUser(function(user, done) {
 	done(null, user);
   });

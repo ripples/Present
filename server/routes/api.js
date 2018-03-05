@@ -7,10 +7,18 @@ var util = require('util');
 var moment = require('moment');
 const unzip = require('unzip-stream');
 require('moment-recur');
-
 const utils = require('../utils/utils');
 const lecUpUtils = require('../utils/lectureUpload');
 const calUtils = require('../utils/calendar');
+
+
+//****** NEW LOGGING STUFF, MAY OR MAY NOT WORK *************************//
+var morgan = require('morgan')
+var accessLogStream = fs.createWriteStream(path.join(__dirname, 'apiAccess.log'), {flags: 'a'})
+// setup the logger
+router.use(morgan('combined', {stream: accessLogStream}))
+//********IF DOESN'T WORK, GET RID OF THIS ***************************//
+
 
 router.get('/identify/', function (req, res) {
 	if (req.session.lti_token) {
@@ -25,6 +33,7 @@ router.get('/listOfCourseLectures/', function (req, res) {
 	const fpath = "./lectures/" + req.session.lti_token.lis_course_section_sourcedid.toString()
 	dirToJson(fpath, function (err, dirTree) {
 		if (err) {
+			console.warn(err);
 			throw err;
 		} else {
 			dirTree.children = dirTree.children.filter((lecture) => {
@@ -60,6 +69,7 @@ router.get('/manifest/:lectureName', function (req, res) {
 	const fpath = "./lectures/" + req.session.lti_token.lis_course_section_sourcedid.toString() + '/' + req.params.lectureName.toString() + '/INFO'
 	fs.readFile(fpath, 'utf8', function (err, contents) {
 		if (err) {
+			console.warn(err);
 			res.status(404).send('Not Found');
 			return;
 		}
@@ -124,6 +134,7 @@ router.get('/video/:lectureName', function (req, res) {
 	const fpath = "./lectures/" + req.session.lti_token.lis_course_section_sourcedid.toString() + '/' + req.params.lectureName.toString()
 	util.promisify(fs.readdir)(fpath).then((files, err) => {
 		if(err){
+			console.warn(err);
 			throw err
 		}
 		return files.find(e => e.endsWith('.mp4'))
@@ -158,7 +169,7 @@ router.get('/video/:lectureName', function (req, res) {
 			fs.createReadStream(fpath).pipe(res)
 		}
 	}).catch(err => {
-		console.log(err)
+		console.warn(err)
 		res.status(404).send()
 	})
 });
@@ -216,7 +227,10 @@ router.get('/calendar/populate/:fpath', function (req, res) { //Gets the calenda
 	fs.exists(fpath, function (exists) {
 		if (exists) {
 			fs.readFile(fpath, function (err, data) {
-				if (err) throw err;
+				if (err){
+					console.warn(err);
+					throw err;
+				}
 				const eventArray = calUtils.icsToEventObjectArray(data.toString());
 				res.status(200).send(eventArray);
 			})

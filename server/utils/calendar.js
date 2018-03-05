@@ -33,6 +33,7 @@ module.exports = {
 		}
 		fileText += END_TAG;
 	}
+  // Check if filepath exists, if not, recursively make the directories then write the file
 	fs.writeFileSync(fpath, fileText, function (err) {
 		if (err) return console.log(err);
 	});
