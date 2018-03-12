@@ -6,6 +6,7 @@ var session = require('express-session');
 var passport = require('passport')
 var lti = require('ims-lti')
 var CustomStrategy = require('passport-custom')
+const fs = require('fs')
 
 var public = require('./routes/public');
 var api = require('./routes/api');
