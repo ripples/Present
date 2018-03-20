@@ -77,7 +77,7 @@ class Calendar extends React.Component {
                   headers: {"Content-Type": "application/json"},
                   credentials: 'same-origin',
                   body: JSON.stringify(this.props.calendarForm.events)};
-    fetch('/api/calendar/save/' + this.props.courseId + '/' + encodeURIComponent("./lectures/" + this.props.calendarForm.room + "/Calendar.ics") + '/' + encodeURIComponent(this.props.calendarForm.url), options).then((response) => {
+    fetch('/api/calendar/save/' + this.props.courseId + '/' + encodeURIComponent("./lectures/" + this.props.calendarForm.room) + '/' + encodeURIComponent(this.props.calendarForm.url), options).then((response) => {
       return response.text()
     }).then((data) => {
       this.props.setCalOriginalCal(deepCopy(this.props.calendarForm.events)); //So the user can't re-save the same calendar

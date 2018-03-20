@@ -2,6 +2,7 @@ const fs = require('fs');
 const path = require('path');
 var moment = require('moment');
 require('moment-recur');
+var fse = require('fs-extra');
 
 
 module.exports = {
@@ -34,10 +35,13 @@ module.exports = {
 		fileText += END_TAG;
 	}
   // Check if filepath exists, if not, recursively make the directories then write the file
-	fs.writeFileSync(fpath, fileText, function (err) {
-		if (err) return console.log(err);
-	});
-  	let fetch = require('node-fetch');
+  fse.ensureDir(fpath).then(() => {
+		fs.writeFile(fpath + "/Calendar.ics", fileText, function (err) {
+			if (err) return console.log(err);
+		});
+	}).then(() => {
+    //Create form data to make POST request to server
+		let fetch = require('node-fetch');
   	let FormData = require('form-data');
   	const stats = fs.statSync(fpath);
   	const fileSizeInBytes = stats.size;
@@ -48,7 +52,6 @@ module.exports = {
   	} catch (e) {
   		console.log('Error:', e.stack);
   	}
-
   	body.append('file', filedata);
   	fetch(capture_url, { //Send the newly created schedule to the capture server
   		method: 'POST',
@@ -58,14 +61,16 @@ module.exports = {
   			//'Authorization': 'Basic' + base64.encode(username + ":" + password)
   		},
   		body: body
-  	})
-  		.then(function (res) {
+  	}).then(function (res) {
   			return res.text();
-  		}).then(function (text) {
-  			console.log(text);
-  		}).catch(function (error) {
-  			console.log('Fetch operation error: ' + error.message);
-  		});
+  		 }).then(function (text) {
+         console.log(text);
+       }).catch(function (error) {
+         console.log('Fetch operation error: ' + error.message);
+       });
+     }).catch(err => {
+       console.error(err);
+     });
   },
 
   //Converts a JSDate object into an ics friendly date format
