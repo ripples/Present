@@ -15,19 +15,17 @@ var entry = require('./routes/entry')
 
 var app = express();
 app.use(cookieParser())
-//app.use(require('morgan')('combined')) //used for very verbose logging
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
 
 
-//****** NEW LOGGING STUFF, MAY OR MAY NOT WORK *************************//
+/* Use this for very verbose logging
 var morgan = require('morgan')
 var accessLogStream = fs.createWriteStream(path.join(__dirname, 'appAccess.log'), {flags: 'a'})
-// setup the logger
 app.use(morgan('combined', {stream: accessLogStream}))
-//********IF DOESN'T WORK, GET RID OF THIS ***************************//
+*/
 
 bb.extend(app, {
     upload: true,

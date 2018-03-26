@@ -12,12 +12,11 @@ const lecUpUtils = require('../utils/lectureUpload');
 const calUtils = require('../utils/calendar');
 
 
-//****** NEW LOGGING STUFF, MAY OR MAY NOT WORK *************************//
+/* Use this for very verbose logging
 var morgan = require('morgan')
 var accessLogStream = fs.createWriteStream(path.join(__dirname, 'apiAccess.log'), {flags: 'a'})
-// setup the logger
 router.use(morgan('combined', {stream: accessLogStream}))
-//********IF DOESN'T WORK, GET RID OF THIS ***************************//
+*/
 
 
 router.get('/identify/', function (req, res) {
