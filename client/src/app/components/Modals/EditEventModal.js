@@ -10,7 +10,7 @@ import {getCurrentSemester, formatTime, getEventDT, isValidDate} from '../Calend
 import {hideModal} from '../../Actions/modalActions.js';
 import {clearForm, setCalRepeatDays, setCalRecurrence, setCalExcludeDates, setCalIncludeDates, setCalSDate,
         setCalEDate, setCalDescription, setCalEvents, setCalShowRecur, setCalSTime, setCalETime, setCalMultidayEvent} from '../../Actions/calFormActions.js';
-import {showMessage, setMessageBody} from '../../Actions/messageActions.js';
+import {showMessage, setMessageBody, setMessageTitle} from '../../Actions/messageActions.js';
 import {confirm} from '../Messages/Confirm.js';
 
 
@@ -87,21 +87,17 @@ class EditEventModal extends React.Component {
 
   //Deletes the given event from the calendar (Doesn't save the calendar changes to the server!)
   deleteEvent(event, e){
-    confirm('Are you sure you want to delete this event? To make the changes permanent, you must save the calendar.', {title: 'Warning: Event Deletion'}).then(() => {
-      if(e){ //If called from a button
-        e.preventDefault();
+    if(e){
+      e.preventDefault();
+    }
+    let events = this.props.calendarForm.events; //Get the list of current events
+    if(events.includes(event)){ //If the event exists in the calendar
+      events.splice(events.indexOf(event), 1);
+      this.props.setCalEvents(events); //Remove it and update the state
+      if(this.props.modalType){ //If the modal is still open
+        this.onClose(); //Close it
       }
-      let events = this.props.calendarForm.events; //Get the list of current events
-      if(events.includes(event)){ //If the event exists in the calendar
-        events.splice(events.indexOf(event), 1);
-        this.props.setCalEvents(events); //Remove it and update the state
-        if(this.props.modalType){ //If the modal is still open
-          this.onClose(); //Close it
-        }
-      }
-    }, () => {
-      console.log('Single event deletion aborted.');
-    });
+    }
   }
 
   //Adds a new event to the calendar list (doesn't save the calendar changes to the server!)
@@ -134,18 +130,36 @@ class EditEventModal extends React.Component {
     this.props.hideModal();
   }
 
+  formIsValidated(){
+    let form = this.props.calendarForm;
+    let sDateValid = (form.sDate !== "");
+    let eDateValid = (form.eDate !== "");
+    let sTimeValid = (form.sTime !== "");
+    let eTimeValid = (form.eTime !== "");
+    let descriptionValid = (form.description !== "");
+    return (sDateValid && eDateValid && sTimeValid && eTimeValid && descriptionValid);
+  }
+
   //Makes changes to the given event as specified by the user
   handleEdit(event, e){
     if(e){ //If called from a button
       e.preventDefault();
     }
     //Create the new edited event with the new specifications by the user
-    let editedEvent = new Event(this.props.courseId, event.title, getEventDT(this.props.calendarForm.sDate, this.props.calendarForm.sTime),
-                                getEventDT(this.props.calendarForm.eDate, this.props.calendarForm.eTime), this.props.calendarForm.description,
-                                this.props.calendarForm.room, (getCurrentSemester() + ' ' + this.props.courseId), event.hexColor);
-    this.deleteEvent(event); //Remove the old event
-    this.addNewEvent(editedEvent); //Add the new one
-    this.onClose(); //Close the modal
+    if(this.formIsValidated()){
+      let editedEvent = new Event(this.props.courseId, event.title, getEventDT(this.props.calendarForm.sDate, this.props.calendarForm.sTime),
+                                  getEventDT(this.props.calendarForm.eDate, this.props.calendarForm.eTime), this.props.calendarForm.description,
+                                  this.props.calendarForm.room, (getCurrentSemester() + ' ' + this.props.courseId), event.hexColor);
+      this.deleteEvent(event); //Remove the old event
+      this.addNewEvent(editedEvent); //Add the new one
+      this.onClose(); //Close the modal
+    }
+    else{
+      this.props.setMessageTitle("ERROR");
+      this.props.setMessageBody("ERROR (Incomplete form): You must complete the basic information of the form (Start Date, Start Time, End Time, Description) before submitting!");
+      this.props.showMessage("CUSTOM");
+    }
+
   }
 
   render() {
@@ -190,18 +204,6 @@ var modalBtnStyle = {
   color: "#000080"
 }
 
-/*var disabledButtonStyle = {
-  display: 'inline',
-  margin: '10px 5px 10px 5px',
-  paddingLeft: "10px",
-  paddingRight: "10px",
-  paddingTop: "4px",
-  paddingBottom: "4px",
-  backgroundColor: "grey",
-  borderRadius: "4px",
-  color: "#00008"
-}*/
-
 var pickerStyle = {
   display: 'inline-block',
   margin: 'auto',
@@ -239,7 +241,8 @@ const mapDispatchToProps = (dispatch, ownProps) => {
     setCalETime: (eTime) => dispatch(setCalETime(eTime)),
     setCalMultidayEvent: (multidayEvent) => dispatch(setCalMultidayEvent(multidayEvent)),
     showMessage: (messageType) => dispatch(showMessage(messageType)),
-    setMessageBody: (body) => dispatch(setMessageBody(body))
+    setMessageBody: (body) => dispatch(setMessageBody(body)),
+    setMessageTitle: (title) => dispatch(setMessageTitle(title))
   }
 };
 

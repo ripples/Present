@@ -165,6 +165,15 @@ class AddEventModal extends React.Component {
     return false;
   }
 
+  formIsValidated(){
+    let form = this.props.calendarForm;
+    let sDateValid = (form.sDate !== "");
+    let sTimeValid = (form.sTime !== "");
+    let eTimeValid = (form.eTime !== "");
+    let descriptionValid = (form.description !== "");
+    return (sDateValid && sTimeValid && eTimeValid && descriptionValid);
+  }
+
   //Adds a new event to the calendar list (doesn't save the calendar changes to the server!)
   addNewEvent(event){
     let currentEvents = this.props.calendarForm.events; //Get the current list of events
@@ -256,36 +265,43 @@ class AddEventModal extends React.Component {
     if(end === ""){
       end = start;
     }
-    let isRecurringEvent = this.props.calendarForm.showRecur;
-    let repeatDays = this.props.calendarForm.repeatDays;
-    if(+start > +end){
-      this.props.setMessageTitle("ERROR");
-      this.props.setMessageBody('ERROR (Start Date later than End Date): Your ending date must be later than or the same as your starting date.');
-      this.props.showMessage('CUSTOM');
-    }
-    if(isRecurringEvent){
-      if(repeatDays.length > 0){
-        if(+start === +end){ //If the user input a recurrence but set the same start and end date
-          this.props.setMessageTitle("ERROR");
-          this.props.setMessageBody('ERROR (Single Day Recurrence): If you want a recurring date, you must have the start and end dates be different.');
-          this.props.showMessage('CUSTOM');
-        }
-        else {
-          this.addRecurringEvent(); //Add a recurring event
-        }
-      }
-      else{
+    if(this.formIsValidated()){
+      let isRecurringEvent = this.props.calendarForm.showRecur;
+      let repeatDays = this.props.calendarForm.repeatDays;
+      if(+start > +end){
         this.props.setMessageTitle("ERROR");
-        this.props.setMessageBody("Error (No Repeat Days): In order to make a recurring event, you must check the boxes of the days you want the event to repeat on.");
+        this.props.setMessageBody('ERROR (Start Date later than End Date): Your ending date must be later than or the same as your starting date.');
         this.props.showMessage('CUSTOM');
-        //error need to check repeat days
+      }
+      if(isRecurringEvent){
+        if(repeatDays.length > 0){
+          if(+start === +end){ //If the user input a recurrence but set the same start and end date
+            this.props.setMessageTitle("ERROR");
+            this.props.setMessageBody('ERROR (Single Day Recurrence): If you want a recurring date, you must have the start and end dates be different.');
+            this.props.showMessage('CUSTOM');
+          }
+          else {
+            this.addRecurringEvent(); //Add a recurring event
+          }
+        }
+        else{
+          this.props.setMessageTitle("ERROR");
+          this.props.setMessageBody("Error (No Repeat Days): In order to make a recurring event, you must check the boxes of the days you want the event to repeat on.");
+          this.props.showMessage('CUSTOM');
+          //error need to check repeat days
+        }
+      }
+      else{ //If single event
+        let newEvent = new Event(this.props.courseId, (this.props.courseTitle + ' ' + getCurrentSemester()), getEventDT(start, this.props.calendarForm.sTime),
+                                 getEventDT(end, this.props.calendarForm.eTime), this.props.calendarForm.description, this.props.calendarForm.room,
+                                 (getCurrentSemester() + ' ' + this.props.courseId), this.props.calendarForm.hexColor, false, null);
+        this.addNewEvent(newEvent); //Add a single event
       }
     }
-    else{ //If single event
-      let newEvent = new Event(this.props.courseId, (this.props.courseTitle + ' ' + getCurrentSemester()), getEventDT(start, this.props.calendarForm.sTime),
-                               getEventDT(end, this.props.calendarForm.eTime), this.props.calendarForm.description, this.props.calendarForm.room,
-                               (getCurrentSemester() + ' ' + this.props.courseId), this.props.calendarForm.hexColor, false, null);
-      this.addNewEvent(newEvent); //Add a single event
+    else{
+      this.props.setMessageTitle("ERROR");
+      this.props.setMessageBody("ERROR (Incomplete form): You must complete the basic information of the form (Start Date, Start Time, End Time, Description) before submitting!");
+      this.props.showMessage("CUSTOM");
     }
   }
 
