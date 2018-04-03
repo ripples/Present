@@ -156,7 +156,7 @@ class EditEventModal extends React.Component {
     }
     else{
       this.props.setMessageTitle("ERROR");
-      this.props.setMessageBody("ERROR (Incomplete form): You must complete the basic information of the form (Start Date, Start Time, End Time, Description) before submitting!");
+      this.props.setMessageBody("ERROR (Incomplete form): You must complete the basic information of the form (Start Date, End Date, Start Time, End Time, Description) before submitting!");
       this.props.showMessage("CUSTOM");
     }
 
