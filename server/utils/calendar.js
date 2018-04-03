@@ -205,8 +205,8 @@ module.exports = {
     var files = fs.readdirSync(startPath); //Get the file tree of the given start path
     for(var i = 0; i < files.length; i++){ //Walking the tree
 	  var filename = path.join(startPath, files[i]); //Get the current filename
-      var stat = fs.lstatSync(filename); //Get the stats
-      if(stat.isDirectory()){
+      //var stat = fs.lstatSync(filename); //Get the stats
+      if(fs.lstatSync(filename).isDirectory()){
         fpath = module.exports.getMostRecentICS(filename, filter, mostRecentDate, fpath); //Recurse
       }
       else if(filename.indexOf(filter) >= 0){ //If it's not a directory
