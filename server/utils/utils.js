@@ -29,6 +29,16 @@ const utils = {
 			}
 		}
 		return false
+	},
+
+	//Used to create an entire filepath if the parent directories do not exist (sync)
+	createFPathSync: function (fpath) {
+		var path = fpath.replace(/\/$/, '').split('/');
+
+    for (var i = 1; i <= path.length; i++) {
+        var segment = path.slice(0, i).join('/');
+        !fs.existsSync(segment) ? fs.mkdirSync(segment) : null ;
+    }
 	}
 }
 

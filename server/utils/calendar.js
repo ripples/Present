@@ -1,8 +1,9 @@
 const fs = require('fs');
 const path = require('path');
+const utils = require('./utils');
 var moment = require('moment');
 require('moment-recur');
-var fse = require('fs-extra');
+
 
 
 module.exports = {
@@ -34,21 +35,18 @@ module.exports = {
 		}
 		fileText += END_TAG;
 	}
-  // Check if filepath exists, if not, recursively make the directories then write the file
-  fse.ensureDir(fpath).then(() => {
-		fs.writeFile(fpath + "/Calendar.ics", fileText, function (err) {
-			if (err) return console.log(err);
-		});
-	}).then(() => {
+  utils.createFPathSync(fpath);
+  fs.writeFile(fpath + "/Calendar.ics", fileText, function (err) {
+    if (err) return console.log(err);
     //Create form data to make POST request to server
-		let fetch = require('node-fetch');
+    let fetch = require('node-fetch');
   	let FormData = require('form-data');
   	const stats = fs.statSync(fpath);
   	const fileSizeInBytes = stats.size;
   	var body = new FormData();
   	var filedata = 0
   	try {
-  		filedata = fs.readFileSync(fpath, 'utf8');
+  		filedata = fs.readFileSync(fpath + '/Calendar.ics', 'utf8');
   	} catch (e) {
   		console.log('Error:', e.stack);
   	}
@@ -68,9 +66,7 @@ module.exports = {
        }).catch(function (error) {
          console.log('Fetch operation error: ' + error.message);
        });
-     }).catch(err => {
-       console.error(err);
-     });
+    });
   },
 
   //Converts a JSDate object into an ics friendly date format
