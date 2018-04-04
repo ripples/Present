@@ -6,7 +6,7 @@ PAOL Present is a web client for PAOL lecture capture. It is simple, lightweight
 Present's developer environment can be in Windows, OSX, and Linux.
 
 1. Install the latest version of [NodeJS](https://nodejs.org/en/).
-1. If on Windows, install [OpenSSL 1.0.2m](https://slproweb.com/products/Win32OpenSSL.html) and have either a C++ compiler installed (I.E. Visual Studio) or use [Windows Build Tools](https://github.com/felixrieseberg/windows-build-tools) .
+1. If on Windows, install [OpenSSL 1.0.2m](https://slproweb.com/products/Win32OpenSSL.html) or later and have either a C++ compiler installed (I.E. Visual Studio) or use [Windows Build Tools](https://github.com/felixrieseberg/windows-build-tools) .
 1. Run `npm install`
 1. Create your `.env` file if you want to use custom ports in development.
 1. Either use a deployment script, or `npm run start-all`
@@ -124,13 +124,13 @@ Once done, hit save changes. Then save and return to course, and finally you may
 
 ## Sakai
 
-With Sakai, you may need to have your system administrator allow for you to add the LTI External tool. First, under site info, go to `Mange Tools`
+With Sakai, you may need to have your system administrator allow for you to add the LTI External tool. First, under a site page or lesson, click "Add Content".
 
-![Step 1](https://i.imgur.com/kMqeOS2.png)
+![Step 1](https://i.imgur.com/6Polhgd.png)
 
-On our installation, you then need to go to Plugin Tools and select PAOL LTI; however, on other installations, you may just select external tool under the general menu.
+On our installation, you then need to go to "Add External Tool" and select PAOL LTI 2 in the next menu; however, on other installations, you may just select external tool under the general menu.
 
-![Step 2](https://i.imgur.com/HcMTdKE.png)
+![Step 2](https://i.imgur.com/FsSove6.png)
 
 You then need to configure the launch URL with where you have Present deployed, in adition to the launch key value as `key` and the secret as whatever is in the `.env` for `LTI_SECRET`. Custom parameters may be added ensure proper syncing of classnames with capture.
 
