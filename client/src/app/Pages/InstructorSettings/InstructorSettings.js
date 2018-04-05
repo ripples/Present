@@ -52,7 +52,7 @@ class InstructorSettings extends Component {
             case "lectureDelete":
                 return <LectureDelete />
             default:
-                return <div />
+                return <LectureUpload />
         }
     }
 
