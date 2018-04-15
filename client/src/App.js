@@ -38,12 +38,22 @@ export default class App extends Component {
     ).then(
       token =>
       {
-        fetch(('/api/listofCourseLectures/'), {
+        fetch(('/api/courseExists'), {
           credentials: 'same-origin'
-		  }).then(res => res.json()).then(course => {
-        this.store.dispatch(setToken(token));
-        this.store.dispatch(setCourseFiles(course));
-        });
+        }).then(res => res.json()).then( exists => {
+          if(exists.exists){
+            fetch(('/api/listofCourseLectures/'), {
+              credentials: 'same-origin'
+          }).then(res => res.json()).then(course => {
+            this.store.dispatch(setToken(token));
+            this.store.dispatch(setCourseFiles(course));
+            });
+          } else {
+            //make new course
+          }
+        }
+
+        )
       }
     ).catch( err => console.log(err));
   }

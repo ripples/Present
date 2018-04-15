@@ -28,6 +28,16 @@ router.get('/identify/', function (req, res) {
 	}
 });
 
+router.get('/courseExists', function(req, res){
+	const path = "./lectures/" + req.session.lti_token.lis_course_section_sourcedid.toString()
+	if(fs.existsSync(path)){
+		res.send({exists: true})
+	} else {
+		fs.mkdirSync(path);
+		res.send({exists: false})
+	}
+});
+
 router.get('/listOfCourseLectures/', function (req, res) {
 	const fpath = "./lectures/" + req.session.lti_token.lis_course_section_sourcedid.toString()
 	dirToJson(fpath, function (err, dirTree) {
