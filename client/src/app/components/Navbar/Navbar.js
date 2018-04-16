@@ -5,7 +5,6 @@ import { Link } from 'react-router';
 class Navbar extends Component {
 
     render(){
-        console.log(this.props.roles)
         return(
             <div className="navbar navbar-fixed-top navbar-default" style={barStyle}>
                 <div className="container-fluid">

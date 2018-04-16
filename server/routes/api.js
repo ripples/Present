@@ -33,8 +33,10 @@ router.get('/courseExists', function(req, res){
 	if(fs.existsSync(path)){
 		res.send({exists: true})
 	} else {
-		fs.mkdirSync(path);
-		res.send({exists: false})
+		if(req.session.lti_token.roles.toString().toLowerCase().includes("instructor")) {
+			fs.mkdirSync(path);
+			res.send({exists: false})
+		}
 	}
 });
 
