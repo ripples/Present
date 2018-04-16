@@ -38,6 +38,7 @@ export default class App extends Component {
     ).then(
       token =>
       {
+        this.store.dispatch(setToken(token));
         fetch(('/api/courseExists'), {
           credentials: 'same-origin'
         }).then(res => res.json()).then( exists => {
@@ -45,7 +46,6 @@ export default class App extends Component {
             fetch(('/api/listofCourseLectures/'), {
               credentials: 'same-origin'
           }).then(res => res.json()).then(course => {
-            this.store.dispatch(setToken(token));
             this.store.dispatch(setCourseFiles(course));
             });
           } else {
