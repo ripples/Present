@@ -49,7 +49,7 @@ export default class App extends Component {
             this.store.dispatch(setCourseFiles(course));
             });
           } else {
-            //make new course
+            hashHistory.push('/course/' + token.lis_course_section_sourcedid + '/instructorSettings')
           }
         }
 
