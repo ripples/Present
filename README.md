@@ -9,7 +9,9 @@ Present's developer environment can be in Windows, OSX, and Linux.
 1. If on Windows, install [OpenSSL 1.0.2m](https://slproweb.com/products/Win32OpenSSL.html) or later and have either a C++ compiler installed (I.E. Visual Studio) or use [Windows Build Tools](https://github.com/felixrieseberg/windows-build-tools) .
 1. Run `npm install`
 1. Create your `.env` file if you want to use custom ports in development.
-1. Either use a deployment script, or `npm run start-all`
+1. Run the following command: `start-pm2-prod`. This command will
+   build the client code for production and then run the system under
+   the `pm2` process manager.
 1. Visit from a valid LTI consumer such as Moodle, Sakai, or Canvus.
 
 ## Lectures Folder
