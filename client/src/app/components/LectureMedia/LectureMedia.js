@@ -61,9 +61,6 @@ class LectureMedia extends React.Component {
 				{ (this.props.manifest && (this.props.manifest.whiteboardCount + this.props.manifest.computerCount) > 0) ?
 					<div>
 						<div className="container-fluid" style ={lectureBody}>
-							<div style = {lectureVideo}>
-								<VideoView videoSrc={'/api/video/' + this.props.lectureId } style={lectureVideo} onVideoTimeUpdate={this.onVideoTimeUpdate} manifest={this.props.manifest}/>
-							</div>
 							<div style = {selectedImage}>
 								<LectureImage src = {this.props.lectureImage} fallbackImage = "images/no-comp-image-found.png"/>
 							</div>
@@ -71,7 +68,10 @@ class LectureMedia extends React.Component {
 						<div style = {date}>
 							{"Lecture: " + convertMonth(this.props.lectureId.substring(0,10)) + this.props.lectureId.substring(3,5) + ", " + this.props.lectureId.substring(6,10)}
 						</div>
-						<div style = {imageContainer}>
+				  <div style = {imageContainer}>
+				                        
+				  <VideoView videoSrc={'/api/video/' + this.props.lectureId } style={lectureVideo} onVideoTimeUpdate={this.onVideoTimeUpdate} manifest={this.props.manifest}/>
+				                        
 							{computerImages ? computerImages: null}
 							{whiteBoardImages ? whiteBoardImages: null}
 						</div>
