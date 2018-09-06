@@ -12,7 +12,7 @@ Present's developer environment can be in Windows, OSX, and Linux.
 1. Run the following command: `start-pm2-prod`. This command will
    build the client code for production and then run the system under
    the `pm2` process manager.
-1. Run this `sudo pm2 start npm`
+1. Run this `sudo pm2 start npm -- start`
 1. Visit from a valid LTI consumer such as Moodle, Sakai, or Canvus.
 
 ## Lectures Folder
