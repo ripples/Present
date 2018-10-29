@@ -3,6 +3,7 @@ import { IndexRoute, Router, Route, hashHistory } from 'react-router';
 import {createStore, applyMiddleware, compose} from "redux";
 import {Provider} from "react-redux";
 import thunkMiddleware from "redux-thunk";
+import ReactGA from 'react-ga';
 
 import appReducer from './app/Reducers/reducer.js';
 import {setToken} from './app/Actions/tokenActions.js';
@@ -13,7 +14,10 @@ import LecturesList from './app/Pages/LecturesList/LecturesList';
 import Lecture from './app/Pages/Lecture/Lecture.js';
 import InstructorSettings from './app/Pages/InstructorSettings/InstructorSettings.js';
 
-
+function initializeReactGA() {
+    ReactGA.initialize('UA-128313361-1');
+    ReactGA.pageview('/index.html');
+}
 
 export default class App extends Component {
 
@@ -31,6 +35,7 @@ export default class App extends Component {
   }
 
   componentDidMount() {
+      initializeReactGA();
     fetch(('/api/identify/'), {
       credentials: 'same-origin' // or 'include'
     }).then(
