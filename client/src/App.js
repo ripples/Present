@@ -14,10 +14,12 @@ import LecturesList from './app/Pages/LecturesList/LecturesList';
 import Lecture from './app/Pages/Lecture/Lecture.js';
 import InstructorSettings from './app/Pages/InstructorSettings/InstructorSettings.js';
 
-function initializeReactGA() {
-    ReactGA.initialize('UA-128313361-1');
-    ReactGA.pageview('/#/');
-}
+// function initializeReactGA() {
+//     ReactGA.initialize('UA-128313361-1');
+//     ReactGA.pageview(window.location.pathname + window.location.search);
+// }
+ReactGA.initialize('UA-128313361-1');
+ReactGA.pageview(window.location.pathname + window.location.search);
 
 export default class App extends Component {
 
@@ -35,7 +37,7 @@ export default class App extends Component {
   }
 
   componentDidMount() {
-      initializeReactGA();
+     // initializeReactGA();
     fetch(('/api/identify/'), {
       credentials: 'same-origin' // or 'include'
     }).then(
