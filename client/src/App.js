@@ -16,7 +16,7 @@ import InstructorSettings from './app/Pages/InstructorSettings/InstructorSetting
 
 function initializeReactGA() {
     ReactGA.initialize('UA-128313361-1');
-    ReactGA.pageview('/index.html');
+    ReactGA.pageview('/#/');
 }
 
 export default class App extends Component {
