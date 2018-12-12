@@ -18,8 +18,8 @@ import InstructorSettings from './app/Pages/InstructorSettings/InstructorSetting
 //     ReactGA.initialize('UA-128313361-1');
 //     ReactGA.pageview(window.location.pathname + window.location.search);
 // }
-ReactGA.initialize('UA-128313361-1');
-ReactGA.pageview(window.location.pathname + window.location.search);
+//ReactGA.initialize('UA-128313361-1');
+//ReactGA.pageview(window.location.pathname + window.location.search);
 
 export default class App extends Component {
 
