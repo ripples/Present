@@ -141,6 +141,8 @@ You then need to configure the launch URL with where you have Present deployed, 
 
 Hit continue, then finish, and the button should work.
 
+## Setting up Google Analytics
+
 ## FAQS
 
 - No Lectures are showing up!
