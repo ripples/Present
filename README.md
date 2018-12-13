@@ -149,7 +149,7 @@ To add React Google Analytics, go to: analytics.google.com/analytics/web/ and lo
 
 Head to the bottom of the left menu and click 'Admin'.
 
-![Step 2](https://imgur.com/d3fe2qv)
+![Step 2](https://i.imgur.com/d3fe2qv.png)
 
 It will take you to a menu where you can select '+ Create Account'.
 
