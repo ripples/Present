@@ -145,7 +145,7 @@ Hit continue, then finish, and the button should work.
 
 To add React Google Analytics, go to: analytics.google.com/analytics/web/ and login with whatever gmail account your project is associated with.
 
-![Step 1](https://imgur.com/OcA6pCE)
+![Step 1](https://i.imgur.com/TBFw3Zz.png)
 
 Head to the bottom of the left menu and click 'Admin'.
 
@@ -153,15 +153,22 @@ Head to the bottom of the left menu and click 'Admin'.
 
 It will take you to a menu where you can select '+ Create Account'.
 
-![Step 3](https://imgur.com/6bOF2oq)
+![Step 3](https://i.imgur.com/LLIkB3a.png)
 
-Give your project an easily recogonized title, 
+Give your project an easily recogonized title, a name, the corresponding URL, 'Education' category, and correct hosting timezone.
 
-![Step 4](https://imgur.com/17B2WSh)
+![Step 4](https://i.imgur.com/L49pnlH.png)
 
-![Step 5](https://imgur.com/CTgCMPN)
+Leave any boxes checked or unchecked that you like. It all depends on what kind of info you want let Google have. Since we deal students it is likely that we will not want Google to have access to any of this info.
 
-![Step 6](https://imgur.com/zydplnr)
+![Step 5](https://i.imgur.com/gwI4MhB.png)
+
+After you accept the terms and conditions you will be redirected to a page that has your site's tracking ID. This ID is very important so make sure you know how to get back to this information.
+
+![Step 6](https://i.imgur.com/4w32jm4.png)
+
+Lastly, in line 10 of the head tag there is a call to ga(). The second parameter is for your tracking ID, so copy yours into this spot and boom, your page views are now being tracked in real time. If you want to look at this just go to the menu on the left and click 'Overview'.
+
 ## FAQS
 
 - No Lectures are showing up!
