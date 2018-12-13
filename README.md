@@ -167,7 +167,7 @@ After you accept the terms and conditions you will be redirected to a page that 
 
 ![Step 6](https://i.imgur.com/4w32jm4.png)
 
-Lastly, in line 10 of the head tag there is a call to ga(). The second parameter is for your tracking ID, so copy yours into this spot and boom, your page views are now being tracked in real time. If you want to look at this just go to the menu on the left and click 'Overview'.
+Lastly, in line 10 of the head tag there is a call to ga(). The second parameter is for your tracking ID, so copy yours into this spot and boom, your page views are now being tracked in real time. If you want to look at this just go to the menu on the left and click 'Real-Time'.
 
 ## FAQS
 
