@@ -143,6 +143,25 @@ Hit continue, then finish, and the button should work.
 
 ## Setting up Google Analytics
 
+To add React Google Analytics, go to: analytics.google.com/analytics/web/ and login with whatever gmail account your project is associated with.
+
+![Step 1](https://imgur.com/OcA6pCE)
+
+Head to the bottom of the left menu and click 'Admin'.
+
+![Step 2](https://imgur.com/aXAIzQt)
+
+It will take you to a menu where you can select '+ Create Account'.
+
+![Step 3](https://imgur.com/6bOF2oq)
+
+Give your project an easily recogonized title, 
+
+![Step 4](https://imgur.com/17B2WSh)
+
+![Step 5](https://imgur.com/CTgCMPN)
+
+![Step 6](https://imgur.com/zydplnr)
 ## FAQS
 
 - No Lectures are showing up!
