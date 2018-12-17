@@ -14,6 +14,7 @@ Present's developer environment can be in Windows, OSX, and Linux.
    the `pm2` process manager.
 1. Run this `sudo pm2 start npm -- start`
 1. Visit from a valid LTI consumer such as Moodle, Sakai, or Canvus.
+1. Run `./install/installReact.sh` in order to ensure that React Google Analytics can be used
 
 ## Lectures Folder
 ### Folder Structure
@@ -183,3 +184,5 @@ Lastly, in line 10 of the head tag there is a call to ga(). The second parameter
     - This periodically happens if the Launch URL does not include `http://`. 
 - Do you support SSL?
     - Some day. We aim to make it easy to add.
+- All of the changes I just made arent showing up even after I made sure the files are updated on the server?
+    - Please make sure you have rebuilt the project or else it won't recognize the new files!
